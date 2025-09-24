@@ -21,20 +21,21 @@ public class Movie {
 
     public String[] showtimes;
 
-    public Movie(String title, int rating, String description, String poster, String trailer, String[] showtimes) {
+    public String genre;
+
+    public Movie(String title, int rating, String description, String poster, String trailer, String genre, String[] showtimes) {
         this.title = title;
         this.rating = rating;
         this.description = description;
         this.poster = poster;
         this.trailer = trailer;
         this.showtimes = showtimes;
+        this.genre = genre;
     }
-
-
 
     @Override
     public String toString() {
-        return String.format("Movie name: %s", title);
+        return title;
     }
 
 }

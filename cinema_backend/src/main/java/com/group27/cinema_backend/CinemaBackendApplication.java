@@ -24,6 +24,8 @@ public class CinemaBackendApplication implements CommandLineRunner {
         System.out.println(movieRepository.count());
         System.out.println("Hello");
 
+        System.out.println(movieRepository.findByTitleContainingIgnoreCase("Avatar"));
+
     }
 
 }

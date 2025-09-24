@@ -3,7 +3,7 @@ package com.group27.cinema_backend.model;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
-@Document("Movie")
+@Document("movie")
 public class Movie {
 
     @Id

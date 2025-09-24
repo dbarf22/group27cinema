@@ -7,6 +7,8 @@ import org.springframework.data.mongodb.core.mapping.Document;
 public class Movie {
 
     @Id
+    private String id;
+
     public String title;
 
     public int rating;

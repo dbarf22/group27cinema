@@ -1,5 +1,6 @@
 package com.group27.cinema_backend.model;
 
+import org.bson.types.ObjectId;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
@@ -7,7 +8,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
 public class Movie {
 
     @Id
-    private String id;
+    public String id;
 
     public String title;
 
@@ -16,6 +17,14 @@ public class Movie {
     public String description;
 
     public String poster;
+
+    public String getPoster() {
+        return poster;
+    }
+
+    public String getTrailer() {
+        return trailer;
+    }
 
     public String trailer;
 

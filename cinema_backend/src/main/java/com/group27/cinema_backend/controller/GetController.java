@@ -49,10 +49,10 @@ public class GetController {
 
     @GetMapping("/api/movies/poster")
     public Map<String,String> getPoster(@RequestParam(required = true) String id) {
-        String trailer = movieRepository.findById(id)
+        String poster = movieRepository.findById(id)
                                     .map(Movie::getPoster)
                                     .orElse("Movie not found");
-    return Collections.singletonMap("trailer", trailer);
+    return Collections.singletonMap("poster", poster);
     }
 
 }

@@ -34,7 +34,7 @@ public class GetController {
         } else if (genre == null){
             return movieRepository.findByTitleContainingIgnoreCase(title);
         } else if (title == null) {
-            return movieRepository.findByTitleContainingIgnoreCase(genre);
+            return movieRepository.findByGenre(genre);
         }
         return movieRepository.findAll();
     }

@@ -1,5 +1,6 @@
 import MovieSection from "@/components/MovieSection";
 import { Movie } from "@/types/movie";
+import MovieSearch from "../components//MovieSearch";
 
 export default async function HomePage() {
   const res = await fetch("http://localhost:8080/api/movies", {
@@ -16,6 +17,8 @@ export default async function HomePage() {
       <h1 className="text-3xl font-bold">Cinema E-Booking System</h1>
       <MovieSection title="Now Playing" movies={nowPlaying} />
       <MovieSection title="Coming Soon" movies={comingSoon} />
+      <h1 className="text-2xl font-bold mb-4">Movie Search</h1>
+      <MovieSearch />
     </main>
   );
 }

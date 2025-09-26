@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.PathVariable;
 
 import javax.swing.text.html.Option;
 import java.util.Collections;
@@ -37,6 +38,11 @@ public class GetController {
             return movieRepository.findByGenre(genre);
         }
         return movieRepository.findAll();
+    }
+
+    @GetMapping("/api/movies/{id}")
+    public Movie getById(@PathVariable String id) {
+    return movieRepository.findById(id).orElse(null);
     }
 
     @GetMapping("/api/movies/trailer")

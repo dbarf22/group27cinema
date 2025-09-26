@@ -32,6 +32,8 @@ public class Movie {
 
     public String genre;
 
+    public Movie() {}
+
     public Movie(String title, int rating, String description, String poster, String trailer, String genre, String[] showtimes) {
         this.title = title;
         this.rating = rating;

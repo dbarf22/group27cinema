@@ -1,26 +1,43 @@
 @import "tailwindcss";
 
+/* Light-only theme variables */
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --background: #f9fafb;  /* soft off-white */
+  --foreground: #1f2937;  /* gray-800 */
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+  --font-sans: var(--font-geist-sans, 'Inter', 'Helvetica Neue', Arial, sans-serif);
+  --font-mono: var(--font-geist-mono, 'Fira Code', monospace);
 }
 
 body {
-  background: var(--background);
+  background: linear-gradient(180deg, var(--background), #eef2f7); /* subtle gradient */
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-sans);
+  min-height: 100vh;
+  background-attachment: fixed;
+}
+
+/* Headings: bold and cinematic */
+h1, h2, h3, h4, h5, h6 {
+  font-weight: 700;
+  letter-spacing: -0.5px;
+  color: var(--foreground);
+}
+
+/* Links */
+a {
+  color: #2563eb; /* Tailwind blue-600 */
+  transition: color 0.2s ease;
+}
+a:hover {
+  color: #1d4ed8; /* darker blue */
+}
+
+/* Showtime pill utility */
+.showtime-pill {
+  @apply px-3 py-1 rounded-full text-xs font-medium bg-blue-600 text-white shadow-sm;
 }

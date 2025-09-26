@@ -3,8 +3,8 @@
 import { useEffect, useMemo, useState } from "react";
 
 type Movie = {
-  id?: string;     // Your Spring serialization may be "id"
-  _id?: string;    // or "_id" depending on your model
+  id?: string;
+  _id?: string;
   title: string;
   genre?: string;
   year?: number;
@@ -17,7 +17,6 @@ export default function MovieSearch() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<null | string>(null);
 
-  // simple debounce so we don't spam the backend while typing
   const debouncedQuery = useDebounce(q, 300);
 
   async function fetchMovies(query: string, by: "title" | "genre") {
@@ -37,13 +36,10 @@ export default function MovieSearch() {
     }
   }
 
-  // initial load: show all movies
   useEffect(() => {
     fetchMovies("", mode);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // live update on debounced input
   useEffect(() => {
     fetchMovies(debouncedQuery, mode);
   }, [debouncedQuery, mode]);
@@ -102,7 +98,6 @@ export default function MovieSearch() {
   );
 }
 
-/** Small debounce hook */
 function useDebounce<T>(value: T, delay = 300) {
   const [debounced, setDebounced] = useState(value);
   useEffect(() => {

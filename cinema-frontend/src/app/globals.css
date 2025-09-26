@@ -1,9 +1,8 @@
 @import "tailwindcss";
 
-/* Light-only theme variables */
 :root {
-  --background: #f9fafb;  /* soft off-white */
-  --foreground: #1f2937;  /* gray-800 */
+  --background: #f9fafb;
+  --foreground: #1f2937;
 }
 
 @theme inline {
@@ -14,30 +13,28 @@
 }
 
 body {
-  background: linear-gradient(180deg, var(--background), #eef2f7); /* subtle gradient */
+  background: linear-gradient(180deg, var(--background), #eef2f7);
   color: var(--foreground);
   font-family: var(--font-sans);
   min-height: 100vh;
   background-attachment: fixed;
 }
 
-/* Headings: bold and cinematic */
 h1, h2, h3, h4, h5, h6 {
   font-weight: 700;
   letter-spacing: -0.5px;
   color: var(--foreground);
 }
 
-/* Links */
 a {
-  color: #2563eb; /* Tailwind blue-600 */
+  color: #2563eb;
   transition: color 0.2s ease;
 }
 a:hover {
-  color: #1d4ed8; /* darker blue */
+  color: #1d4ed8;
 }
 
-/* Showtime pill utility */
+
 .showtime-pill {
   @apply px-3 py-1 rounded-full text-xs font-medium bg-blue-600 text-white shadow-sm;
 }

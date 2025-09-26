@@ -10,12 +10,28 @@ async function fetchMovie(id: string): Promise<Movie | null> {
   return res.json();
 }
 
+function getYouTubeId(url: string): string | null {
+    try {
+      const parsed = new URL(url);
+      if (parsed.hostname.includes("youtube.com")) {
+        return parsed.searchParams.get("v");
+      }
+      if (parsed.hostname === "youtu.be") {
+        return parsed.pathname.slice(1);
+      }
+    } catch {
+      return null;
+    }
+    return null;
+  }
+
 export default async function MovieDetails(
   { params }: { params: Promise<{ id: string }> }
 ) {
   const { id } = await params;
   const movie = await fetchMovie(id);
   if (!movie) return notFound();
+  const ytId = movie.trailer ? getYouTubeId(movie.trailer) : null;
 
   return (
     <main className="max-w-4xl mx-auto px-6 py-10 space-y-8">
@@ -62,19 +78,21 @@ export default async function MovieDetails(
         </section>
       )}
 
-      {/* TRAILER */}
-      {movie.trailer && movie.trailer.trim() !== "" && (
-        <section>
-          <h2 className="text-xl font-semibold mb-3">Trailer</h2>
-          <a
-            href={movie.trailer}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="inline-block text-blue-600 underline font-medium"
-          >
-            Watch trailer
-          </a>
-        </section>
+      {/* EMBED TRAILER */}
+      {ytId ? (
+        <div className="w-full max-w-3xl mx-auto">
+             <div className="relative pb-[56%] h-0 overflow-hidden rounded-lg shadow-lg">
+          <iframe
+            src={`https://www.youtube.com/embed/${ytId}`}
+            title={`${movie.title} trailer`}
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+            allowFullScreen
+            className="absolute top-0 left-0 w-full h-full"
+          />
+          </div>
+        </div>
+      ) : (
+        <p className="text-sm text-gray-500">No trailer available</p>
       )}
     </main>
   );

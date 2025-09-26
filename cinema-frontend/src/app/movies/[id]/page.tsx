@@ -1,4 +1,5 @@
 import Image from "next/image";
+import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Movie } from "@/types/movie";
 
@@ -10,6 +11,7 @@ async function fetchMovie(id: string): Promise<Movie | null> {
   return res.json();
 }
 
+// function to get the embed ID from the youtube link
 function getYouTubeId(url: string): string | null {
     try {
       const parsed = new URL(url);
@@ -63,17 +65,19 @@ export default async function MovieDetails(
       {/* SHOWTIMES */}
       {Array.isArray(movie.showtimes) && movie.showtimes.length > 0 && (
         <section>
-          <h2 className="text-xl font-semibold mb-3">Showtimes</h2>
-          <div className="flex flex-wrap gap-2">
-            {movie.showtimes.map((t, i) => (
-              <span
-                key={i}
-                className="px-3 py-1 rounded-full text-sm font-semibold
-                           text-blue-700 bg-white border border-blue-200 shadow-sm"
-              >
-                {t}
-              </span>
-            ))}
+            <h2 className="text-xl font-semibold mb-3">Showtimes</h2>
+            <div className="flex flex-wrap gap-2">
+                {movie.showtimes.map((t, i) => (
+                    <Link
+                        key={i}
+                        href={`/booking/${movie.id}?showtime=${encodeURIComponent(t)}`}
+                        className="px-3 py-1 rounded-full text-sm font-semibold
+                        text-blue-700 bg-white border border-blue-200 shadow-sm
+                        hover:bg-blue-50 transition"
+                    >
+                        {t}
+                    </Link>
+                ))}
           </div>
         </section>
       )}

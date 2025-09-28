@@ -9,7 +9,7 @@ import java.util.List;
 public interface MovieRepository extends MongoRepository<Movie, String> {
 
     List<Movie> findByTitleContainingIgnoreCase(String title);
-    List<Movie> findByGenre(String genre);
+    List<Movie> findByGenreContainingIgnoreCase(String genre);
 
-	public long count();
+	long count();
 }

@@ -2,18 +2,12 @@ package com.group27.cinema_backend.controller;
 
 import com.group27.cinema_backend.model.Movie;
 import com.group27.cinema_backend.repository.MovieRepository;
-import org.bson.types.ObjectId;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.PathVariable;
 
-import javax.swing.text.html.Option;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 @RestController
 public class GetController {
@@ -35,14 +29,17 @@ public class GetController {
         } else if (genre == null){
             return movieRepository.findByTitleContainingIgnoreCase(title);
         } else if (title == null) {
-            return movieRepository.findByGenre(genre);
+            return movieRepository.findByGenreContainingIgnoreCase(genre);
         }
         return movieRepository.findAll();
     }
 
     @GetMapping("/api/movies/{id}")
     public Movie getById(@PathVariable String id) {
-    return movieRepository.findById(id).orElse(null);
+        Movie m = movieRepository.findById(id).orElse(null);
+        Movie n = new Movie();
+        n.setTitle("Movie not found");
+        return Objects.requireNonNullElse(m, n);
     }
 
     @GetMapping("/api/movies/trailer")

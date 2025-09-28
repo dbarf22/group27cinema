@@ -12,6 +12,10 @@ public class Movie {
 
     public String title;
 
+    public void setTitle(String title) {
+        this.title = title;
+    }
+
     public int rating;
 
     public String description;

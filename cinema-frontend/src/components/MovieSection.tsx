@@ -8,8 +8,10 @@ import Form from "next/form";
 
 export default function MovieSection({
   title,
+  movie
 }: {
   title: string;
+  movie: Movie;
 }) {
 
   const [searchQuery, setSearchQuery] = useState("");
@@ -21,16 +23,13 @@ export default function MovieSection({
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
-
+    console.log("Button hit!");
   }
 
   return (
     <section className="space-y-10">
       <div>
-          <Form className="mx-auto" action={""}>
-            <input name ="query" className="bg-red-100"/>
-            <button className="space-x-3">Submit</button>
-          </Form>
+          <button onClick={handleSearch}>click me</button>
 
       </div>
       <h2 className="text-2xl font-semibold">{title}</h2>

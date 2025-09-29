@@ -36,7 +36,7 @@ export default function MovieCard({ movie }: { movie: Movie }) {
           ))}
         </div>
       ) : (
-        <p className="mt-2 text-xs text-gray-500">No showtimes</p>
+        <p className="max-w-screen-xl mx-auto mt-2 text-xs text-gray-500">No showtimes</p>
       )}
     </div>
   );

@@ -45,7 +45,7 @@ export default function MovieSearch() {
   }, [debouncedQuery, mode]);
 
   return (
-    <div className="max-w-2xl space-y-4">
+    <div className="max-w-screen-xl mx-auto space-y-4">
       <form
         onSubmit={(e) => {
           e.preventDefault();

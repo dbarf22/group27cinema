@@ -9,7 +9,7 @@ export default function MovieCard({ movie }: { movie: Movie }) {
       : "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='400' height='600'><rect width='100%' height='100%' fill='%23eee'/><text x='50%' y='50%' dominant-baseline='middle' text-anchor='middle' fill='%23999' font-size='20'>No Poster</text></svg>";
 
   return (
-    <div className="flex flex-col items-center w-48">
+    <div className="flex flex-col max-w-screen-xl mx-auto w-48">
       {/* POSTER & TITLE AS LINK */}
       <Link href={`/movies/${movie.id}`} className="group w-full">
         <div className="relative w-48 h-72 rounded-xl overflow-hidden shadow-md transition group-hover:shadow-lg">

@@ -6,7 +6,7 @@ type Movie = {
   id?: string;
   _id?: string;
   title: string;
-  genre?: string;
+  genre?: string[];
   year?: number;
 };
 
@@ -88,7 +88,7 @@ export default function MovieSearch() {
             <li key={key} className="border rounded p-3">
               <div className="font-semibold">{m.title}</div>
               <div className="text-sm text-gray-600">
-                {m.genre ?? "Unknown genre"} {m.year ? `• ${m.year}` : ""}
+                {m.genre?.join(', ') ?? "Unknown genre"} {m.year ? `${m.year}` : ""}
               </div>
             </li>
           );

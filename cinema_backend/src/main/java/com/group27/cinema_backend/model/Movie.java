@@ -34,11 +34,11 @@ public class Movie {
 
     public String[] showtimes;
 
-    public String genre;
+    public String[] genre;
 
     public Movie() {}
 
-    public Movie(String title, int rating, String description, String poster, String trailer, String genre, String[] showtimes) {
+    public Movie(String title, int rating, String description, String poster, String trailer, String[] genre, String[] showtimes) {
         this.title = title;
         this.rating = rating;
         this.description = description;

@@ -6,6 +6,6 @@ export type Movie = {
     poster: string;
     trailer: string;
     showtimes: string[];
-    genre: string;
+    genre: string[];
   };
   

@@ -53,7 +53,7 @@ export default async function MovieDetails(
       <div className="text-center space-y-2">
         <h1 className="text-4xl font-bold">{movie.title}</h1>
         <p className="text-gray-700">
-          {movie.genre} · Rating: {movie.rating}/5
+          {movie.genre.join(', ')} · Rating: {movie.rating}/5
         </p>
       </div>
 

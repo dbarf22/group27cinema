@@ -32,9 +32,9 @@ export default function MovieSection({
   )
 
   return (
-    <section className="space-y-10">
-        <input ref={inputRef} onChange={handleSearchChange} className={"border bg-gray-100 rounded"} />
+    <section className="space-y-3">
       <h2 className="text-2xl font-semibold">{title}</h2>
+        <input placeholder={"Search for a movie"} ref={inputRef} onChange={handleSearchChange} className={"border bg-gray-100 rounded"} />
       {movies.length === 0 ? (
         <p className="text-sm text-gray-600">Nothing to show here yet.</p>
       ) : (

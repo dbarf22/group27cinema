@@ -1,28 +1,30 @@
 @import "tailwindcss";
 
 :root {
-  --background: #f9fafb;
-  --foreground: #1f2937;
+  --background: #ffffff;
+  --foreground: #000000;
+  --font-sans: 'Bebas Neue', sans-serif;
 }
 
 body {
-  background: linear-gradient(180deg, var(--background), #eef2f7);
+  background: linear-gradient(180deg, var(--background), #ffffff);
   color: var(--foreground);
-  font-family: var(--font-sans);
+  font-family: var();
   min-height: 100vh;
   background-attachment: fixed;
+  font-family: var(--font-sans);
 }
 
 h1, h2, h3, h4, h5, h6 {
-  font-weight: 700;
-  letter-spacing: -0.5px;
+  font-weight: 1000;
+  letter-spacing: 1px;
   color: var(--foreground);
 }
 
 a {
-  color: #2563eb;
+  color: #000000;
   transition: color 0.2s ease;
 }
 a:hover {
-  color: #1d4ed8;
+  color: #ff0000;
 }

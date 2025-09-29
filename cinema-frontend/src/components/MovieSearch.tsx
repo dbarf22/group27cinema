@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
+import Link from "next/link";
 
 type Movie = {
   id?: string;
@@ -85,13 +86,17 @@ export default function MovieSearch() {
         {items.map((m, i) => {
           const key = (m.id ?? m._id ?? i) as React.Key;
           return (
-            <li key={key} className="border rounded p-3">
-              <div className="font-semibold">{m.title}</div>
-              <div className="text-sm text-gray-600">
-                {m.genre?.join(', ') ?? "Unknown genre"} {m.year ? `${m.year}` : ""}
-              </div>
-            </li>
-          );
+          <li key={key} className="border rounded p-3 hover:shadow transition">
+            <Link href={`/movies/${m.id ?? m._id}`} className="block space-y-1">
+             <div className="font-semibold text-balck-700 hover:underline">
+              {m.title}
+             </div>
+             <div className="text-sm text-gray-600">
+              {m.genre?.join(', ') ?? "Unknown genre"} {m.year ? `${m.year}` : ""}
+             </div>
+             </Link>
+          </li>
+           );
         })}
       </ul>
     </div>

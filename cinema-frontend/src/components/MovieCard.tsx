@@ -29,7 +29,7 @@ export default function MovieCard({ movie }: { movie: Movie }) {
               href={`/booking/${movie.id}?showtime=${encodeURIComponent(t)}`}
               className="px-3 py-1 rounded-full text-xs font-semibold
               text-blue-700 bg-white border border-blue-200 shadow-sm
-              hover:bg-blue-50 transition opacity-100"
+              hover:bg-blue-50 transition opacity-100 tracking-wider"
             >
               {t}
             </Link>

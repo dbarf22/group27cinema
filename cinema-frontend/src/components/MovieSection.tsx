@@ -2,9 +2,8 @@
 
 import MovieCard from "./MovieCard";
 import { Movie } from "@/types/movie";
-import {useMemo, useState} from "react";
-import {text} from "node:stream/consumers";
-import Form from "next/form";
+import {useMemo, useRef, useState} from "react";
+
 
 export default function MovieSection({
   title,
@@ -15,13 +14,16 @@ export default function MovieSection({
 }) {
 
   const [searchQuery, setSearchQuery] = useState("");
+  const inputRef = useRef<HTMLInputElement>(null);
 
   function movieFilter(title: string) {
       return movies.filter(movie => movie.title.toLowerCase().includes(title.toLowerCase()));
   }
 
-  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-      setSearchQuery(e.target.value);
+  const handleSearchChange = () => {
+      if(inputRef.current) {
+          setSearchQuery(inputRef.current.value);
+      }
   }
 
   const filteredMovies = useMemo(() =>{
@@ -29,15 +31,10 @@ export default function MovieSection({
       [searchQuery]
   )
 
+
   return (
     <section className="space-y-10">
-      <input
-          type="text"
-          placeholder="Search movies by title..."
-          value={searchQuery}
-          onChange={handleSearchChange}
-          className="p-2 border border-gray-300 rounded-md flex-grow text-sm text-black"
-        />
+        <input ref={inputRef} onChange={handleSearchChange} className={"border"} />
       <h2 className="text-2xl font-semibold">{title}</h2>
       {movies.length === 0 ? (
         <p className="text-sm text-gray-600">Nothing to show here yet.</p>

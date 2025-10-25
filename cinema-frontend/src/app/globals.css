@@ -1,5 +1,10 @@
 @import "tailwindcss";
 
+html, body {
+  margin: 0;
+  padding: 0;
+}
+
 :root {
   --background: #ffffff;
   --foreground: #000000;
@@ -9,7 +14,6 @@
 body {
   background: linear-gradient(180deg, var(--background), #ffffff);
   color: var(--foreground);
-  font-family: var();
   min-height: 100vh;
   background-attachment: fixed;
   font-family: var(--font-sans);
@@ -21,10 +25,5 @@ h1, h2, h3, h4, h5, h6 {
   color: var(--foreground);
 }
 
-a {
-  color: #000000;
-  transition: color 0.2s ease;
-}
-a:hover {
-  color: #ff0000;
-}
+a { color: #000000; transition: color 0.2s ease; }
+a:hover { color: #ff0000; }

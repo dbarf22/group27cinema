@@ -14,8 +14,8 @@ export default function Header() {
   };
 
   return (
-    <header className="bg-blue-600 text-white shadow-md py-4 px-6 mb-6 rounded-b-lg">
-      <div className="max-w-7xl mx-auto flex items-center justify-between">
+    <header className="w-full bg-blue-600 text-white shadow-md py-4 mb-6">
+      <div className="max-w-7xl mx-auto flex items-center justify-between px-6">
         <h1
           onClick={handleHomeClick}
           className="text-2xl font-bold tracking-tight cursor-pointer hover:underline"

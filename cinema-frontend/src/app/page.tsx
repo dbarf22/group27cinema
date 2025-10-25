@@ -14,7 +14,6 @@ export default async function HomePage() {
 
   return (
     <main className="mx-auto max-w-6xl px-4 py-8 space-y-10">
-      <h1 className="text-5xl font-bold text-center">Cinema E-Booking System</h1>
 
       <MovieSection title="Now Playing" movies={nowPlaying} />
       <MovieSection title="Coming Soon" movies={comingSoon} />

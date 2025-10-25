@@ -82,7 +82,6 @@ export default async function MovieDetails(
         </section>
       )}
 
-      {/* EMBED TRAILER */}
       {ytId ? (
         <div className="w-full max-w-3xl mx-auto">
              <div className="relative pb-[56%] h-0 overflow-hidden rounded-lg shadow-lg">

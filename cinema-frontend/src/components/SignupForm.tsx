@@ -1,7 +1,10 @@
 "use client";
-
+import 'react-phone-number-input/style.css'
 import { useRouter } from "next/navigation";
 import { useState, FormEvent } from "react";
+import PhoneInput from 'react-phone-number-input';
+import type { E164Number } from 'libphonenumber-js/core';
+
 
 type Card = {
   type: string;
@@ -28,6 +31,7 @@ const emptyCard: Card = {
 export default function SignupForm() {
   const router = useRouter();
   const [error, setError] = useState("");
+  const [phoneNumber, setPhoneNumber] = useState<E164Number | undefined>();
   const [showVerify, setShowVerify] = useState(false);
   const [showAddress, setShowAddress] = useState(false);
   const [showPayments, setShowPayments] = useState(false);
@@ -67,22 +71,54 @@ export default function SignupForm() {
   }
 
   async function handleSubmit(e: FormEvent<HTMLFormElement>) {
-    e.preventDefault();
-    setError("");
-    const f = new FormData(e.currentTarget);
-    const name = String(f.get("name") || "").trim();
-    const phone = String(f.get("phone") || "").trim();
-    const email = String(f.get("email") || "").trim();
-    const password = String(f.get("password") || "");
-    if (!name || !phone || !email || !password) {
-      setError("Name, phone, email, and password are required.");
-      return;
-    }
-    setShowVerify(true);
+      e.preventDefault();
+      setError("");
+      const f = new FormData(e.currentTarget);
+
+      const username = String(f.get("username") || "").trim();
+      const email = String(f.get("email") || "").trim();
+      const firstName = String(f.get("firstName") || "").trim();
+      const lastName = String(f.get("lastName") || "").trim();
+      const password = String(f.get("password") || "");
+      const wantsPromotions = f.get("wantsPromotions") === "on";
+
+      if (!username || !email || !firstName || !lastName || !password || !phoneNumber) {
+          setError("All fields are required.");
+          return;
+      }
+
+      try {
+          const res = await fetch("/api/auth/register", {
+              method: "POST",
+              headers: {
+                  "Content-Type": "application/json",
+              },
+              body: JSON.stringify({
+                  username,
+                  email,
+                  firstName,
+                  lastName,
+                  password,
+                  wantsPromotions,
+                  phoneNumber: phoneNumber,
+              }),
+          });
+
+          if (!res.ok) {
+              const errorText = await res.text();
+              throw new Error(errorText || "Registration failed");
+          }
+
+          // todo: verify email
+          router.push("/login");
+
+      } catch (err: any) {
+          setError(err.message || "An error occurred.");
+      }
   }
 
   return (
-    <div className="mx-auto mt-14 px-4 max-w-2xl">
+    <div className="mx-auto mt-14 px-4 max-w-4xl">
       <div className="rounded-2xl border border-gray-200 bg-white shadow-sm p-8">
         {!showVerify ? (
           <>
@@ -103,25 +139,13 @@ export default function SignupForm() {
             <form onSubmit={handleSubmit} className="mt-6 space-y-8">
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
-                  <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-1">
-                    Full Name
+                  <label htmlFor="username" className="block text-sm font-medium text-gray-700 mb-1">
+                    Username
                   </label>
                   <input
-                    id="name"
-                    name="name"
+                    id="username"
+                    name="username"
                     type="text"
-                    required
-                    className="w-full px-3 py-2 rounded-xl border border-gray-300 outline-none focus:ring-2 focus:ring-black"
-                  />
-                </div>
-                <div>
-                  <label htmlFor="phone" className="block text-sm font-medium text-gray-700 mb-1">
-                    Phone Number
-                  </label>
-                  <input
-                    id="phone"
-                    name="phone"
-                    type="tel"
                     required
                     className="w-full px-3 py-2 rounded-xl border border-gray-300 outline-none focus:ring-2 focus:ring-black"
                   />
@@ -139,18 +163,67 @@ export default function SignupForm() {
                   />
                 </div>
                 <div>
-                  <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-1">
-                    Password
+                  <label htmlFor="firstName" className="block text-sm font-medium text-gray-700 mb-1">
+                    First Name
                   </label>
                   <input
-                    id="password"
-                    name="password"
-                    type="password"
+                    id="firstName"
+                    name="firstName"
+                    type="text"
                     required
                     className="w-full px-3 py-2 rounded-xl border border-gray-300 outline-none focus:ring-2 focus:ring-black"
                   />
                 </div>
+                <div>
+                  <label htmlFor="lastName" className="block text-sm font-medium text-gray-700 mb-1">
+                    Last Name
+                  </label>
+                  <input
+                    id="lastName"
+                    name="lastName"
+                    type="text"
+                    required
+                    className="w-full px-3 py-2 rounded-xl border border-gray-300 outline-none focus:ring-2 focus:ring-black"
+                  />
+                </div>
+                <div>
+                    <label htmlFor={"phoneNumber"} className="block text-sm font-medium text-gray-700 mb-1">
+                        Phone Number
+                    </label>
+                    <PhoneInput
+                        id="phoneNumber"
+                        name="phoneNumber"
+                        value={phoneNumber}
+                        onChange={(value: E164Number) => setPhoneNumber(value || undefined)}
+                        defaultCountry="US"
+                        className="w-full px-3 py-2 rounded-xl border border-gray-300 bg-white focus-within:ring-2 focus-within:ring-black"
+                    />
+                </div>
+                <div>
+                    <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-1">
+                        Password
+                    </label>
+                    <input
+                        id="password"
+                        name="password"
+                        type="password"
+                        required
+                        className="w-full px-3 py-2 rounded-xl border border-gray-300 outline-none focus:ring-2 focus:ring-black"
+                    />
+                </div>
               </div>
+
+                <div className="flex items-center gap-2">
+                    <input
+                        type={"checkbox"}
+                        id={"wantsPromotions"}
+                        name={"wantsPromotions"}
+                        className={"h-4 w-4 rounded border-gray-300 text-black focus:ring-black"}
+                    />
+                    <label htmlFor={"wantsPromotions"} className={"text-sm text-gray-700"}>
+                        I want to receive promotions.
+                    </label>
+                </div>
 
               <div className="space-y-2">
                 <button

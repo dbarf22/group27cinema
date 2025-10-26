@@ -7,22 +7,38 @@ export default function LoginForm() {
   const router = useRouter();
   const [error, setError] = useState("");
 
-  async function onSubmit(e: FormEvent<HTMLFormElement>) {
-    e.preventDefault();
-    setError("");
-    try {
-      const f = new FormData(e.currentTarget);
-      const email = String(f.get("email") || "").trim();
-      const password = String(f.get("password") || "");
-      if (!email || !password) {
-        setError("Please enter your email and password.");
-        return;
-      }
-      router.push("/");
-    } catch {
-      setError("Check your credentials and try again.");
+    async function onSubmit(e: FormEvent<HTMLFormElement>) {
+        e.preventDefault();
+        setError("");
+        try {
+            const f = new FormData(e.currentTarget);
+            const email = String(f.get("email") || "").trim();
+            const password = String(f.get("password") || "");
+
+            if (!email || !password) {
+                setError("Please enter your email and password.");
+                return;
+            }
+
+            const res = await fetch("/api/auth/login", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({ email, password }),
+            });
+
+            if (!res.ok) {
+                const errorText = await res.text();
+                throw new Error(errorText || "Login failed");
+            }
+
+            router.push("/");
+
+        } catch (err: any) {
+            setError(err.message || "Incorrect login info.");
+        }
     }
-  }
 
   return (
     <div className="mx-auto mt-14 px-4 max-w-md">

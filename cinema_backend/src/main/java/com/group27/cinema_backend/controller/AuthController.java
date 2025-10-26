@@ -73,7 +73,15 @@ public class AuthController {
         if (!"Active".equals(user.getStatus())) {
             return new ResponseEntity<>("Account is not active.", HttpStatus.FORBIDDEN);
         }
-        return ResponseEntity.ok(Map.of("message", "Login Successful"));
+
+        Map<String,Object> responseData = Map.of(
+                "message", "Login successful.",
+                "user", Map.of(
+                        "email", user.getEmail(),
+                        "username", user.getUsername()
+                )
+        );
+        return new ResponseEntity<>(responseData, HttpStatus.OK);
     }
 
     // FORGOT PASSWORD

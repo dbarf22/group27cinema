@@ -2,10 +2,12 @@
 
 import { useState, FormEvent } from "react";
 import { useRouter } from "next/navigation";
+import { useSession} from "@/app/session/SessionContext";
 
 export default function LoginForm() {
   const router = useRouter();
   const [error, setError] = useState("");
+  const { login} = useSession();
 
     async function onSubmit(e: FormEvent<HTMLFormElement>) {
         e.preventDefault();
@@ -32,6 +34,9 @@ export default function LoginForm() {
                 const errorText = await res.text();
                 throw new Error(errorText || "Login failed");
             }
+
+            const data = await res.json();
+            login(data.user);
 
             router.push("/");
 

@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import Header from "@/components/Header";
+import {SessionProvider} from "@/app/session/SessionContext";
 
 const geistSans = Geist({ variable: "--font-geist-sans", subsets: ["latin"] });
 const geistMono = Geist_Mono({ variable: "--font-geist-mono", subsets: ["latin"] });
@@ -23,11 +24,12 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         />
       </head>
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
-        <Header />
-
-        <main className="mx-auto max-w-screen-xl px-4 py-8">
-          {children}
-        </main>
+      <SessionProvider>
+          <Header/>
+          <main className="mx-auto max-w-screen-xl px-4 py-8">
+              {children}
+          </main>
+      </SessionProvider>
       </body>
     </html>
   );

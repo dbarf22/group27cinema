@@ -25,7 +25,7 @@ function ResetPasswordContent() {
       return;
     }
     if (!newPw || !confirmPw) {
-      setErr('Fill in all fields.');
+      setErr('Please fill in all fields.');
       return;
     }
     if (newPw.length < 6) {
@@ -74,7 +74,7 @@ function ResetPasswordContent() {
               autoComplete="new-password"
               required
               className="mt-1 w-full rounded border px-3 py-2"
-              placeholder="••••••••"
+              placeholder="******"
             />
           </div>
           <div>
@@ -87,7 +87,7 @@ function ResetPasswordContent() {
               autoComplete="new-password"
               required
               className="mt-1 w-full rounded border px-3 py-2"
-              placeholder="••••••••"
+              placeholder="******"
             />
           </div>
           <button type="submit" disabled={busy} className="w-full rounded bg-black px-4 py-2 text-white disabled:opacity-50">
@@ -104,7 +104,7 @@ function ResetPasswordContent() {
 
       <div className="mt-6 text-center">
         <button type="button" onClick={() => router.push('/login')} className="text-sm underline">
-          Back to login
+          Back
         </button>
       </div>
     </div>
@@ -116,7 +116,7 @@ export default function ResetPasswordPage() {
     <Suspense
       fallback={
         <div className="mx-auto max-w-md p-6 text-center">
-          <div className="rounded border p-6">Loading…</div>
+          <div className="rounded border p-6">Loading</div>
         </div>
       }
     >

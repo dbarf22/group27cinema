@@ -7,7 +7,7 @@ import { useSession} from "@/app/session/SessionContext";
 export default function LoginForm() {
   const router = useRouter();
   const [error, setError] = useState("");
-  const { login} = useSession();
+  const {login} = useSession();
 
     async function onSubmit(e: FormEvent<HTMLFormElement>) {
         e.preventDefault();
@@ -28,7 +28,7 @@ export default function LoginForm() {
                     "Content-Type": "application/json",
                 },
                 body: JSON.stringify({ email, password }),
-            });
+            }); // responds with
 
             if (!res.ok) {
                 const errorText = await res.text();
@@ -36,7 +36,7 @@ export default function LoginForm() {
             }
 
             const data = await res.json();
-            login(data.user);
+            login(data.user); // uses login from sessioncontext
 
             router.push("/");
 

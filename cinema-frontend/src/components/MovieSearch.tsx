@@ -38,10 +38,6 @@ export default function MovieSearch() {
   }
 
   useEffect(() => {
-    fetchMovies("", mode);
-  }, []);
-
-  useEffect(() => {
     fetchMovies(debouncedQuery, mode);
   }, [debouncedQuery, mode]);
 

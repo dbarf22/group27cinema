@@ -5,6 +5,10 @@ import {createContext, useContext, useState, ReactNode, useEffect} from "react";
 type User = {
     username: string;
     email: string;
+    firstName: string;
+    lastName: string;
+    phoneNumber: string;
+    wantsPromotions: boolean;
 }
 
 type SessionContextInfo = {

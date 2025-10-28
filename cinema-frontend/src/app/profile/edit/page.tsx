@@ -1,416 +1,466 @@
 'use client';
+import 'react-phone-number-input/style.css'
 
-import { useState, useEffect, FormEvent } from 'react';
-import { useRouter } from 'next/navigation';
-import { useSession } from '@/app/session/SessionContext';
+import {useState, useEffect, FormEvent} from 'react';
+import {useRouter} from 'next/navigation';
+import {useSession} from '@/app/session/SessionContext';
+import { isPossiblePhoneNumber } from 'react-phone-number-input'
+
+
+import PhoneInput from 'react-phone-number-input';
+import type {E164Number} from 'libphonenumber-js/core';
 
 type Card = {
-  type: string;
-  number: string;
-  expMonth: string;
-  expYear: string;
-  billingStreet: string;
-  billingCity: string;
-  billingState: string;
-  billingZip: string;
+    type: string;
+    number: string;
+    expMonth: string;
+    expYear: string;
+    billingStreet: string;
+    billingCity: string;
+    billingState: string;
+    billingZip: string;
 };
 
 const emptyCard: Card = {
-  type: '',
-  number: '',
-  expMonth: '',
-  expYear: '',
-  billingStreet: '',
-  billingCity: '',
-  billingState: '',
-  billingZip: '',
+    type: '',
+    number: '',
+    expMonth: '',
+    expYear: '',
+    billingStreet: '',
+    billingCity: '',
+    billingState: '',
+    billingZip: '',
 };
 
 export default function EditProfilePage() {
-  const router = useRouter();
-  const { currentUser } = useSession();
+    const router = useRouter();
+    const {currentUser, login} = useSession();
 
-  const [msg, setMsg] = useState({ error: '', ok: '' });
-  const [busy, setBusy] = useState(false);
+    const [msg, setMsg] = useState({error: '', ok: ''});
+    const [busy, setBusy] = useState(false);
 
-  const [username, setUsername] = useState('');
-  const [email, setEmail] = useState('');
+    const [username, setUsername] = useState('');
+    const [email, setEmail] = useState('');
 
-  const [firstName, setFirst] = useState('');
-  const [lastName, setLast] = useState('');
-  const [phoneNumber, setPhone] = useState('');
-  const [wantsPromotions, setPromo] = useState(false);
+    const [firstName, setFirst] = useState('');
+    const [lastName, setLast] = useState('');
+    const [phoneNumber, setPhone] = useState('')
+    const [wantsPromotions, setPromo] = useState(false);
 
-  const [street, setStreet] = useState('');
-  const [city, setCity] = useState('');
-  const [state, setState] = useState('');
-  const [zip, setZip] = useState('');
+    const [street, setStreet] = useState('');
+    const [city, setCity] = useState('');
+    const [state, setState] = useState('');
+    const [zip, setZip] = useState('');
 
-  const [cards, setCards] = useState<Card[]>([]);
-  const maxCards = 3;
+    const [cards, setCards] = useState<Card[]>([]);
+    const maxCards = 3;
 
-  const [currentPassword, setCurPw] = useState('');
-  const [newPassword, setNewPw] = useState('');
-  const [confirmPassword, setConfirmPw] = useState('');
+    const [currentPassword, setCurPw] = useState('');
+    const [newPassword, setNewPw] = useState('');
+    const [confirmPassword, setConfirmPw] = useState('');
 
-  const [showAddress, setShowAddress] = useState(false);
-  const [showPayments, setShowPayments] = useState(false);
-  const [showPassword, setShowPassword] = useState(false);
+    const [showAddress, setShowAddress] = useState(false);
+    const [showPayments, setShowPayments] = useState(false);
+    const [showPassword, setShowPassword] = useState(false);
 
-  useEffect(() => {
-    if (!currentUser) {
-      router.push('/login');
-      return;
-    }
-    setUsername(currentUser.username || '');
-    setEmail(currentUser.email || '');
-  }, [currentUser, router]);
+    useEffect(() => {
+        if (!currentUser) {
+            router.push('/login');
+            return;
+        }
+        setUsername(currentUser.username || '');
+        setEmail(currentUser.email || '');
+        setPhone(currentUser.phoneNumber || '');
+        setFirst(currentUser.firstName || '');
+        setLast(currentUser.lastName || '');
+        setPromo(currentUser.wantsPromotions || false);
 
-  const setError = (s: string) => setMsg({ error: s, ok: '' });
-  const setOk = (s: string) => setMsg({ error: '', ok: s });
+    }, [currentUser, router]);
 
-  const updateCard = (i: number, k: keyof Card, v: string) =>
-    setCards(prev => {
-      const next = [...prev];
-      next[i] = { ...next[i], [k]: v };
-      return next;
-    });
+    const setError = (s: string) => setMsg({error: s, ok: ''});
+    const setOk = (s: string) => setMsg({error: '', ok: s});
 
-  const addCard = () => cards.length < maxCards && setCards(prev => [...prev, { ...emptyCard }]);
-  const removeCard = (i: number) => setCards(prev => prev.filter((_, idx) => idx !== i));
+    const updateCard = (i: number, k: keyof Card, v: string) =>
+        setCards(prev => {
+            const next = [...prev];
+            next[i] = {...next[i], [k]: v};
+            return next;
+        });
 
-  const handleProfile = async (e: FormEvent) => {
-    e.preventDefault();
-    setMsg({ error: '', ok: '' });
-    setBusy(true);
-    setTimeout(() => {
-      setOk('Profile updated');
-      setBusy(false);
-    }, 800);
-  };
+    const addCard = () => cards.length < maxCards && setCards(prev => [...prev, {...emptyCard}]);
+    const removeCard = (i: number) => setCards(prev => prev.filter((_, idx) => idx !== i));
 
-  const handleAddress = async (e: FormEvent) => {
-    e.preventDefault();
-    setMsg({ error: '', ok: '' });
-    setBusy(true);
-    setTimeout(() => {
-      setOk('Address updated');
-      setBusy(false);
-    }, 800);
-  };
+    const handleProfile = async (e: FormEvent) => {
+        e.preventDefault();
+        setBusy(true);
+        setError('');
+        setOk('');
 
-  const handlePayments = async (e: FormEvent) => {
-    e.preventDefault();
-    setMsg({ error: '', ok: '' });
-    for (let i = 0; i < cards.length; i++) {
-      const c = cards[i];
-      if (!c.type || !c.number || !c.expMonth || !c.expYear) {
-        setError(`Card ${i + 1}: fill required fields`);
-        return;
-      }
-    }
-    setBusy(true);
-    setTimeout(() => {
-      setOk('Payment methods updated');
-      setBusy(false);
-    }, 800);
-  };
+        try {
+            if (!isPossiblePhoneNumber(phoneNumber)) {
+                throw new Error('Phone number is invalid.');
+            }
+            const res = await fetch("/api/auth/edit-profile", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({
+                    username,
+                    email,
+                    firstName,
+                    lastName,
+                    wantsPromotions,
+                    phoneNumber: phoneNumber,
+                }),
+            });
 
-  const handlePassword = async (e: FormEvent) => {
-    e.preventDefault();
-    setMsg({ error: '', ok: '' });
-    if (newPassword !== confirmPassword) {
-      setError('Passwords do not match');
-      return;
-    }
-    if (newPassword.length < 6) {
-      setError('Min 6 characters');
-      return;
-    }
-    setBusy(true);
-    setTimeout(() => {
-      setOk('Password changed');
-      setCurPw('');
-      setNewPw('');
-      setConfirmPw('');
-      setBusy(false);
-    }, 800);
-  };
+            const data = await res.json();
+            login(data.user);
 
-  if (!currentUser) return null;
+            if (!res.ok) {
+                const errorText = await res.text();
+                throw new Error(errorText || "Edit profile failed");
+            }
+            setOk("Profile successfully updated!");
 
-  return (
-    <div className="mx-auto max-w-3xl p-6">
-      <h1 className="text-2xl font-semibold text-center mb-4">Edit Profile</h1>
+        } catch (err: any) {
+            setError(err.message || "An error occurred.");
+        } finally {
+            setBusy(false);
+        }
 
-      {msg.error ? (
-        <div className="mb-4 rounded border border-red-200 bg-red-50 p-3 text-sm text-red-700">{msg.error}</div>
-      ) : null}
-      {msg.ok ? (
-        <div className="mb-4 rounded border border-green-200 bg-green-50 p-3 text-sm text-green-700">{msg.ok}</div>
-      ) : null}
+    };
 
-      <form onSubmit={handleProfile} className="space-y-4 border-b pb-6 mb-6">
-        <h2 className="text-lg font-medium">Profile</h2>
-        <div className="grid gap-3 sm:grid-cols-2">
-          <input
-            id="username"
-            placeholder="Username"
-            value={username}
-            onChange={e => setUsername(e.target.value)}
-            required
-            className="rounded border px-3 py-2"
-          />
-          <input
-            id="email"
-            placeholder="rct94192@uga.edu"
-            type="email"
-            value={email}
-            disabled
-            className="rounded border px-3 py-2 bg-gray-100"
-          />
-          <input
-            id="firstName"
-            placeholder="Ray"
-            value={firstName}
-            onChange={e => setFirst(e.target.value)}
-            required
-            className="rounded border px-3 py-2"
-          />
-          <input
-            id="lastName"
-            placeholder="Tan"
-            value={lastName}
-            onChange={e => setLast(e.target.value)}
-            required
-            className="rounded border px-3 py-2"
-          />
-          <input
-            id="phoneNumber"
-            type="tel"
-            placeholder="123-456-7890"
-            value={phoneNumber}
-            onChange={e => setPhone(e.target.value)}
-            className="rounded border px-3 py-2 sm:col-span-2"
-          />
-        </div>
-        <label className="flex items-center gap-2 text-sm">
-          <input
-            type="checkbox"
-            checked={wantsPromotions}
-            onChange={e => setPromo(e.target.checked)}
-            className="h-4 w-4"
-          />
-          RECIEVE PROMOTIONS?
-        </label>
-        <button type="submit" disabled={busy} className="w-full rounded bg-black px-4 py-2 text-white disabled:opacity-50">
-          {busy ? 'Updating…' : 'Update Profile'}
-        </button>
-      </form>
+    const handleAddress = async (e: FormEvent) => {
+        e.preventDefault();
+        setMsg({error: '', ok: ''});
+        setBusy(true);
+        setTimeout(() => {
+            setOk('Address updated');
+            setBusy(false);
+        }, 800);
+    };
 
-      <div className="border-b pb-6 mb-6">
-        <button
-          type="button"
-          onClick={() => setShowAddress(s => !s)}
-          className="mb-4 flex w-full items-center justify-between text-left text-lg font-medium"
-        >
-          Home Address <span>{showAddress ? '−' : '+'}</span>
-        </button>
+    const handlePayments = async (e: FormEvent) => {
+        e.preventDefault();
+        setMsg({error: '', ok: ''});
+        for (let i = 0; i < cards.length; i++) {
+            const c = cards[i];
+            if (!c.type || !c.number || !c.expMonth || !c.expYear) {
+                setError(`Card ${i + 1}: fill required fields`);
+                return;
+            }
+        }
+        setBusy(true);
+        setTimeout(() => {
+            setOk('Payment methods updated');
+            setBusy(false);
+        }, 800);
+    };
 
-        {showAddress && (
-          <form onSubmit={handleAddress} className="space-y-3">
-            <input
-              id="street"
-              placeholder="123 Example Rd"
-              value={street}
-              onChange={e => setStreet(e.target.value)}
-              className="w-full rounded border px-3 py-2"
-            />
-            <div className="grid gap-3 sm:grid-cols-3">
-              <input
-                id="city"
-                placeholder="Athens"
-                value={city}
-                onChange={e => setCity(e.target.value)}
-                className="rounded border px-3 py-2"
-              />
-              <input
-                id="state"
-                placeholder="GA"
-                value={state}
-                onChange={e => setState(e.target.value)}
-                maxLength={2}
-                className="rounded border px-3 py-2"
-              />
-              <input
-                id="zip"
-                placeholder="30606"
-                value={zip}
-                onChange={e => setZip(e.target.value)}
-                className="rounded border px-3 py-2"
-              />
-            </div>
-            <button type="submit" disabled={busy} className="w-full rounded bg-black px-4 py-2 text-white disabled:opacity-50">
-              {busy ? 'Updating…' : 'Update Address'}
-            </button>
-          </form>
-        )}
-      </div>
+    const handlePassword = async (e: FormEvent) => {
+        e.preventDefault();
+        setMsg({error: '', ok: ''});
+        if (newPassword !== confirmPassword) {
+            setError('Passwords do not match');
+            return;
+        }
+        if (newPassword.length < 6) {
+            setError('Min 6 characters');
+            return;
+        }
+        setBusy(true);
+        setTimeout(() => {
+            setOk('Password changed');
+            setCurPw('');
+            setNewPw('');
+            setConfirmPw('');
+            setBusy(false);
+        }, 800);
+    };
 
-      <div className="border-b pb-6 mb-6">
-        <button
-          type="button"
-          onClick={() => setShowPayments(s => !s)}
-          className="mb-4 flex w-full items-center justify-between text-left text-lg font-medium"
-        >
-          Payment Methods <span>{showPayments ? '−' : '+'}</span>
-        </button>
+    if (!currentUser) return null;
 
-        {showPayments && (
-          <form onSubmit={handlePayments} className="space-y-4">
-            {cards.length === 0 ? (
-              <p className="text-sm text-gray-600">No cards added.</p>
-            ) : (
-              cards.map((c, i) => (
-                <div key={i} className="rounded border p-3">
-                  <div className="mb-2 flex items-center justify-between">
-                    <div className="font-medium">Card {i + 1}</div>
-                    <button type="button" onClick={() => removeCard(i)} className="text-sm text-red-600">
-                      Remove
-                    </button>
-                  </div>
-                  <div className="grid gap-3 sm:grid-cols-2">
-                    <select
-                      value={c.type}
-                      onChange={e => updateCard(i, 'type', e.target.value)}
-                      required
-                      className="rounded border px-3 py-2 bg-white"
-                    >
-                      <option value="">Type</option>
-                      <option value="Visa">Visa</option>
-                      <option value="MasterCard">MasterCard</option>
-                      <option value="Discover">Discover</option>
-                      <option value="American Express">American Express</option>
-                    </select>
+    return (
+        <div className="mx-auto max-w-3xl p-6">
+            <h1 className="text-2xl font-semibold text-center mb-4">Edit Profile</h1>
+
+            {msg.error ? (
+                <div className="mb-4 rounded border border-red-200 bg-red-50 p-3 text-sm text-red-700">{msg.error}</div>
+            ) : null}
+            {msg.ok ? (
+                <div
+                    className="mb-4 rounded border border-green-200 bg-green-50 p-3 text-sm text-green-700">{msg.ok}</div>
+            ) : null}
+
+            <form onSubmit={handleProfile} className="space-y-4 border-b pb-6 mb-6">
+                <h2 className="text-lg font-medium">Profile</h2>
+                <div className="grid gap-3 sm:grid-cols-2">
                     <input
-                      placeholder="Card number"
-                      value={c.number}
-                      onChange={e => updateCard(i, 'number', e.target.value)}
-                      required
-                      maxLength={19}
-                      className="rounded border px-3 py-2"
+                        id="username"
+                        placeholder="Username"
+                        value={username}
+                        onChange={e => setUsername(e.target.value)}
+                        required
+                        className="rounded border px-3 py-2"
                     />
                     <input
-                      placeholder="00"
-                      value={c.expMonth}
-                      onChange={e => updateCard(i, 'expMonth', e.target.value)}
-                      required
-                      maxLength={2}
-                      className="rounded border px-3 py-2"
+                        id="email"
+                        placeholder="Email"
+                        type="email"
+                        value={email}
+                        disabled
+                        className="rounded border px-3 py-2 bg-gray-100"
                     />
                     <input
-                      placeholder="0000"
-                      value={c.expYear}
-                      onChange={e => updateCard(i, 'expYear', e.target.value)}
-                      required
-                      maxLength={4}
-                      className="rounded border px-3 py-2"
+                        id="firstName"
+                        placeholder="First Name"
+                        value={firstName}
+                        onChange={e => setFirst(e.target.value)}
+                        required
+                        className="rounded border px-3 py-2"
                     />
                     <input
-                      placeholder="123 Example Rd"
-                      value={c.billingStreet}
-                      onChange={e => updateCard(i, 'billingStreet', e.target.value)}
-                      className="sm:col-span-2 rounded border px-3 py-2"
+                        id="lastName"
+                        placeholder="Last Name"
+                        value={lastName}
+                        onChange={e => setLast(e.target.value)}
+                        required
+                        className="rounded border px-3 py-2"
                     />
-                    <input
-                      placeholder="Athens"
-                      value={c.billingCity}
-                      onChange={e => updateCard(i, 'billingCity', e.target.value)}
-                      className="rounded border px-3 py-2"
-                    />
-                    <input
-                      placeholder="GA"
-                      value={c.billingState}
-                      onChange={e => updateCard(i, 'billingState', e.target.value)}
-                      maxLength={2}
-                      className="rounded border px-3 py-2"
-                    />
-                    <input
-                      placeholder="30606"
-                      value={c.billingZip}
-                      onChange={e => updateCard(i, 'billingZip', e.target.value)}
-                      className="rounded border px-3 py-2"
-                    />
-                  </div>
+                    <div>
+                        <PhoneInput
+                            id="phoneNumber"
+                            name="phoneNumber"
+                            value={phoneNumber}
+                            onChange={(value: E164Number) => setPhone(value)}
+                            defaultCountry="US"
+                            className="rounded border px-3 py-2"
+                        />
+                    </div>
                 </div>
-              ))
-            )}
+                <label className="flex items-center gap-2 text-sm">
+                    <input
+                        type="checkbox"
+                        checked={wantsPromotions}
+                        onChange={e => setPromo(e.target.checked)}
+                        className="h-4 w-4"
+                    />
+                    RECIEVE PROMOTIONS?
+                </label>
+                <button type="submit" disabled={busy}
+                        className="w-full rounded bg-black px-4 py-2 text-white disabled:opacity-50">
+                    {busy ? 'Updating…' : 'Update Profile'}
+                </button>
+            </form>
 
-            <div className="flex items-center justify-between">
-              <button
-                type="button"
-                onClick={addCard}
-                disabled={cards.length >= maxCards}
-                className="text-sm text-blue-600 disabled:opacity-50"
-              >
-                + Add Card ({cards.length}/{maxCards})
-              </button>
+            <div className="border-b pb-6 mb-6">
+                <button
+                    type="button"
+                    onClick={() => setShowAddress(s => !s)}
+                    className="mb-4 flex w-full items-center justify-between text-left text-lg font-medium"
+                >
+                    Home Address <span>{showAddress ? '−' : '+'}</span>
+                </button>
+
+                {showAddress && (
+                    <form onSubmit={handleAddress} className="space-y-3">
+                        <input
+                            id="street"
+                            placeholder="123 Example Rd"
+                            value={street}
+                            onChange={e => setStreet(e.target.value)}
+                            className="w-full rounded border px-3 py-2"
+                        />
+                        <div className="grid gap-3 sm:grid-cols-3">
+                            <input
+                                id="city"
+                                placeholder="Athens"
+                                value={city}
+                                onChange={e => setCity(e.target.value)}
+                                className="rounded border px-3 py-2"
+                            />
+                            <input
+                                id="state"
+                                placeholder="GA"
+                                value={state}
+                                onChange={e => setState(e.target.value)}
+                                maxLength={2}
+                                className="rounded border px-3 py-2"
+                            />
+                            <input
+                                id="zip"
+                                placeholder="30606"
+                                value={zip}
+                                onChange={e => setZip(e.target.value)}
+                                className="rounded border px-3 py-2"
+                            />
+                        </div>
+                        <button type="submit" disabled={busy}
+                                className="w-full rounded bg-black px-4 py-2 text-white disabled:opacity-50">
+                            {busy ? 'Updating…' : 'Update Address'}
+                        </button>
+                    </form>
+                )}
             </div>
 
-            {cards.length > 0 && (
-              <button type="submit" disabled={busy} className="w-full rounded bg-black px-4 py-2 text-white disabled:opacity-50">
-                {busy ? 'Updating…' : 'Update Payment Methods'}
-              </button>
-            )}
-          </form>
-        )}
-      </div>
+            <div className="border-b pb-6 mb-6">
+                <button
+                    type="button"
+                    onClick={() => setShowPayments(s => !s)}
+                    className="mb-4 flex w-full items-center justify-between text-left text-lg font-medium"
+                >
+                    Payment Methods <span>{showPayments ? '−' : '+'}</span>
+                </button>
 
-      <div>
-        <button
-          type="button"
-          onClick={() => setShowPassword(s => !s)}
-          className="mb-4 flex w-full items-center justify-between text-left text-lg font-medium"
-        >
-          Change Password <span>{showPassword ? '−' : '+'}</span>
-        </button>
+                {showPayments && (
+                    <form onSubmit={handlePayments} className="space-y-4">
+                        {cards.length === 0 ? (
+                            <p className="text-sm text-gray-600">No cards added.</p>
+                        ) : (
+                            cards.map((c, i) => (
+                                <div key={i} className="rounded border p-3">
+                                    <div className="mb-2 flex items-center justify-between">
+                                        <div className="font-medium">Card {i + 1}</div>
+                                        <button type="button" onClick={() => removeCard(i)}
+                                                className="text-sm text-red-600">
+                                            Remove
+                                        </button>
+                                    </div>
+                                    <div className="grid gap-3 sm:grid-cols-2">
+                                        <select
+                                            value={c.type}
+                                            onChange={e => updateCard(i, 'type', e.target.value)}
+                                            required
+                                            className="rounded border px-3 py-2 bg-white"
+                                        >
+                                            <option value="">Type</option>
+                                            <option value="Visa">Visa</option>
+                                            <option value="MasterCard">MasterCard</option>
+                                            <option value="Discover">Discover</option>
+                                            <option value="American Express">American Express</option>
+                                        </select>
+                                        <input
+                                            placeholder="Card number"
+                                            value={c.number}
+                                            onChange={e => updateCard(i, 'number', e.target.value)}
+                                            required
+                                            maxLength={19}
+                                            className="rounded border px-3 py-2"
+                                        />
+                                        <input
+                                            placeholder="00"
+                                            value={c.expMonth}
+                                            onChange={e => updateCard(i, 'expMonth', e.target.value)}
+                                            required
+                                            maxLength={2}
+                                            className="rounded border px-3 py-2"
+                                        />
+                                        <input
+                                            placeholder="0000"
+                                            value={c.expYear}
+                                            onChange={e => updateCard(i, 'expYear', e.target.value)}
+                                            required
+                                            maxLength={4}
+                                            className="rounded border px-3 py-2"
+                                        />
+                                        <input
+                                            placeholder="123 Example Rd"
+                                            value={c.billingStreet}
+                                            onChange={e => updateCard(i, 'billingStreet', e.target.value)}
+                                            className="sm:col-span-2 rounded border px-3 py-2"
+                                        />
+                                        <input
+                                            placeholder="Athens"
+                                            value={c.billingCity}
+                                            onChange={e => updateCard(i, 'billingCity', e.target.value)}
+                                            className="rounded border px-3 py-2"
+                                        />
+                                        <input
+                                            placeholder="GA"
+                                            value={c.billingState}
+                                            onChange={e => updateCard(i, 'billingState', e.target.value)}
+                                            maxLength={2}
+                                            className="rounded border px-3 py-2"
+                                        />
+                                        <input
+                                            placeholder="30606"
+                                            value={c.billingZip}
+                                            onChange={e => updateCard(i, 'billingZip', e.target.value)}
+                                            className="rounded border px-3 py-2"
+                                        />
+                                    </div>
+                                </div>
+                            ))
+                        )}
 
-        {showPassword && (
-          <form onSubmit={handlePassword} className="space-y-3">
-            <input
-              id="currentPassword"
-              type="password"
-              placeholder="Current password"
-              value={currentPassword}
-              onChange={e => setCurPw(e.target.value)}
-              className="w-full rounded border px-3 py-2"
-            />
-            <input
-              id="newPassword"
-              type="password"
-              placeholder="New password"
-              value={newPassword}
-              onChange={e => setNewPw(e.target.value)}
-              className="w-full rounded border px-3 py-2"
-            />
-            <input
-              id="confirmPassword"
-              type="password"
-              placeholder="Confirm new password"
-              value={confirmPassword}
-              onChange={e => setConfirmPw(e.target.value)}
-              className="w-full rounded border px-3 py-2"
-            />
-            <button
-              type="submit"
-              disabled={busy || !currentPassword || !newPassword}
-              className="w-full rounded bg-black px-4 py-2 text-white disabled:opacity-50"
-            >
-              {busy ? 'Changing…' : 'Change Password'}
-            </button>
-          </form>
-        )}
-      </div>
-    </div>
-  );
+                        <div className="flex items-center justify-between">
+                            <button
+                                type="button"
+                                onClick={addCard}
+                                disabled={cards.length >= maxCards}
+                                className="text-sm text-blue-600 disabled:opacity-50"
+                            >
+                                + Add Card ({cards.length}/{maxCards})
+                            </button>
+                        </div>
+
+                        {cards.length > 0 && (
+                            <button type="submit" disabled={busy}
+                                    className="w-full rounded bg-black px-4 py-2 text-white disabled:opacity-50">
+                                {busy ? 'Updating…' : 'Update Payment Methods'}
+                            </button>
+                        )}
+                    </form>
+                )}
+            </div>
+
+            <div>
+                <button
+                    type="button"
+                    onClick={() => setShowPassword(s => !s)}
+                    className="mb-4 flex w-full items-center justify-between text-left text-lg font-medium"
+                >
+                    Change Password <span>{showPassword ? '−' : '+'}</span>
+                </button>
+
+                {showPassword && (
+                    <form onSubmit={handlePassword} className="space-y-3">
+                        <input
+                            id="currentPassword"
+                            type="password"
+                            placeholder="Current password"
+                            value={currentPassword}
+                            onChange={e => setCurPw(e.target.value)}
+                            className="w-full rounded border px-3 py-2"
+                        />
+                        <input
+                            id="newPassword"
+                            type="password"
+                            placeholder="New password"
+                            value={newPassword}
+                            onChange={e => setNewPw(e.target.value)}
+                            className="w-full rounded border px-3 py-2"
+                        />
+                        <input
+                            id="confirmPassword"
+                            type="password"
+                            placeholder="Confirm new password"
+                            value={confirmPassword}
+                            onChange={e => setConfirmPw(e.target.value)}
+                            className="w-full rounded border px-3 py-2"
+                        />
+                        <button
+                            type="submit"
+                            disabled={busy || !currentPassword || !newPassword}
+                            className="w-full rounded bg-black px-4 py-2 text-white disabled:opacity-50"
+                        >
+                            {busy ? 'Changing…' : 'Change Password'}
+                        </button>
+                    </form>
+                )}
+            </div>
+        </div>
+    );
 }

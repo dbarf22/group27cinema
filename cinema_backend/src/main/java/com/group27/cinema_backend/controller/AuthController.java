@@ -78,7 +78,11 @@ public class AuthController {
                 "message", "Login successful.",
                 "user", Map.of(
                         "email", user.getEmail(),
-                        "username", user.getUsername()
+                        "username", user.getUsername(),
+                        "phoneNumber", user.getPhoneNumber(),
+                        "first_name", user.getFirstName(),
+                        "last_name", user.getLastName(),
+                        "wantsPromotions", user.isWantsPromotions()
                 )
         );
         return new ResponseEntity<>(responseData, HttpStatus.OK);
@@ -99,7 +103,7 @@ public class AuthController {
             System.out.println("PASSWORD RESET TOKEN for " + user.getEmail() + ": " + token);
         }
 
-        return ResponseEntity.ok("If an account exists, a reset token has been generated.");
+        return ResponseEntity.ok("If  account exists, a reset token has been generated.");
     }
 
     // RESET PASSWORD
@@ -116,5 +120,42 @@ public class AuthController {
         userRepository.save(user);
 
         return ResponseEntity.ok("Password has been reset successfully.");
+    }
+
+    // Edit Profile
+    @PostMapping("/edit-profile")
+    public ResponseEntity<?> editProfile(@RequestBody Map<String, String> payload) {
+        Optional<User> userOpt = userRepository.findByEmail(payload.get("email"));
+        if (!userOpt.isPresent()) {
+            return new ResponseEntity<>("User not found.", HttpStatus.BAD_REQUEST);
+        }
+
+        User user = userOpt.get();
+
+            if (payload.containsKey("firstName")) {
+                user.setFirstName(payload.get("firstName"));
+            }
+            if (payload.containsKey("lastName")) {
+                user.setLastName(payload.get("lastName"));
+            }
+            if (payload.containsKey("phoneNumber")) {
+                user.setPhoneNumber(payload.get("phoneNumber"));
+            }
+            if (payload.containsKey("email")) {
+                user.setEmail(payload.get("email"));
+            }
+            if (payload.containsKey("wantsPromotions")) {
+                if (payload.get("wantsPromotions") == "true") {
+                    user.setWantsPromotions(true);
+                } else  {
+                    user.setWantsPromotions(false);
+                }
+            }
+            if (payload.containsKey("username")) {
+                user.setUsername(payload.get("username"));
+            }
+            userRepository.save(user);
+            Map<String,Object> responseData = Map.of("message", "Profile successfully edited.","user", user);
+            return new ResponseEntity<>(responseData, HttpStatus.OK);
     }
 }

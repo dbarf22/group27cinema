@@ -1,5 +1,6 @@
 package com.group27.cinema_backend.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -30,6 +31,7 @@ public class User {
     @Column(name = "last_name", length = 50)
     private String lastName;
 
+    @JsonIgnore
     @Column(name = "hashed_password", nullable = false, length = 255)
     private String hashedPassword;
 

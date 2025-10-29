@@ -1,5 +1,6 @@
 package com.group27.cinema_backend.controller;
 
+import com.group27.cinema_backend.model.Card;
 import com.group27.cinema_backend.model.User;
 import com.group27.cinema_backend.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,38 +22,30 @@ public class AuthController {
 
     @Autowired
     private PasswordEncoder passwordEncoder;
+    @Autowired
+    private PasswordEncoder cardEncoder;
 
     // REGISTRATION
     @PostMapping("/register")
-    public ResponseEntity<?> registerUser(@RequestBody Map<String, String> payload) {
+    public ResponseEntity<?> registerUser(@RequestBody User user) {
 
         // Check for duplicate email or username
-        if (userRepository.findByEmail(payload.get("email")).isPresent()) {
+        if (userRepository.findByEmail(user.getEmail()).isPresent()) {
             return new ResponseEntity<>("Email is already in use.", HttpStatus.BAD_REQUEST);
         }
-        if (userRepository.findByUsername(payload.get("username")).isPresent()) {
+        if (userRepository.findByUsername(user.getUsername()).isPresent()) {
             return new ResponseEntity<>("Username is already in use.", HttpStatus.BAD_REQUEST);
         }
 
-        User user = new User();
-        user.setUsername(payload.get("username"));
-        user.setFirstName(payload.get("firstName"));
-        user.setLastName(payload.get("lastName"));
-        user.setEmail(payload.get("email"));
-        user.setPhoneNumber(payload.get("phoneNumber"));
-
-        user.setStreet(payload.get("street"));
-        user.setCity(payload.get("city"));
-        user.setState(payload.get("state"));
-        user.setZipCode(payload.get("zipCode"));
-
-        // store hashed password
-        user.setHashedPassword(passwordEncoder.encode(payload.get("password")));
-        // store if they want promotions
-        user.setWantsPromotions(Boolean.parseBoolean(payload.get("wantsPromotions")));
-
-        // todo: EMAIL VERIFICATION!
+        user.setHashedPassword(passwordEncoder.encode(user.getHashedPassword()));
         user.setStatus("Active");
+
+        if (user.getCards() != null) {
+            for (Card card : user.getCards()) {
+                card.setCardNumber(cardEncoder.encode(card.getCardNumber()));
+                card.setUser(user);
+            }
+        }
 
         userRepository.save(user);
 

@@ -9,8 +9,6 @@ import org.hibernate.annotations.OnDeleteAction;
 @Table(name = "cards")
 public class Card {
 
-
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "idcards")

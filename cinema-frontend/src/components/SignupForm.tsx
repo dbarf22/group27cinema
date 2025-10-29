@@ -7,8 +7,8 @@ import type { E164Number } from 'libphonenumber-js/core';
 
 
 type Card = {
-  type: string;
-  number: string;
+  cardType: string;
+  cardNumber: string;
   expMonth: string;
   expYear: string;
   billingStreet: string;
@@ -17,9 +17,10 @@ type Card = {
   billingZip: string;
 };
 
+
 const emptyCard: Card = {
-  type: "",
-  number: "",
+  cardType: "",
+  cardNumber: "",
   expMonth: "",
   expYear: "",
   billingStreet: "",
@@ -84,6 +85,7 @@ export default function SignupForm() {
       const password = String(f.get("password") || "");
       const wantsPromotions = f.get("wantsPromotions") === "on";
 
+      // Address stuff
       const street = String(f.get("street") || "").trim();
       const city = String(f.get("city") || "").trim();
       const state = String(f.get("state") || "").trim();
@@ -92,6 +94,13 @@ export default function SignupForm() {
       if (!username || !email || !firstName || !lastName || !password || !phoneNumber) {
           setError("All fields are required.");
           return;
+      }
+
+      for (const card of cards) {
+          if (!card.cardType || !card.expMonth || !card.expYear || !card.billingStreet) {
+              setError("All fields are required.");
+              return;
+          }
       }
 
       try {
@@ -105,13 +114,14 @@ export default function SignupForm() {
                   email,
                   firstName,
                   lastName,
-                  password,
+                  hashedPassword: password,
                   wantsPromotions,
                   phoneNumber: phoneNumber,
                   street,
                   city,
                   state,
-                  zipCode
+                  zipCode,
+                  cards
               }),
           });
 
@@ -121,7 +131,7 @@ export default function SignupForm() {
           }
 
           // todo: verify email
-          router.push("/login");
+         // router.push("/login");
 
       } catch (err: any) {
           setError(err.message || "An error occurred.");
@@ -316,8 +326,8 @@ export default function SignupForm() {
                           <div>
                             <label className="block text-sm font-medium text-gray-700 mb-1">Card Type</label>
                             <select
-                              value={card.type}
-                              onChange={(e) => updateCard(cardIndex, "type", e.target.value)}
+                              value={card.cardType}
+                              onChange={(e) => updateCard(cardIndex, "cardType", e.target.value)}
                               className="w-full px-3 py-2 rounded-xl border border-gray-300 outline-none focus:ring-2 focus:ring-black"
                             >
                               <option value="">Select</option>
@@ -330,8 +340,8 @@ export default function SignupForm() {
                             <label className="block text-sm font-medium text-gray-700 mb-1">Card Number</label>
                             <input
                               type="text"
-                              value={card.number}
-                              onChange={(e) => updateCard(cardIndex, "number", e.target.value)}
+                              value={card.cardNumber}
+                              onChange={(e) => updateCard(cardIndex, "cardNumber", e.target.value)}
                               className="w-full px-3 py-2 rounded-xl border border-gray-300 outline-none focus:ring-2 focus:ring-black"
                             />
                           </div>

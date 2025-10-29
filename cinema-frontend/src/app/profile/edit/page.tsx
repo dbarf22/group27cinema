@@ -247,7 +247,7 @@ export default function EditProfilePage() {
                         onChange={e => setPromo(e.target.checked)}
                         className="h-4 w-4"
                     />
-                    RECIEVE PROMOTIONS?
+                    RECEIVE PROMOTIONS?
                 </label>
                 <button type="submit" disabled={busy}
                         className="w-full rounded bg-black px-4 py-2 text-white disabled:opacity-50">

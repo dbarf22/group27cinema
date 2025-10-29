@@ -41,6 +41,11 @@ public class AuthController {
         user.setEmail(payload.get("email"));
         user.setPhoneNumber(payload.get("phoneNumber"));
 
+        user.setStreet(payload.get("street"));
+        user.setCity(payload.get("city"));
+        user.setState(payload.get("state"));
+        user.setZipCode(payload.get("zipCode"));
+
         // store hashed password
         user.setHashedPassword(passwordEncoder.encode(payload.get("password")));
         // store if they want promotions

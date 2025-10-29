@@ -28,6 +28,7 @@ const emptyCard: Card = {
   billingZip: "",
 };
 
+
 export default function SignupForm() {
   const router = useRouter();
   const [error, setError] = useState("");
@@ -39,7 +40,7 @@ export default function SignupForm() {
   const [addedInitialCard, setAddedInitialCard] = useState(false);
   const maxCards = 3;
 
-  // helper function updateCard for adding or udpating information fields in a card
+  // helper function updateCard for adding or updating information fields in a card
   // ensures that only the selected field and card is updated and properly re-rerendered to React
   function updateCard(cardIndex: number, field: keyof Card, value: string) {
     setCards((prev) => {
@@ -75,12 +76,18 @@ export default function SignupForm() {
       setError("");
       const f = new FormData(e.currentTarget);
 
+      // User acct stuff
       const username = String(f.get("username") || "").trim();
       const email = String(f.get("email") || "").trim();
       const firstName = String(f.get("firstName") || "").trim();
       const lastName = String(f.get("lastName") || "").trim();
       const password = String(f.get("password") || "");
       const wantsPromotions = f.get("wantsPromotions") === "on";
+
+      const street = String(f.get("street") || "").trim();
+      const city = String(f.get("city") || "").trim();
+      const state = String(f.get("state") || "").trim();
+      const zipCode = String(f.get("zipCode") || "").trim();
 
       if (!username || !email || !firstName || !lastName || !password || !phoneNumber) {
           setError("All fields are required.");
@@ -101,6 +108,10 @@ export default function SignupForm() {
                   password,
                   wantsPromotions,
                   phoneNumber: phoneNumber,
+                  street,
+                  city,
+                  state,
+                  zipCode
               }),
           });
 
@@ -272,12 +283,12 @@ export default function SignupForm() {
                         />
                       </div>
                       <div>
-                        <label htmlFor="zip" className="block text-sm font-medium text-gray-700 mb-1">
+                        <label htmlFor="zipCode" className="block text-sm font-medium text-gray-700 mb-1">
                           Zip Code
                         </label>
                         <input
-                          id="zip"
-                          name="zip"
+                          id="zipCode"
+                          name="zipCode"
                           type="text"
                           className="w-full px-3 py-2 rounded-xl border border-gray-300 outline-none focus:ring-2 focus:ring-black"
                         />

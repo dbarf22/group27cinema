@@ -5,8 +5,8 @@ import {createContext, useContext, useState, ReactNode, useEffect} from "react";
 type User = {
     username: string;
     email: string;
-    firstName: string;
-    lastName: string;
+    first_name: string;
+    last_name: string;
     phoneNumber: string;
     wantsPromotions: boolean;
 }

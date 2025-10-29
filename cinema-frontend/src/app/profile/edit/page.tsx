@@ -42,8 +42,8 @@ export default function EditProfilePage() {
     const [username, setUsername] = useState('');
     const [email, setEmail] = useState('');
 
-    const [firstName, setFirst] = useState('');
-    const [lastName, setLast] = useState('');
+    const [first_name, setFirst] = useState('');
+    const [last_name, setLast] = useState('');
     const [phoneNumber, setPhone] = useState('')
     const [wantsPromotions, setPromo] = useState(false);
 
@@ -71,8 +71,8 @@ export default function EditProfilePage() {
         setUsername(currentUser.username || '');
         setEmail(currentUser.email || '');
         setPhone(currentUser.phoneNumber || '');
-        setFirst(currentUser.firstName || '');
-        setLast(currentUser.lastName || '');
+        setFirst(currentUser.first_name || '');
+        setLast(currentUser.last_name || '');
         setPromo(currentUser.wantsPromotions || false);
 
     }, [currentUser, router]);
@@ -108,8 +108,8 @@ export default function EditProfilePage() {
                 body: JSON.stringify({
                     username,
                     email,
-                    firstName,
-                    lastName,
+                    first_name,
+                    last_name,
                     wantsPromotions,
                     phoneNumber: phoneNumber,
                 }),
@@ -216,7 +216,7 @@ export default function EditProfilePage() {
                     <input
                         id="firstName"
                         placeholder="First Name"
-                        value={firstName}
+                        value={first_name}
                         onChange={e => setFirst(e.target.value)}
                         required
                         className="rounded border px-3 py-2"
@@ -224,7 +224,7 @@ export default function EditProfilePage() {
                     <input
                         id="lastName"
                         placeholder="Last Name"
-                        value={lastName}
+                        value={last_name}
                         onChange={e => setLast(e.target.value)}
                         required
                         className="rounded border px-3 py-2"

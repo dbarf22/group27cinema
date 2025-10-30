@@ -131,7 +131,7 @@ export default function SignupForm() {
           }
 
           // todo: verify email
-         // router.push("/login");
+         router.push("/account-verify");
 
       } catch (err: any) {
           setError(err.message || "An error occurred.");

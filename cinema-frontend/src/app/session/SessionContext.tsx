@@ -3,13 +3,29 @@
 import {createContext, useContext, useState, ReactNode, useEffect} from "react";
 
 type User = {
-    username: string;
-    email: string;
-    first_name: string;
-    last_name: string;
-    phoneNumber: string;
-    wantsPromotions: boolean;
-}
+  username: string;
+  email: string;
+  firstName: string;
+  lastName: string;
+  phoneNumber: string;
+  wantsPromotions: boolean;
+  street: string;
+  city: string;
+  state: string;
+  zipCode: string;
+  cards: Card[];
+};
+
+type Card = {
+    cardType: string;
+    cardNumber: string;
+    expMonth: string;
+    expYear: string;
+    billingStreet: string;
+    billingCity: string;
+    billingState: string;
+    billingZip: string;
+};
 
 type SessionContextInfo = {
     currentUser: User | null;

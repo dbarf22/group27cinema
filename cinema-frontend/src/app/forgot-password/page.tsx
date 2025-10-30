@@ -26,11 +26,22 @@ export default function ForgotPasswordPage() {
     }
 
     setBusy(true);
-    setTimeout(() => {
-      setOk('An email will be sent if that email exists.');
-      setEmail('');
-      setBusy(false);
-    }, 800);
+    try {
+        const res = await fetch(`http://localhost:8080/api/auth/forgot-password?email=${email}`, {
+            method: 'POST',
+            headers: {
+                  "Content-Type": "application/json",
+              },
+            body: JSON.stringify({email: email})
+        });
+        setOk("If an account with that email exists, an email will be sent.")
+    } catch (error) {
+        setOk("If an account with that email exists, an email will be sent.")
+    } finally {
+        setBusy(false);
+    }
+
+
   }
     
     return (

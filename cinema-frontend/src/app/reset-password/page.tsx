@@ -36,13 +36,28 @@ function ResetPasswordContent() {
       setErr('Passwords do not match.');
       return;
     }
+      setBusy(true);
+      try {
+          const res = await fetch(`http://localhost:8080/api/auth/reset-password?token=${token}`, {
+              method: "POST",
+              headers: {
+                  "Content-Type": "application/json",
+              },
+              body: JSON.stringify({newPassword: newPw}),
+          });
 
-    setBusy(true);
-    setTimeout(() => {
-      setOk('Password reset. Redirecting…');
-      setTimeout(() => router.push('/login'), 900);
-      setBusy(false);
-    }, 800);
+          if (!res.ok) {
+              const errText = await res.text();
+              throw new Error(errText || "Invalid token.");
+          }
+
+          setOk("Password reset successfully.");
+          setTimeout(() => router.push("/login"));
+      } catch (err: any) {
+          setErr(err.message);
+      } finally {
+          setBusy(false);
+      }
   }
 
   return (

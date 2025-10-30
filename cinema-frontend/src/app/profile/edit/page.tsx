@@ -11,8 +11,8 @@ import PhoneInput from 'react-phone-number-input';
 import type {E164Number} from 'libphonenumber-js/core';
 
 type Card = {
-    type: string;
-    number: string;
+    cardType: string;
+    cardNumber: string;
     expMonth: string;
     expYear: string;
     billingStreet: string;
@@ -22,8 +22,8 @@ type Card = {
 };
 
 const emptyCard: Card = {
-    type: '',
-    number: '',
+    cardType: '',
+    cardNumber: '',
     expMonth: '',
     expYear: '',
     billingStreet: '',
@@ -37,7 +37,11 @@ export default function EditProfilePage() {
     const {currentUser, login} = useSession();
 
     const [msg, setMsg] = useState({error: '', ok: ''});
-    const [busy, setBusy] = useState(false);
+    const [busyProfile, setBusyProfile] = useState(false);
+    const [busyAddress, setBusyAddress] = useState(false);
+    const [busyPayments, setBusyPayments] = useState(false);
+    const [busyPassword, setBusyPassword] = useState(false);
+
 
     const [username, setUsername] = useState('');
     const [email, setEmail] = useState('');
@@ -71,9 +75,14 @@ export default function EditProfilePage() {
         setUsername(currentUser.username || '');
         setEmail(currentUser.email || '');
         setPhone(currentUser.phoneNumber || '');
-        setFirst(currentUser.first_name || '');
-        setLast(currentUser.last_name || '');
+        setFirst(currentUser.firstName || '');
+        setLast(currentUser.lastName || '');
         setPromo(currentUser.wantsPromotions || false);
+        setCards(currentUser.cards || []);
+        setState(currentUser.state || '');
+        setStreet(currentUser.street || '');
+        setCity(currentUser.city || '');
+        setZip(currentUser.zipCode || '')
 
     }, [currentUser, router]);
 
@@ -92,7 +101,7 @@ export default function EditProfilePage() {
 
     const handleProfile = async (e: FormEvent) => {
         e.preventDefault();
-        setBusy(true);
+        setBusyProfile(true);
         setError('');
         setOk('');
 
@@ -100,7 +109,7 @@ export default function EditProfilePage() {
             if (!isPossiblePhoneNumber(phoneNumber)) {
                 throw new Error('Phone number is invalid.');
             }
-            const res = await fetch("/api/auth/edit-profile", {
+            const res = await fetch("http://localhost:8080/api/auth/edit-profile", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
@@ -108,10 +117,15 @@ export default function EditProfilePage() {
                 body: JSON.stringify({
                     username,
                     email,
-                    first_name,
-                    last_name,
+                    firstName: first_name,
+                    lastName: last_name,
                     wantsPromotions,
-                    phoneNumber: phoneNumber,
+                    phoneNumber,
+                    street,
+                    city,
+                    state,
+                    zipCode: zip,
+                    cards,
                 }),
             });
 
@@ -127,36 +141,94 @@ export default function EditProfilePage() {
         } catch (err: any) {
             setError(err.message || "An error occurred.");
         } finally {
-            setBusy(false);
+            setBusyProfile(false);
         }
 
     };
 
     const handleAddress = async (e: FormEvent) => {
         e.preventDefault();
-        setMsg({error: '', ok: ''});
-        setBusy(true);
-        setTimeout(() => {
-            setOk('Address updated');
-            setBusy(false);
-        }, 800);
+        setBusyAddress(true);
+        setError('');
+        setOk('');
+
+         try {
+            if (!isPossiblePhoneNumber(phoneNumber)) {
+                throw new Error('Phone number is invalid.');
+            }
+            const res = await fetch("http://localhost:8080/api/auth/edit-profile", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({
+                    email: email,
+                    street,
+                    city,
+                    state,
+                    zipCode: zip,
+                }),
+            });
+
+            const data = await res.json();
+            login(data.user);
+
+            if (!res.ok) {
+                const errorText = await res.text();
+                throw new Error(errorText || "Edit address failed");
+            }
+            setOk("Address successfully updated!");
+
+        } catch (err: any) {
+            setError(err.message || "An error occurred.");
+        } finally {
+            setBusyAddress(false);
+        }
     };
 
     const handlePayments = async (e: FormEvent) => {
         e.preventDefault();
+        setBusyPayments(true);
+        setError('');
+        setOk('');
+
         setMsg({error: '', ok: ''});
         for (let i = 0; i < cards.length; i++) {
             const c = cards[i];
-            if (!c.type || !c.number || !c.expMonth || !c.expYear) {
+            if (!c.cardType || !c.cardNumber || !c.expMonth || !c.expYear) {
                 setError(`Card ${i + 1}: fill required fields`);
                 return;
             }
         }
-        setBusy(true);
-        setTimeout(() => {
-            setOk('Payment methods updated');
-            setBusy(false);
-        }, 800);
+         try {
+            if (!isPossiblePhoneNumber(phoneNumber)) {
+                throw new Error('Phone number is invalid.');
+            }
+            const res = await fetch("http://localhost:8080/api/auth/edit-profile", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({
+                    email: email,
+                    cards
+                }),
+            });
+
+            const data = await res.json();
+            login(data.user);
+
+            if (!res.ok) {
+                const errorText = await res.text();
+                throw new Error(errorText || "Edit payment info failed");
+            }
+            setOk("Payment info successfully updated!");
+
+        } catch (err: any) {
+            setError(err.message || "An error occurred.");
+        } finally {
+            setBusyPayments(false);
+        }
     };
 
     const handlePassword = async (e: FormEvent) => {
@@ -170,14 +242,36 @@ export default function EditProfilePage() {
             setError('Min 6 characters');
             return;
         }
-        setBusy(true);
-        setTimeout(() => {
-            setOk('Password changed');
-            setCurPw('');
-            setNewPw('');
-            setConfirmPw('');
-            setBusy(false);
-        }, 800);
+        setBusyPassword(true);
+        try {
+            const res = await fetch("http://localhost:8080/api/auth/change-password", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({
+                    email: email,
+                    password: currentPassword,
+                    newPassword: newPassword,
+                }),
+            });
+
+            if (!res.ok) {
+                const text = await res.text();
+                throw new Error(text || "Failed to change password");
+            }
+
+            setOk("Password changed successfully.");
+            setCurPw("");
+            setNewPw("");
+            setConfirmPw("");
+        } catch (err: any) {
+            setError(err.message || "An error occurred while changing the password");
+        } finally {
+            setBusyPassword(false);
+        }
+
+
     };
 
     if (!currentUser) return null;
@@ -249,9 +343,9 @@ export default function EditProfilePage() {
                     />
                     RECEIVE PROMOTIONS?
                 </label>
-                <button type="submit" disabled={busy}
+                <button type="submit" disabled={busyProfile}
                         className="w-full rounded bg-black px-4 py-2 text-white disabled:opacity-50">
-                    {busy ? 'Updating…' : 'Update Profile'}
+                    {busyProfile ? 'Updating…' : 'Update Profile'}
                 </button>
             </form>
 
@@ -297,9 +391,9 @@ export default function EditProfilePage() {
                                 className="rounded border px-3 py-2"
                             />
                         </div>
-                        <button type="submit" disabled={busy}
+                        <button type="submit" disabled={busyAddress}
                                 className="w-full rounded bg-black px-4 py-2 text-white disabled:opacity-50">
-                            {busy ? 'Updating…' : 'Update Address'}
+                            {busyAddress ? 'Updating…' : 'Update Address'}
                         </button>
                     </form>
                 )}
@@ -330,8 +424,8 @@ export default function EditProfilePage() {
                                     </div>
                                     <div className="grid gap-3 sm:grid-cols-2">
                                         <select
-                                            value={c.type}
-                                            onChange={e => updateCard(i, 'type', e.target.value)}
+                                            value={c.cardType}
+                                            onChange={e => updateCard(i, 'cardType', e.target.value)}
                                             required
                                             className="rounded border px-3 py-2 bg-white"
                                         >
@@ -343,8 +437,8 @@ export default function EditProfilePage() {
                                         </select>
                                         <input
                                             placeholder="Card number"
-                                            value={c.number}
-                                            onChange={e => updateCard(i, 'number', e.target.value)}
+                                            value={c.cardNumber}
+                                            onChange={e => updateCard(i, 'cardNumber', e.target.value)}
                                             required
                                             maxLength={19}
                                             className="rounded border px-3 py-2"
@@ -407,9 +501,9 @@ export default function EditProfilePage() {
                         </div>
 
                         {cards.length > 0 && (
-                            <button type="submit" disabled={busy}
+                            <button type="submit" disabled={busyPayments}
                                     className="w-full rounded bg-black px-4 py-2 text-white disabled:opacity-50">
-                                {busy ? 'Updating…' : 'Update Payment Methods'}
+                                {busyPayments ? 'Updating…' : 'Update Payment Methods'}
                             </button>
                         )}
                     </form>
@@ -453,10 +547,10 @@ export default function EditProfilePage() {
                         />
                         <button
                             type="submit"
-                            disabled={busy || !currentPassword || !newPassword}
+                            disabled={busyPassword || !currentPassword || !newPassword}
                             className="w-full rounded bg-black px-4 py-2 text-white disabled:opacity-50"
                         >
-                            {busy ? 'Changing…' : 'Change Password'}
+                            {busyPassword ? 'Changing…' : 'Change Password'}
                         </button>
                     </form>
                 )}

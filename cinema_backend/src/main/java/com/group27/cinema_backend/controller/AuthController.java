@@ -50,6 +50,7 @@ public class AuthController {
                 card.setUser(user);
             }
         }
+        user.setAccountType("Customer");
 
         userRepository.save(user);
 
@@ -239,6 +240,7 @@ public class AuthController {
         if (updatedUser.getCards() != null && !updatedUser.getCards().isEmpty()) {
             user.getCards().clear();
             for (Card card : updatedUser.getCards()) {
+                card.setCardNumber(cardEncoder.encode(card.getCardNumber()));
                 card.setUser(user);
                 user.getCards().add(card);
             }

@@ -96,9 +96,18 @@ export default function SignupForm() {
           return;
       }
 
+      if (street && city && state && zipCode) {
+          } else if (!street && !city && !state && !zipCode) {
+          } else {
+              setError("All address fields must be filled if adding address.")
+              return;
+          }
+
       for (const card of cards) {
-          if (!card.cardType || !card.expMonth || !card.expYear || !card.billingStreet) {
-              setError("All fields are required.");
+          if (card.cardType && card.expMonth && card.expYear && card.billingStreet) {
+          } else if (!card.cardType && !card.expMonth && !card.expYear && !card.billingStreet) {
+          } else {
+              setError("All payment fields must be filled if adding payment.")
               return;
           }
       }
@@ -121,7 +130,7 @@ export default function SignupForm() {
                   city,
                   state,
                   zipCode,
-                  cards
+                  cards,
               }),
           });
 

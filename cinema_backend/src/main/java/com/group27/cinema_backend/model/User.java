@@ -66,6 +66,17 @@ public class User {
     @Column(name = "zipCode")
     private String zipCode;
 
+    public String getAccountType() {
+        return accountType;
+    }
+
+    public void setAccountType(String accountType) {
+        this.accountType = accountType;
+    }
+
+    @Column(name = "accountType")
+    private String accountType;
+
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
     @JsonManagedReference
     private List<Card> cards = new ArrayList<>();

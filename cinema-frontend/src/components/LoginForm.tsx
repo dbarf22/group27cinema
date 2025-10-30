@@ -16,6 +16,7 @@ export default function LoginForm() {
             const f = new FormData(e.currentTarget);
             const email = String(f.get("email") || "").trim();
             const password = String(f.get("password") || "");
+            const rememberMe = f.get("rememberMe") === "on";
 
             if (!email || !password) {
                 setError("Please enter your email and password.");
@@ -36,7 +37,7 @@ export default function LoginForm() {
             }
 
             const data = await res.json();
-            login(data.user); // uses login from sessioncontext
+            login(data.user, rememberMe); // uses login from sessioncontext
 
             router.push("/");
 
@@ -102,6 +103,7 @@ export default function LoginForm() {
           <div className="flex items-center justify-between text-sm text-gray-700">
             <label className="flex items-center gap-2">
               <input
+                  id="rememberMe"
                 type="checkbox"
                 name="rememberMe"
                 className="h-4 w-4 rounded border-gray-300 text-black focus:ring-black"

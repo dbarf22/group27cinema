@@ -113,11 +113,6 @@ public class AuthController {
         userMap.put("city", user.getCity());
         userMap.put("street", user.getStreet());
 
-        List<Card> card = user.getCards();
-        Card firstCard = card.get(0);
-
-        System.out.println(firstCard.getBillingState());
-
         Map<String, Object> responseData = Map.of(
                 "message", "Login successful.",
                 "user", userMap

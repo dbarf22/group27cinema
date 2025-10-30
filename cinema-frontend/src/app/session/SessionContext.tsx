@@ -30,7 +30,7 @@ type Card = {
 type SessionContextInfo = {
     currentUser: User | null;
     isLoading: boolean;
-    login: (user: User) => void;
+    login: (user: User, rememberMe: boolean) => void;
     logout: () => void;
 };
 
@@ -42,28 +42,31 @@ export function SessionProvider({ children }: { children: ReactNode }) {
 
     useEffect(() => {
         try {
-            const storedUser = localStorage.getItem('currentUser');
+            const storedUser = localStorage.getItem('currentUser') || sessionStorage.getItem('currentUser');
             if (storedUser) {
                 setCurrentUser(JSON.parse(storedUser));
             }
         } catch (e) {
             console.error("Failed to parse user from localStorage", e);
             localStorage.removeItem('currentUser');
+            sessionStorage.removeItem('currentUser');
         }
         setIsLoading(false);
     }, []);
 
-    const login = (user: User) => {
+    const login = (user: User, rememberMe: boolean) => {
         setCurrentUser(user);
         try {
-            localStorage.setItem('currentUser', JSON.stringify(user));
+            const storage = rememberMe ? localStorage : sessionStorage;
+            storage.setItem('currentUser', JSON.stringify(user));
         } catch (e) {
-            console.error("Failed to save user to localStorage", e);
+            console.error("Failed to save user to storage", e);
         }
     };
 
     const logout = () => {
         setCurrentUser(null);
+        sessionStorage.removeItem("currentUser");
         localStorage.removeItem('currentUser');
     };
 

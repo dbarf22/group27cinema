@@ -1,6 +1,5 @@
 package com.group27.cinema_backend.model;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
@@ -32,7 +31,7 @@ public class User {
     private String lastName;
 
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
-    @Column(name = "hashed_password", nullable = false, length = 255)
+    @Column(name = "hashed_password", nullable = false)
     private String hashedPassword;
 
     @CreationTimestamp
@@ -73,10 +72,6 @@ public class User {
 
     public List<Card> getCards() {
         return cards;
-    }
-
-    public void setCards(List<Card> cards) {
-        this.cards = cards;
     }
 
     public String getStreet() {
@@ -131,10 +126,6 @@ public class User {
         return email;
     }
 
-    public void setEmail(String email) {
-        this.email = email;
-    }
-
     public String getFirstName() {
         return firstName;
     }
@@ -157,22 +148,6 @@ public class User {
 
     public void setHashedPassword(String hashedPassword) {
         this.hashedPassword = hashedPassword;
-    }
-
-    public LocalDateTime getCreatedAt() {
-        return createdAt;
-    }
-
-    public void setCreatedAt(LocalDateTime createdAt) {
-        this.createdAt = createdAt;
-    }
-
-    public LocalDateTime getUpdatedAt() {
-        return updatedAt;
-    }
-
-    public void setUpdatedAt(LocalDateTime updatedAt) {
-        this.updatedAt = updatedAt;
     }
 
     public String getPhoneNumber() {

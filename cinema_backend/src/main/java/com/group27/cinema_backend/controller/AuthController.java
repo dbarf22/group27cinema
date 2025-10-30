@@ -4,11 +4,8 @@ import com.group27.cinema_backend.model.Card;
 import com.group27.cinema_backend.model.User;
 import com.group27.cinema_backend.repository.UserRepository;
 import com.group27.cinema_backend.service.EmailService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.mail.javamail.JavaMailSender;
-import org.springframework.mail.javamail.JavaMailSenderImpl;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
@@ -22,14 +19,17 @@ import java.util.UUID;
 @RequestMapping("/api/auth")
 public class AuthController {
 
-    @Autowired
-    private UserRepository userRepository;
-    @Autowired
-    private PasswordEncoder passwordEncoder;
-    @Autowired
-    private PasswordEncoder cardEncoder;
-    @Autowired
-    private EmailService emailService;
+    private final UserRepository userRepository;
+    private final PasswordEncoder passwordEncoder;
+    private final PasswordEncoder cardEncoder;
+    private final EmailService emailService;
+
+    public AuthController(UserRepository userRepository, PasswordEncoder passwordEncoder, PasswordEncoder cardEncoder, EmailService emailService) {
+        this.userRepository = userRepository;
+        this.passwordEncoder = passwordEncoder;
+        this.cardEncoder = cardEncoder;
+        this.emailService = emailService;
+    }
 
     // REGISTRATION
     @PostMapping("/register")
@@ -69,7 +69,7 @@ public class AuthController {
     public ResponseEntity<?> verifyUser(@RequestParam("token") String token) {
         Optional<User> user = userRepository.findByVerificationToken(token);
 
-        if (!user.isPresent()) {
+        if (user.isEmpty()) {
             return new ResponseEntity<>("Verification token is invalid.", HttpStatus.BAD_REQUEST);
         }
 
@@ -88,7 +88,7 @@ public class AuthController {
 
         Optional<User> userOpt = userRepository.findByEmail(payload.get("email"));
 
-        if (!userOpt.isPresent()) {
+        if (userOpt.isEmpty()) {
             return new ResponseEntity<>("Invalid email or password.", HttpStatus.UNAUTHORIZED);
         }
 
@@ -147,7 +147,7 @@ public class AuthController {
     @PostMapping("/reset-password")
     public ResponseEntity<?> resetPassword(@RequestParam("token") String token, @RequestBody Map<String, String> payload) {
         Optional<User> userOpt = userRepository.findByVerificationToken(token);
-        if (!userOpt.isPresent()) {
+        if (userOpt.isEmpty()) {
             return new ResponseEntity<>("Invalid or expired token.", HttpStatus.BAD_REQUEST);
         }
 

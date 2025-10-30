@@ -18,7 +18,7 @@ public class GetController {
         this.movieRepository = movieRepository;
     }
 
-    // leave the paramaters blank to list all movies
+    // leave the parameters blank to list all movies
     // if you're searching by title make sure you don't include genre, and vice versa
     // Returns everything
     @GetMapping("/api/movies")
@@ -43,7 +43,7 @@ public class GetController {
     }
 
     @GetMapping("/api/movies/trailer")
-    public Map<String,String> getTrailer(@RequestParam(required = true) String id) {
+    public Map<String,String> getTrailer(@RequestParam() String id) {
         String trailer = movieRepository.findById(id)
                                     .map(Movie::getTrailer)
                                     .orElse("Movie not found");
@@ -51,7 +51,7 @@ public class GetController {
     }
 
     @GetMapping("/api/movies/poster")
-    public Map<String,String> getPoster(@RequestParam(required = true) String id) {
+    public Map<String,String> getPoster(@RequestParam() String id) {
         String poster = movieRepository.findById(id)
                                     .map(Movie::getPoster)
                                     .orElse("Movie not found");

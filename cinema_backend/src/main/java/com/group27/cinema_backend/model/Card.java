@@ -6,6 +6,7 @@ import jakarta.persistence.*;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 
+@SuppressWarnings("unused")
 @Entity
 @Table(name = "cards")
 public class Card {
@@ -44,10 +45,6 @@ public class Card {
 
     @Column(name = "billingState", length = 45)
     private String billingState;
-
-    public String getBillingState() {
-        return billingState;
-    }
 
     public void setBillingState(String billingState) {
         this.billingState = billingState;

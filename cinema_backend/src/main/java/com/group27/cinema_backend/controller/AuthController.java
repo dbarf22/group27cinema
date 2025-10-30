@@ -175,7 +175,14 @@ public class AuthController {
             if (passwordEncoder.matches(payload.get("password"), user.getHashedPassword())) {
                 user.setHashedPassword(hashedNewPassword);
                 userRepository.save(user);
+
+                String subject = "Password has been changed successfully";
+                String body = "Your password has been changed successfully.\n";
+                emailService.sendEmail(user.getEmail(), subject, body);
+
                 return new ResponseEntity<>(HttpStatus.OK);
+
+
             } else {
                 return new ResponseEntity<>("Password is incorrect.", HttpStatus.BAD_REQUEST);
             }

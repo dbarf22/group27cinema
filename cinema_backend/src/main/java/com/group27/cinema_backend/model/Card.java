@@ -50,6 +50,10 @@ public class Card {
         this.billingState = billingState;
     }
 
+    public String getBillingState() {
+        return billingState;
+    }
+
     public String getBillingZip() {
         return billingZip;
     }

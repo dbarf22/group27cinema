@@ -437,7 +437,7 @@ export default function EditProfilePage() {
                                         </select>
                                         <input
                                             placeholder="Card number"
-                                            value={c.cardNumber}
+
                                             onChange={e => updateCard(i, 'cardNumber', e.target.value)}
                                             required
                                             maxLength={19}

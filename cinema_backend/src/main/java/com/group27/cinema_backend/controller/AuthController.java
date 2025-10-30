@@ -9,10 +9,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 
 @CrossOrigin(origins = "http://localhost:3000")
 @RestController
@@ -115,6 +112,11 @@ public class AuthController {
         userMap.put("city", user.getCity());
         userMap.put("street", user.getStreet());
 
+        List<Card> card = user.getCards();
+        Card firstCard = card.get(0);
+
+        System.out.println(firstCard.getBillingState());
+
         Map<String, Object> responseData = Map.of(
                 "message", "Login successful.",
                 "user", userMap
@@ -155,6 +157,10 @@ public class AuthController {
         user.setHashedPassword(passwordEncoder.encode(payload.get("newPassword")));
         user.setVerificationToken(null);
         userRepository.save(user);
+
+        String subject = "Password has been changed successfully";
+        String body = "Your password has been changed successfully.\n";
+        emailService.sendEmail(user.getEmail(), subject, body);
 
         return ResponseEntity.ok("Password has been reset successfully.");
     }

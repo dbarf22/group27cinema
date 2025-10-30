@@ -66,7 +66,7 @@ public class User {
     @Column(name = "zipCode")
     private String zipCode;
 
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
     @JsonManagedReference
     private List<Card> cards = new ArrayList<>();
 

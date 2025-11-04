@@ -1,9 +1,12 @@
 package com.group27.cinema_backend.controller;
 
+import com.group27.cinema_backend.dto.LoginRequest;
+import com.group27.cinema_backend.dto.LoginResponse;
 import com.group27.cinema_backend.model.Card;
 import com.group27.cinema_backend.model.User;
 import com.group27.cinema_backend.repository.UserRepository;
 import com.group27.cinema_backend.service.EmailService;
+import com.group27.cinema_backend.service.UserService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -16,109 +19,47 @@ import java.util.*;
 @RequestMapping("/api/auth")
 public class AuthController {
 
-    private final UserRepository userRepository;
-    private final PasswordEncoder passwordEncoder;
-    private final PasswordEncoder cardEncoder;
-    private final EmailService emailService;
+    //Spring dependency injection. We made userService a bean in the service package, and now
+    // we are injecting it into AuthController. Spring will manage the instance of this userservice
+    private final UserService userService;
 
-    public AuthController(UserRepository userRepository, PasswordEncoder passwordEncoder, PasswordEncoder cardEncoder, EmailService emailService) {
-        this.userRepository = userRepository;
-        this.passwordEncoder = passwordEncoder;
-        this.cardEncoder = cardEncoder;
-        this.emailService = emailService;
+    AuthController(UserService userService) {
+        this.userService = userService;
     }
 
     // REGISTRATION
     @PostMapping("/register")
     public ResponseEntity<?> registerUser(@RequestBody User user) {
-
-        // Check for duplicate email or username
-        if (userRepository.findByEmail(user.getEmail()).isPresent()) {
-            return new ResponseEntity<>("Email is already in use.", HttpStatus.BAD_REQUEST);
+        try {
+            userService.registerUser(user);
+            return new ResponseEntity<>("User registered successfully. " +
+                    "Please check your email for a verification link.", HttpStatus.CREATED);
+        } catch (Exception e) {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
         }
-        if (userRepository.findByUsername(user.getUsername()).isPresent()) {
-            return new ResponseEntity<>("Username is already in use.", HttpStatus.BAD_REQUEST);
-        }
-
-        user.setHashedPassword(passwordEncoder.encode(user.getHashedPassword()));
-        user.setStatus("Inactive");
-        user.setVerificationToken(UUID.randomUUID().toString());
-
-        if (user.getCards() != null) {
-            for (Card card : user.getCards()) {
-                card.setCardNumber(cardEncoder.encode(card.getCardNumber()));
-                card.setUser(user);
-            }
-        }
-        user.setAccountType("Customer");
-
-        userRepository.save(user);
-
-        String subject = "Verification Needed";
-        String link = "http://localhost:8080/api/auth/verify?token=" + user.getVerificationToken();
-        String body = "Please click the link in order to activate your account.\n" + link;
-        emailService.sendEmail(user.getEmail(), subject, body);
-
-        return new ResponseEntity<>("User registered successfully.", HttpStatus.CREATED);
     }
 
     // verification
     @GetMapping("verify")
     public ResponseEntity<?> verifyUser(@RequestParam("token") String token) {
-        Optional<User> user = userRepository.findByVerificationToken(token);
-
-        if (user.isEmpty()) {
-            return new ResponseEntity<>("Verification token is invalid.", HttpStatus.BAD_REQUEST);
+        try {
+            userService.verifyUser(token);
+            return new ResponseEntity<>("Account successfully activated.", HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
         }
-
-        User user1 = user.get();
-        user1.setStatus("Active");
-        user1.setVerificationToken(null);
-        userRepository.save(user1);
-
-        return new ResponseEntity<>("Account successfully activated.", HttpStatus.OK);
     }
 
-    // LOGIN
+    // Login uses a new dto to ensure stuff sent to the frontend doesnt include password
     @PostMapping("/login")
-    public ResponseEntity<?> loginUser(@RequestBody Map<String, String> payload) {
-
-
-        Optional<User> userOpt = userRepository.findByEmail(payload.get("email"));
-
-        if (userOpt.isEmpty()) {
-            return new ResponseEntity<>("Invalid email or password.", HttpStatus.UNAUTHORIZED);
+    public ResponseEntity<?> loginUser(@RequestBody LoginRequest loginRequest) {
+        try {
+            User user = userService.loginUser(loginRequest.email(), loginRequest.password());
+            LoginResponse response = new LoginResponse("Login successful.", user);
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            return new ResponseEntity<>(Map.of("message", e.getMessage()), HttpStatus.UNAUTHORIZED);
         }
-
-        User user = userOpt.get();
-
-        if (!passwordEncoder.matches(payload.get("password"), user.getHashedPassword())) {
-            return new ResponseEntity<>("Invalid email or password.", HttpStatus.UNAUTHORIZED);
-        }
-
-        if (!"Active".equals(user.getStatus())) {
-            return new ResponseEntity<>("Account is not active.", HttpStatus.FORBIDDEN);
-        }
-
-        Map<String, Object> userMap = new HashMap<>();
-        userMap.put("email", user.getEmail());
-        userMap.put("username", user.getUsername());
-        userMap.put("phoneNumber", user.getPhoneNumber());
-        userMap.put("firstName", user.getFirstName());
-        userMap.put("lastName", user.getLastName());
-        userMap.put("wantsPromotions", user.isWantsPromotions());
-        userMap.put("cards", user.getCards());
-        userMap.put("state", user.getState());
-        userMap.put("zipCode", user.getZipCode());
-        userMap.put("city", user.getCity());
-        userMap.put("street", user.getStreet());
-
-        Map<String, Object> responseData = Map.of(
-                "message", "Login successful.",
-                "user", userMap
-        );
-
-        return new ResponseEntity<>(responseData, HttpStatus.OK);
     }
 
     // FORGOT PASSWORD
@@ -198,52 +139,12 @@ public class AuthController {
     // Edit Profile
     @PostMapping("/edit-profile")
     public ResponseEntity<?> editProfile(@RequestBody User updatedUser) {
-        Optional<User> userOpt = userRepository.findByEmail(updatedUser.getEmail());
-        if (userOpt.isEmpty()) {
-            return ResponseEntity.badRequest().body("User not found.");
+        try {
+            User user = userService.editProfile(updatedUser);
+            LoginResponse response = new LoginResponse("Profile successfully edited.", user);
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            return new ResponseEntity<>(Map.of("message", e.getMessage()), HttpStatus.BAD_REQUEST);
         }
-
-        User user = userOpt.get();
-
-        if (updatedUser.getFirstName() != null && !updatedUser.getFirstName().isBlank()) {
-            user.setFirstName(updatedUser.getFirstName());
-        }
-        if (updatedUser.getLastName() != null && !updatedUser.getLastName().isBlank()) {
-            user.setLastName(updatedUser.getLastName());
-        }
-        if (updatedUser.getPhoneNumber() != null && !updatedUser.getPhoneNumber().isBlank()) {
-            user.setPhoneNumber(updatedUser.getPhoneNumber());
-        }
-        if (updatedUser.getUsername() != null && !updatedUser.getUsername().isBlank()) {
-            user.setUsername(updatedUser.getUsername());
-        }
-        if (updatedUser.getStreet() != null && !updatedUser.getStreet().isBlank()) {
-            user.setStreet(updatedUser.getStreet());
-        }
-        if (updatedUser.getCity() != null && !updatedUser.getCity().isBlank()) {
-            user.setCity(updatedUser.getCity());
-        }
-        if (updatedUser.getState() != null && !updatedUser.getState().isBlank()) {
-            user.setState(updatedUser.getState());
-        }
-        if (updatedUser.getZipCode() != null && !updatedUser.getZipCode().isBlank()) {
-            user.setZipCode(updatedUser.getZipCode());
-        }
-
-        user.setWantsPromotions(updatedUser.isWantsPromotions());
-
-        if (updatedUser.getCards() != null && !updatedUser.getCards().isEmpty()) {
-            user.getCards().clear();
-            for (Card card : updatedUser.getCards()) {
-                card.setCardNumber(cardEncoder.encode(card.getCardNumber()));
-                card.setUser(user);
-                user.getCards().add(card);
-            }
-        }
-        userRepository.save(user);
-        return ResponseEntity.ok(
-                Map.of("message", "Profile successfully edited.", "user", user)
-        );
     }
-
 }

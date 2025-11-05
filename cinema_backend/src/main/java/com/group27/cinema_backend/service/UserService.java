@@ -16,6 +16,11 @@ public class UserService {
     private final PasswordEncoder encoder;
     private final EmailService emailService;
 
+    // These methods all used to be in auth controller but I am separating them now so AuthController
+    // is strictly for routing http requests
+
+    //todo: forgot password, reset password, change password
+
     // Constructor class that ensures dependency injection through spring
     public UserService(UserRepository userRepository, PasswordEncoder encoder,
                        EmailService emailService) {

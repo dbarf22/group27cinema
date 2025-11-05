@@ -1,113 +1,59 @@
 package com.group27.cinema_backend.model;
 
-
-import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 
-@SuppressWarnings("unused")
+import java.util.LinkedHashSet;
+import java.util.Set;
+
 @Entity
 @Table(name = "cards")
 public class Card {
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "idcards")
+    @Column(name = "card_id", nullable = false)
     private Integer id;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @OnDelete(action = OnDeleteAction.CASCADE)
     @JoinColumn(name = "user_id", nullable = false)
-    @JsonBackReference
     private User user;
 
-    @Column(name = "cardType", nullable = false, length = 45)
+    @Column(name = "card_type", nullable = false, length = 45)
     private String cardType;
 
-    @Column(name = "cardNumber", nullable = false)
+    @Column(name = "card_number", nullable = false)
     private String cardNumber;
 
-    @Column(name = "expMonth", length = 2)
+    @Column(name = "exp_month", length = 2)
     private String expMonth;
 
-    @Column(name = "expYear", length = 4)
+    @Column(name = "exp_year", length = 4)
     private String expYear;
 
-    @Column(name = "billingStreet", length = 45)
+    @Column(name = "billing_street", length = 45)
     private String billingStreet;
 
-    @Column(name = "billingCity", length = 45)
+    @Column(name = "billing_city", length = 45)
     private String billingCity;
 
-    @Column(name = "billingZip", length = 45)
+    @Column(name = "billing_zip", length = 45)
     private String billingZip;
 
-    @Column(name = "billingState", length = 45)
+    @Column(name = "billing_state", length = 45)
     private String billingState;
 
-    public void setBillingState(String billingState) {
-        this.billingState = billingState;
+    @OneToMany
+    @JoinColumn(name = "card_id")
+    private Set<Booking> bookings = new LinkedHashSet<>();
+
+    public Integer getId() {
+        return id;
     }
 
-    public String getBillingState() {
-        return billingState;
-    }
-
-    public String getBillingZip() {
-        return billingZip;
-    }
-
-    public void setBillingZip(String billingZip) {
-        this.billingZip = billingZip;
-    }
-
-    public String getBillingCity() {
-        return billingCity;
-    }
-
-    public void setBillingCity(String billingCity) {
-        this.billingCity = billingCity;
-    }
-
-    public String getBillingStreet() {
-        return billingStreet;
-    }
-
-    public void setBillingStreet(String billingStreet) {
-        this.billingStreet = billingStreet;
-    }
-
-    public String getExpYear() {
-        return expYear;
-    }
-
-    public void setExpYear(String expYear) {
-        this.expYear = expYear;
-    }
-
-    public String getExpMonth() {
-        return expMonth;
-    }
-
-    public void setExpMonth(String expMonth) {
-        this.expMonth = expMonth;
-    }
-
-    public String getCardNumber() {
-        return cardNumber;
-    }
-
-    public void setCardNumber(String cardNumber) {
-        this.cardNumber = cardNumber;
-    }
-
-    public String getCardType() {
-        return cardType;
-    }
-
-    public void setCardType(String cardType) {
-        this.cardType = cardType;
+    public void setId(Integer id) {
+        this.id = id;
     }
 
     public User getUser() {
@@ -118,11 +64,76 @@ public class Card {
         this.user = user;
     }
 
-    public Integer getId() {
-        return id;
+    public String getCardType() {
+        return cardType;
     }
 
-    public void setId(Integer id) {
-        this.id = id;
+    public void setCardType(String cardType) {
+        this.cardType = cardType;
     }
+
+    public String getCardNumber() {
+        return cardNumber;
+    }
+
+    public void setCardNumber(String cardNumber) {
+        this.cardNumber = cardNumber;
+    }
+
+    public String getExpMonth() {
+        return expMonth;
+    }
+
+    public void setExpMonth(String expMonth) {
+        this.expMonth = expMonth;
+    }
+
+    public String getExpYear() {
+        return expYear;
+    }
+
+    public void setExpYear(String expYear) {
+        this.expYear = expYear;
+    }
+
+    public String getBillingStreet() {
+        return billingStreet;
+    }
+
+    public void setBillingStreet(String billingStreet) {
+        this.billingStreet = billingStreet;
+    }
+
+    public String getBillingCity() {
+        return billingCity;
+    }
+
+    public void setBillingCity(String billingCity) {
+        this.billingCity = billingCity;
+    }
+
+    public String getBillingZip() {
+        return billingZip;
+    }
+
+    public void setBillingZip(String billingZip) {
+        this.billingZip = billingZip;
+    }
+
+    public String getBillingState() {
+        return billingState;
+    }
+
+    public void setBillingState(String billingState) {
+        this.billingState = billingState;
+    }
+
+    public Set<Booking> getBookings() {
+        return bookings;
+    }
+
+    public void setBookings(Set<Booking> bookings) {
+        this.bookings = bookings;
+    }
+
 }

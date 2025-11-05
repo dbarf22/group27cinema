@@ -1,5 +1,6 @@
 package com.group27.cinema_backend.service;
 
+import com.group27.cinema_backend.dto.RegisterRequest;
 import com.group27.cinema_backend.model.Card;
 import com.group27.cinema_backend.model.User;
 import com.group27.cinema_backend.repository.UserRepository;
@@ -31,33 +32,51 @@ public class UserService {
     }
 
     // Register User method, takes User
-    public User registerUser(User user) throws Exception {
-        if (userRepository.findByEmail(user.getEmail()).isPresent()) {
+    public User registerUser(RegisterRequest request) throws Exception {
+
+        if (userRepository.findByEmail(request.email()).isPresent()) {
             throw new RuntimeException("Email is already in use");
         }
-        if (userRepository.findByUsername(user.getUsername()).isPresent()) {
+        if (userRepository.findByUsername(request.username()).isPresent()) {
             throw new RuntimeException("Username is already in use");
         }
 
-        user.setHashedPassword(encoder.encode(user.getHashedPassword()));
-        user.setStatus("Inactive");
-        user.setVerificationToken(UUID.randomUUID().toString());
+        String token = UUID.randomUUID().toString();
+        String encodedPassword = encoder.encode(request.password());
 
-        if (user.getCards() != null) {
-            for (Card card : user.getCards()) {
+        // builder for user takes 3 required fields: username, email, password
+        // it then
+        User newUser = new User.Builder(request.username(), request.email(), encodedPassword)
+                .firstName(request.firstName())
+                .lastName(request.lastName())
+                .phoneNumber(request.phoneNumber())
+                .wantsPromotions(request.wantsPromotions())
+                .street(request.street())
+                .city(request.city())
+                .state(request.state())
+                .zipCode(request.zipCode())
+                .cards(request.cards())
+
+                .status("Inactive")
+                .verificationToken(token)
+                .accountType("Customer")
+
+                .build();
+
+        if (newUser.getCards() != null) {
+            for (Card card : newUser.getCards()) {
                 card.setCardNumber(encoder.encode(card.getCardNumber()));
-                card.setUser(user);
+                card.setUser(newUser);
             }
         }
-        user.setAccountType("Customer");
 
-        userRepository.save(user);
+        userRepository.save(newUser);
 
         String subject = "Verification Needed";
-        String link = "http://localhost:8080/api/auth/verify?token=" + user.getVerificationToken();
+        String link = "http://localhost:8080/api/auth/verify?token=" + newUser.getVerificationToken();
         String body = "Please click the link in order to activate your account.\n" + link;
-        emailService.sendEmail(user.getEmail(), subject, body);
-        return user;
+        emailService.sendEmail(newUser.getEmail(), subject, body);
+        return newUser;
     }
 
     // Verify user method, takes a token
@@ -65,7 +84,7 @@ public class UserService {
         User user = userRepository.findByVerificationToken(token)
                 .orElseThrow(() -> new Exception("User not found"));
         user.setStatus("Active");
-        user.setVerificationToken(null);
+        user.setVerificationToken("");
         userRepository.save(user);
         return user;
     }
@@ -148,10 +167,10 @@ public class UserService {
         }
     }
 
-    public ResponseEntity<?> resetPassword(String token, String newPassword) {
+    public void resetPassword(String token, String newPassword) throws Exception {
         Optional<User> userOpt = userRepository.findByVerificationToken(token);
         if (userOpt.isEmpty()) {
-            return new ResponseEntity<>("Invalid or expired token.", HttpStatus.BAD_REQUEST);
+            throw new Exception("Invalid token");
         }
 
         User user = userOpt.get();
@@ -162,19 +181,15 @@ public class UserService {
         String subject = "Password has been changed successfully";
         String body = "Your password has been changed successfully.\n";
         emailService.sendEmail(user.getEmail(), subject, body);
-        return ResponseEntity.ok("Password has been changed successfully.");
     }
 
-    public ResponseEntity<?> changePassword(String email, String newPassword, String oldPassword) {
+    public void changePassword(String email, String newPassword, String oldPassword) throws Exception {
         Optional<User> userOpt = userRepository.findByEmail(email);
         if (userOpt.isEmpty()) {
-            return new ResponseEntity<>("User not found.", HttpStatus.NOT_FOUND);
+            throw new Exception("User not found.");
         }
-
         User user = userOpt.get();
-
         String hashedNewPassword = encoder.encode(newPassword);
-
         if (encoder.matches(oldPassword, user.getHashedPassword())) {
             user.setHashedPassword(hashedNewPassword);
             userRepository.save(user);
@@ -182,12 +197,8 @@ public class UserService {
             String subject = "Password has been changed successfully";
             String body = "Your password has been changed successfully.\n";
             emailService.sendEmail(user.getEmail(), subject, body);
-
-            return new ResponseEntity<>(HttpStatus.OK);
-
-
         } else {
-            return new ResponseEntity<>("Password is incorrect.", HttpStatus.BAD_REQUEST);
+            throw new Exception("Password is incorrect.");
         }
     }
 

@@ -2,14 +2,11 @@ package com.group27.cinema_backend.controller;
 
 import com.group27.cinema_backend.dto.LoginRequest;
 import com.group27.cinema_backend.dto.LoginResponse;
-import com.group27.cinema_backend.model.Card;
+import com.group27.cinema_backend.dto.RegisterRequest;
 import com.group27.cinema_backend.model.User;
-import com.group27.cinema_backend.repository.UserRepository;
-import com.group27.cinema_backend.service.EmailService;
 import com.group27.cinema_backend.service.UserService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.*;
@@ -30,11 +27,10 @@ public class AuthController {
 
     // REGISTRATION
     @PostMapping("/register")
-    public ResponseEntity<?> registerUser(@RequestBody User user) {
+    public ResponseEntity<?> registerUser(@RequestBody RegisterRequest registerRequest) {
         try {
-            userService.registerUser(user);
-            return new ResponseEntity<>("User registered successfully. " +
-                    "Please check your email for a verification link.", HttpStatus.CREATED);
+            userService.registerUser(registerRequest);
+            return new ResponseEntity<>("User registered successfully. " + "Please check your email for a verification link.", HttpStatus.CREATED);
         } catch (Exception e) {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
         }
@@ -51,7 +47,7 @@ public class AuthController {
         }
     }
 
-    // Login uses a new dto to ensure stuff sent to the frontend doesnt include password
+    // Login uses a new dto to ensure stuff sent to the frontend doesn't include password
     // the loginresponse body is found in the dto package. frontend request for a login
     // includes username and password wrapped in loginrequest object
     // this method then
@@ -62,7 +58,7 @@ public class AuthController {
             LoginResponse response = new LoginResponse("Login successful.", user);
             return ResponseEntity.ok(response);
         } catch (Exception e) {
-            return new ResponseEntity<>(Map.of("There was an error logging in.", HttpStatus.UNAUTHORIZED);
+            return new ResponseEntity<>("There was an error logging in.", HttpStatus.UNAUTHORIZED);
         }
     }
 
@@ -81,13 +77,19 @@ public class AuthController {
     // RESET PASSWORD
     @PostMapping("/reset-password")
     public ResponseEntity<?> resetPassword(@RequestParam("token") String token, @RequestBody Map<String, String> payload) {
-        return userService.resetPassword(token, payload.get("newPassword"));
+        try {
+            userService.resetPassword(token, payload.get("newPassword"));
+            return new ResponseEntity<>("Password reset successfully.", HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>("There was an error resetting your password.", HttpStatus.BAD_REQUEST);
+        }
     }
 
     @PostMapping("/change-password")
-    public ResponseEntity<?> changePassword(@RequestBody Map<String, String> payload) {
+    public ResponseEntity<?> changePassword(@RequestBody Map<String, String> payload) throws Exception {
         if (payload.containsKey("newPassword") && payload.containsKey("email") && payload.containsKey("password")) {
-            return userService.changePassword(payload.get("email"), payload.get("newPassword"), payload.get("password"));
+            userService.changePassword(payload.get("email"), payload.get("newPassword"), payload.get("password"));
+            return new ResponseEntity<>("Password changed successfully.", HttpStatus.OK);
         } else {
             return new ResponseEntity<>("Fill out all fields.", HttpStatus.BAD_REQUEST);
         }
@@ -95,7 +97,7 @@ public class AuthController {
 
 
     // Edit Profile
-    // uses loginresponse to ensure user is converted to a dto so we dont send password
+    // uses loginresponse to ensure user is converted to a dto so we don't send password
     // back by accident
     @PostMapping("/edit-profile")
     public ResponseEntity<?> editProfile(@RequestBody User updatedUser) {

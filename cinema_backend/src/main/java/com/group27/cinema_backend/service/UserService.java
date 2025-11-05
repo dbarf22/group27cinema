@@ -3,6 +3,7 @@ package com.group27.cinema_backend.service;
 import com.group27.cinema_backend.model.Card;
 import com.group27.cinema_backend.model.User;
 import com.group27.cinema_backend.repository.UserRepository;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -19,7 +20,7 @@ public class UserService {
     // These methods all used to be in auth controller but I am separating them now so AuthController
     // is strictly for routing http requests
 
-    //todo: forgot password, reset password, change password
+    //todo: change password
 
     // Constructor class that ensures dependency injection through spring
     public UserService(UserRepository userRepository, PasswordEncoder encoder,
@@ -86,6 +87,7 @@ public class UserService {
     }
 
     // Edit profile method takes an updated user and applies all changes to the DB
+    //todo: make user builder pattern
     public User editProfile(User updatedUser) {
         User user = userRepository.findByEmail(updatedUser.getEmail())
                 .orElseThrow(() -> new RuntimeException("User not found."));
@@ -127,6 +129,66 @@ public class UserService {
         }
         userRepository.save(user);
         return user;
+    }
+
+    // PASSWORD METHODS
+
+    public void forgotPassword(String email) {
+        Optional<User> userOpt = userRepository.findByEmail(email);
+        if (userOpt.isPresent()) {
+            User user = userOpt.get();
+            String token = UUID.randomUUID().toString();
+            user.setVerificationToken(token);
+            userRepository.save(user);
+
+            String subject = "Verification Needed";
+            String link = "http://localhost:3000/reset-password?token=" + user.getVerificationToken();
+            String body = "Please click the link in order to change your password.\n" + link;
+            emailService.sendEmail(user.getEmail(), subject, body);
+        }
+    }
+
+    public ResponseEntity<?> resetPassword(String token, String newPassword) {
+        Optional<User> userOpt = userRepository.findByVerificationToken(token);
+        if (userOpt.isEmpty()) {
+            return new ResponseEntity<>("Invalid or expired token.", HttpStatus.BAD_REQUEST);
+        }
+
+        User user = userOpt.get();
+        user.setHashedPassword(encoder.encode(newPassword));
+        user.setVerificationToken(null);
+        userRepository.save(user);
+
+        String subject = "Password has been changed successfully";
+        String body = "Your password has been changed successfully.\n";
+        emailService.sendEmail(user.getEmail(), subject, body);
+        return ResponseEntity.ok("Password has been changed successfully.");
+    }
+
+    public ResponseEntity<?> changePassword(String email, String newPassword, String oldPassword) {
+        Optional<User> userOpt = userRepository.findByEmail(email);
+        if (userOpt.isEmpty()) {
+            return new ResponseEntity<>("User not found.", HttpStatus.NOT_FOUND);
+        }
+
+        User user = userOpt.get();
+
+        String hashedNewPassword = encoder.encode(newPassword);
+
+        if (encoder.matches(oldPassword, user.getHashedPassword())) {
+            user.setHashedPassword(hashedNewPassword);
+            userRepository.save(user);
+
+            String subject = "Password has been changed successfully";
+            String body = "Your password has been changed successfully.\n";
+            emailService.sendEmail(user.getEmail(), subject, body);
+
+            return new ResponseEntity<>(HttpStatus.OK);
+
+
+        } else {
+            return new ResponseEntity<>("Password is incorrect.", HttpStatus.BAD_REQUEST);
+        }
     }
 
 }

@@ -18,6 +18,7 @@ import java.util.*;
 @RestController
 @RequestMapping("/api/auth")
 public class AuthController {
+    // This class is strictly for managing http requests now, and we offload all the actual work into facades
 
     //Spring dependency injection. We made userService a bean in the service package, and now
     // we are injecting it into AuthController. Spring will manage the instance of this userservice
@@ -46,11 +47,14 @@ public class AuthController {
             userService.verifyUser(token);
             return new ResponseEntity<>("Account successfully activated.", HttpStatus.OK);
         } catch (Exception e) {
-            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<>("There was an error creating the account.", HttpStatus.BAD_REQUEST);
         }
     }
 
     // Login uses a new dto to ensure stuff sent to the frontend doesnt include password
+    // the loginresponse body is found in the dto package. frontend request for a login
+    // includes username and password wrapped in loginrequest object
+    // this method then
     @PostMapping("/login")
     public ResponseEntity<?> loginUser(@RequestBody LoginRequest loginRequest) {
         try {
@@ -58,78 +62,32 @@ public class AuthController {
             LoginResponse response = new LoginResponse("Login successful.", user);
             return ResponseEntity.ok(response);
         } catch (Exception e) {
-            return new ResponseEntity<>(Map.of("message", e.getMessage()), HttpStatus.UNAUTHORIZED);
+            return new ResponseEntity<>(Map.of("There was an error logging in.", HttpStatus.UNAUTHORIZED);
         }
     }
 
     // FORGOT PASSWORD
     @PostMapping("/forgot-password")
     public ResponseEntity<?> forgotPassword(@RequestParam String email) {
-        Optional<User> userOpt = userRepository.findByEmail(email);
-
-        if (userOpt.isPresent()) {
-            User user = userOpt.get();
-            String token = UUID.randomUUID().toString();
-            user.setVerificationToken(token);
-            userRepository.save(user);
-
-            String subject = "Verification Needed";
-            String link = "http://localhost:3000/reset-password?token=" + user.getVerificationToken();
-            String body = "Please click the link in order to change your password.\n" + link;
-            emailService.sendEmail(user.getEmail(), subject, body);
+        try {
+            userService.forgotPassword(email);
+            return ResponseEntity.ok("If account exists, a reset password link has been sent.");
+        } catch (Exception e) {
+            return new ResponseEntity<>("There was an error trying to reset your password.", HttpStatus.BAD_REQUEST);
         }
 
-        return ResponseEntity.ok("If account exists, a reset password link has been sent.");
     }
 
     // RESET PASSWORD
     @PostMapping("/reset-password")
     public ResponseEntity<?> resetPassword(@RequestParam("token") String token, @RequestBody Map<String, String> payload) {
-        Optional<User> userOpt = userRepository.findByVerificationToken(token);
-        if (userOpt.isEmpty()) {
-            return new ResponseEntity<>("Invalid or expired token.", HttpStatus.BAD_REQUEST);
-        }
-
-        User user = userOpt.get();
-        user.setHashedPassword(passwordEncoder.encode(payload.get("newPassword")));
-        user.setVerificationToken(null);
-        userRepository.save(user);
-
-        String subject = "Password has been changed successfully";
-        String body = "Your password has been changed successfully.\n";
-        emailService.sendEmail(user.getEmail(), subject, body);
-
-        return ResponseEntity.ok("Password has been reset successfully.");
+        return userService.resetPassword(token, payload.get("newPassword"));
     }
 
     @PostMapping("/change-password")
     public ResponseEntity<?> changePassword(@RequestBody Map<String, String> payload) {
         if (payload.containsKey("newPassword") && payload.containsKey("email") && payload.containsKey("password")) {
-
-            Optional<User> userOpt = userRepository.findByEmail(payload.get("email"));
-            if (userOpt.isEmpty()) {
-                return new ResponseEntity<>("User not found.", HttpStatus.NOT_FOUND);
-            }
-
-            User user = userOpt.get();
-
-            String hashedNewPassword = passwordEncoder.encode(payload.get("newPassword"));
-
-            if (passwordEncoder.matches(payload.get("password"), user.getHashedPassword())) {
-                user.setHashedPassword(hashedNewPassword);
-                userRepository.save(user);
-
-                String subject = "Password has been changed successfully";
-                String body = "Your password has been changed successfully.\n";
-                emailService.sendEmail(user.getEmail(), subject, body);
-
-                return new ResponseEntity<>(HttpStatus.OK);
-
-
-            } else {
-                return new ResponseEntity<>("Password is incorrect.", HttpStatus.BAD_REQUEST);
-            }
-
+            return userService.changePassword(payload.get("email"), payload.get("newPassword"), payload.get("password"));
         } else {
             return new ResponseEntity<>("Fill out all fields.", HttpStatus.BAD_REQUEST);
         }
@@ -137,6 +95,8 @@ public class AuthController {
 
 
     // Edit Profile
+    // uses loginresponse to ensure user is converted to a dto so we dont send password
+    // back by accident
     @PostMapping("/edit-profile")
     public ResponseEntity<?> editProfile(@RequestBody User updatedUser) {
         try {
@@ -144,7 +104,7 @@ public class AuthController {
             LoginResponse response = new LoginResponse("Profile successfully edited.", user);
             return ResponseEntity.ok(response);
         } catch (Exception e) {
-            return new ResponseEntity<>(Map.of("message", e.getMessage()), HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<>("There was an error trying to edit your profile.", HttpStatus.BAD_REQUEST);
         }
     }
 }

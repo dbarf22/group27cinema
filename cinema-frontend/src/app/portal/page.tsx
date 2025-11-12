@@ -65,7 +65,7 @@ const PortalPage = () => {
           </div>
 
           <div
-            onClick={() => go("portal/admin/showtimes")}
+            onClick={() => go("portal/admin/manage-showtimes")}
             className="cursor-pointer bg-white shadow-md rounded-xl p-6 border hover:shadow-lg transition"
           >
             <h2 className="text-xl font-semibold text-gray-800 mb-2">Manage Showtimes</h2>

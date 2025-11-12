@@ -20,6 +20,7 @@ export default function ManageMoviesPage() {
     setGenres([...genres, genreInput.trim()]);
     setGenreInput("");
   };
+
   const removeGenre = (g: string) => setGenres(genres.filter((x) => x !== g));
 
   const addShowtime = () => {
@@ -27,6 +28,7 @@ export default function ManageMoviesPage() {
     setShowtimes([...showtimes, showtimeInput.trim()]);
     setShowtimeInput("");
   };
+
   const removeShowtime = (s: string) => setShowtimes(showtimes.filter((x) => x !== s));
 
   const submit = () => {
@@ -45,10 +47,21 @@ export default function ManageMoviesPage() {
   return (
     <div>
       <div className="mx-auto max-w-3xl space-y-8">
-        <header>
-          <h1 className="text-3xl font-bold text-gray-800">Manage Movies</h1>
-          <p className="text-gray-600">Add new titles and manage showtimes, genres, and more.</p>
-        </header>
+        <div className="flex items-center justify-between">
+          <header>
+            <h1 className="text-3xl font-bold text-gray-800">Manage Movies</h1>
+            <p className="text-gray-600">
+              Add new titles and manage showtimes, genres, and more.
+            </p>
+          </header>
+
+          <a
+            href="/portal"
+            className="inline-flex items-center gap-2 rounded border border-gray-300 px-4 py-2 font-semibold text-gray-800 hover:bg-gray-50"
+          >
+            ← Back to Admin
+          </a>
+        </div>
 
         <section className="rounded-2xl border bg-white shadow-sm">
           <button
@@ -60,10 +73,14 @@ export default function ManageMoviesPage() {
           >
             <div>
               <div className="text-lg font-semibold text-gray-900">Add Movie</div>
-              <div className="text-sm text-gray-600">Click to {open ? "hide" : "show"} the form</div>
+              <div className="text-sm text-gray-600">
+                Click to {open ? "hide" : "show"} the form
+              </div>
             </div>
             <svg
-              className={`h-5 w-5 transition-transform ${open ? "rotate-180" : ""}`}
+              className={`h-5 w-5 transition-transform ${
+                open ? "rotate-180" : ""
+              }`}
               viewBox="0 0 20 20"
               fill="currentColor"
               aria-hidden="true"
@@ -84,6 +101,7 @@ export default function ManageMoviesPage() {
           >
             <div className="min-h-0">
               <div className="border-t px-6 py-6">
+
                 <div className="mb-5">
                   <label className="block text-sm font-medium text-gray-700">Title</label>
                   <input
@@ -93,8 +111,11 @@ export default function ManageMoviesPage() {
                     placeholder="Avatar"
                   />
                 </div>
+
                 <div className="mb-5">
-                  <label className="block text-sm font-medium text-gray-700">Rating (1–5)</label>
+                  <label className="block text-sm font-medium text-gray-700">
+                    Rating (1–5)
+                  </label>
                   <input
                     type="number"
                     min="1"
@@ -105,6 +126,7 @@ export default function ManageMoviesPage() {
                     placeholder="5"
                   />
                 </div>
+
                 <div className="mb-5">
                   <label className="block text-sm font-medium text-gray-700">Description</label>
                   <textarea
@@ -114,6 +136,7 @@ export default function ManageMoviesPage() {
                     placeholder="A paraplegic Marine is dispatched to the moon Pandora..."
                   />
                 </div>
+
                 <div className="mb-5">
                   <label className="block text-sm font-medium text-gray-700">Poster URL</label>
                   <input
@@ -123,6 +146,7 @@ export default function ManageMoviesPage() {
                     placeholder="https://m.media-amazon.com/image.jpg"
                   />
                 </div>
+
                 <div className="mb-5">
                   <label className="block text-sm font-medium text-gray-700">Trailer URL</label>
                   <input
@@ -132,6 +156,7 @@ export default function ManageMoviesPage() {
                     placeholder="https://youtube.com/watch?v=..."
                   />
                 </div>
+
                 <div className="mb-5">
                   <label className="block text-sm font-medium text-gray-700">Genres</label>
                   <div className="mt-1 flex gap-2">
@@ -165,6 +190,7 @@ export default function ManageMoviesPage() {
                     ))}
                   </div>
                 </div>
+
                 <div className="mb-5">
                   <label className="block text-sm font-medium text-gray-700">Showtimes</label>
                   <div className="mt-1 flex gap-2">
@@ -219,10 +245,9 @@ export default function ManageMoviesPage() {
 
         <section className="rounded-2xl border bg-white p-6 shadow-sm">
           <div className="text-lg font-semibold text-gray-900">Manage Promotions</div>
-          <p className="mt-1 text-sm text-gray-600">
-            Promote people n stuff yo.
-          </p>
+          <p className="mt-1 text-sm text-gray-600">Promote people n stuff yo.</p>
         </section>
+
       </div>
     </div>
   );

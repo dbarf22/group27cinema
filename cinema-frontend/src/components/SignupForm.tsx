@@ -123,7 +123,7 @@ export default function SignupForm() {
                   email,
                   firstName,
                   lastName,
-                  hashedPassword: password,
+                  password,
                   wantsPromotions,
                   phoneNumber: phoneNumber,
                   street,

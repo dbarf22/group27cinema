@@ -42,6 +42,12 @@ export default function Header() {
               >
                 Logout
               </button>
+              <button
+                onClick={() => go('/portal')}
+                className="bg-white text-blue-700 font-semibold px-4 py-2 rounded hover:bg-gray-100 transition"
+                >
+                Portal
+              </button>
             </>
           ) : (
             <button

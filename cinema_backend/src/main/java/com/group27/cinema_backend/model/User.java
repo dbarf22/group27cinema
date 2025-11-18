@@ -8,7 +8,6 @@ import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 import org.hibernate.annotations.UpdateTimestamp;
 
-import java.lang.module.ModuleDescriptor;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.ArrayList;

@@ -88,7 +88,7 @@ export default function MovieSearch() {
               {m.title}
              </div>
              <div className="text-sm text-gray-600">
-              {m.genre?.join(', ') ?? "Unknown genre"} {m.year ? `${m.year}` : ""}
+              {m.genre ?? "Unknown genre"} {m.year ? `${m.year}` : ""}
              </div>
              </Link>
           </li>

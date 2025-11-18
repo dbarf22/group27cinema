@@ -10,8 +10,8 @@ import java.util.LinkedHashSet;
 import java.util.Set;
 
 @Entity
-@Table(name = "screenings")
-public class Screening {
+@Table(name = "showtimes")
+public class Showtime {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "screening_id", nullable = false)
@@ -20,7 +20,7 @@ public class Screening {
     @ManyToOne(fetch = FetchType.LAZY)
     @OnDelete(action = OnDeleteAction.CASCADE)
     @JoinColumn(name = "movie_id")
-    private Movie1 movie;
+    private Movie movie;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @OnDelete(action = OnDeleteAction.CASCADE)
@@ -48,11 +48,11 @@ public class Screening {
         this.id = id;
     }
 
-    public Movie1 getMovie() {
+    public Movie getMovie() {
         return movie;
     }
 
-    public void setMovie(Movie1 movie) {
+    public void setMovie(Movie movie) {
         this.movie = movie;
     }
 

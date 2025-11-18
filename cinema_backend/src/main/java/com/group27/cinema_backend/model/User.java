@@ -9,9 +9,12 @@ import org.hibernate.annotations.OnDeleteAction;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import java.lang.module.ModuleDescriptor;
+import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Set;
 
 @Entity
 @Table(name = "users")
@@ -21,6 +24,12 @@ public class User {
     @OnDelete(action = OnDeleteAction.SET_NULL)
     @JoinColumn(name = "user_type_id")
     private UserType userType;
+
+    @Column(name = "token_created_at")
+    private Instant tokenCreatedAt;
+
+    @OneToMany(mappedBy = "user")
+    private Set<Booking> bookings = new LinkedHashSet<>();
 
 
     // default constructor is empty. use the builder to create instances
@@ -208,6 +217,22 @@ public class User {
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
     @JsonManagedReference
     private List<Card> cards = new ArrayList<>();
+
+    public Set<Booking> getBookings() {
+        return bookings;
+    }
+
+    public void setBookings(Set<Booking> bookings) {
+        this.bookings = bookings;
+    }
+
+    public Instant getTokenCreatedAt() {
+        return tokenCreatedAt;
+    }
+
+    public void setTokenCreatedAt(Instant tokenCreatedAt) {
+        this.tokenCreatedAt = tokenCreatedAt;
+    }
 
     // GETTERS AND SETTERS
 

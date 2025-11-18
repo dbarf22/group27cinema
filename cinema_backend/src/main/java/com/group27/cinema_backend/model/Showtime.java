@@ -1,5 +1,6 @@
 package com.group27.cinema_backend.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.OnDelete;
@@ -17,6 +18,7 @@ public class Showtime {
     @Column(name = "screening_id", nullable = false)
     private Integer id;
 
+    @JsonIgnore
     @ManyToOne(fetch = FetchType.LAZY)
     @OnDelete(action = OnDeleteAction.CASCADE)
     @JoinColumn(name = "movie_id")
@@ -25,6 +27,7 @@ public class Showtime {
     @ManyToOne(fetch = FetchType.LAZY)
     @OnDelete(action = OnDeleteAction.CASCADE)
     @JoinColumn(name = "auditorium_id")
+    @JsonIgnore
     private Auditorium auditorium;
 
     @Column(name = "showtime")

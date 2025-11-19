@@ -234,7 +234,7 @@ export default function ManageMoviesPage() {
                 </div>
 
                 <button
-                  onClick={handleSubmit}
+                  onClick={() => handleSubmit}
                   className="mt-6 w-full rounded bg-blue-600 py-3 font-semibold text-white hover:bg-blue-500"
                 >
                   Save Movie

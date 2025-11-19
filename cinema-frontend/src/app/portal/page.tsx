@@ -6,11 +6,22 @@ const PortalPage = () => {
   const [accountType, setAccountType] = useState("");
   const router = useRouter();
 
-  useEffect(() => {
-    // Future API call to get user account type
-    // Waiting on the backend guys to write the route and then I'll update this
-    setAccountType("Admin");
-  }, []);
+    useEffect(() => {
+        // Define your async function inside useEffect
+        const fetchData = async () => {
+            try {
+                const response = await fetch('/api/auth/get-account-type?email=dbarfield4@gmail.com'); // Replace with your actual API endpoint
+                if (!response.ok) {
+                    setAccountType("Customer")
+                } else {
+                    setAccountType("Admin")
+                }
+            } catch (err) {
+                console.log(err);
+            }
+        };
+        fetchData();
+    }, []);
 
   const go = (path: string) => {
     console.log(`Navigate to: ${path}`);

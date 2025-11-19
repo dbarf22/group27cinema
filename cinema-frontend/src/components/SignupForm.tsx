@@ -139,8 +139,7 @@ export default function SignupForm() {
               throw new Error(errorText || "Registration failed");
           }
 
-          // todo: verify email
-         router.push("/account-verify");
+          router.push("/account-verify");
 
       } catch (err: any) {
           setError(err.message || "An error occurred.");

@@ -4,6 +4,7 @@ import com.group27.cinema_backend.dto.LoginRequest;
 import com.group27.cinema_backend.dto.LoginResponse;
 import com.group27.cinema_backend.dto.RegisterRequest;
 import com.group27.cinema_backend.model.User;
+import com.group27.cinema_backend.repository.UserRepository;
 import com.group27.cinema_backend.service.UserService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -23,6 +24,20 @@ public class AuthController {
 
     AuthController(UserService userService) {
         this.userService = userService;
+    }
+
+    // TODO: Get acct status
+    @GetMapping("/get-account-type")
+    public ResponseEntity<?> getAccountType(@RequestParam String userKey) {
+        try {
+            if (userService.findUserAccountType(userKey)) {
+                return new ResponseEntity<>("User is an admin", HttpStatus.OK);
+            } else {
+                return new  ResponseEntity<>("User is not an admin", HttpStatus.FORBIDDEN);
+            }
+        } catch (Exception e) {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
+        }
     }
 
     // REGISTRATION
@@ -71,7 +86,6 @@ public class AuthController {
         } catch (Exception e) {
             return new ResponseEntity<>("There was an error trying to reset your password.", HttpStatus.BAD_REQUEST);
         }
-
     }
 
     // RESET PASSWORD

@@ -30,6 +30,16 @@ public class User {
     @OneToMany(mappedBy = "user")
     private Set<Booking> bookings = new LinkedHashSet<>();
 
+    public String getUserKey() {
+        return userKey;
+    }
+
+    public void setUserKey(String userKey) {
+        this.userKey = userKey;
+    }
+
+    @Column(name = "user_key")
+    private String userKey;
 
     // default constructor is empty. use the builder to create instances
     public User() {
@@ -53,6 +63,8 @@ public class User {
         private String state;
         private String zipCode;
 
+        private String userKey;
+
         // these are important values so we set them internally instead of
         // through a json request
         private String verificationToken;
@@ -69,6 +81,11 @@ public class User {
 
         public Builder firstName(String value) {
             this.firstName = value;
+            return this;
+        }
+
+        public Builder userKey(String value){
+            this.userKey = value;
             return this;
         }
 
@@ -149,6 +166,7 @@ public class User {
         this.city = builder.city;
         this.state = builder.state;
         this.zipCode = builder.zipCode;
+        this.userKey = builder.userKey;
         this.accountType = builder.accountType;
         if (builder.cards != null) {
             this.cards = builder.cards;

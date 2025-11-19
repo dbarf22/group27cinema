@@ -42,7 +42,6 @@ export default function EditProfilePage() {
     const [busyPayments, setBusyPayments] = useState(false);
     const [busyPassword, setBusyPassword] = useState(false);
 
-
     const [username, setUsername] = useState('');
     const [email, setEmail] = useState('');
 

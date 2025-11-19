@@ -14,6 +14,7 @@ type User = {
   state: string;
   zipCode: string;
   cards: Card[];
+  userKey: string;
 };
 
 type Card = {

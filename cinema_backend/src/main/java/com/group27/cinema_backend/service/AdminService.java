@@ -67,9 +67,7 @@ public class AdminService {
     }
 
     public int sendPromotionEmail(SendPromotionEmailRequest req) {
-        List<User> recipients = req.subscribedOnly()
-            ? userRepository.findByWantsPromotionsTrue()
-            : userRepository.findAll();
+        List<User> recipients = userRepository.findByWantsPromotionsTrue();
 
         String finalMessage = req.message();
         if (req.promoCode() != null && !req.promoCode().trim().isEmpty()) {

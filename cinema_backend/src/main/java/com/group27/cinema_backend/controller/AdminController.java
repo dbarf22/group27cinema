@@ -1,11 +1,16 @@
 package com.group27.cinema_backend.controller;
 
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
 import com.group27.cinema_backend.dto.AddMovieRequest;
 import com.group27.cinema_backend.dto.CreatePromotionRequest;
 import com.group27.cinema_backend.dto.SendPromotionEmailRequest;
 import com.group27.cinema_backend.service.AdminService;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/admin")

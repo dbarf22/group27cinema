@@ -36,7 +36,7 @@ public class Movie {
 
     @ManyToOne()
     @JoinColumn(name = "rating_id")
-    private RatingCode rating1;
+    private RatingCode ratingCode;
 
     @Column(name = "description")
     private String description;
@@ -112,12 +112,12 @@ public class Movie {
         this.rating = rating;
     }
 
-    public RatingCode getRating1() {
-        return rating1;
+    public RatingCode getRatingCode() {
+        return ratingCode;
     }
 
-    public void setRating1(RatingCode rating1) {
-        this.rating1 = rating1;
+    public void setRatingCode(RatingCode ratingCode) {
+        this.ratingCode = ratingCode;
     }
 
     public String getDescription() {

@@ -1,10 +1,10 @@
 "use client";
-import { useState } from "react";
+import {FormEvent, useState} from "react";
 
 export default function ManageMoviesPage() {
   const [open, setOpen] = useState(false);
   const [title, setTitle] = useState("");
-  const [rating, setRating] = useState("");
+  const [reviewScore, setReviewScore] = useState("");
   const [description, setDescription] = useState("");
   const [poster, setPoster] = useState("");
   const [trailer, setTrailer] = useState("");
@@ -31,18 +31,26 @@ export default function ManageMoviesPage() {
 
   const removeShowtime = (s: string) => setShowtimes(showtimes.filter((x) => x !== s));
 
-  const submit = () => {
-    console.log("Submit:", {
-      title,
-      rating,
-      description,
-      poster,
-      trailer,
-      genres,
-      showtimes,
-    });
-    alert("Movie saved (frontend only). Check console.");
-  };
+    async function handleSubmit(e: FormEvent<HTMLFormElement>) {
+        try {
+            const res = await fetch("/api/admin/movies/add", {
+                method: "POST",
+                headers: {
+                    "Content-Type" : "application/json",
+                },
+                body: JSON.stringify({
+                    title,
+                    reviewScore,
+                    description,
+                    poster,
+                    trailer,
+                    genres
+                })
+            })
+        } catch (err:any) {
+            console.log("Error")
+        }
+    }
 
   return (
     <div>
@@ -121,8 +129,8 @@ export default function ManageMoviesPage() {
                     min="1"
                     max="5"
                     className="mt-1 w-full rounded border p-2"
-                    value={rating}
-                    onChange={(e) => setRating(e.target.value)}
+                    value={reviewScore}
+                    onChange={(e) => setReviewScore(e.target.value)}
                     placeholder="5"
                   />
                 </div>
@@ -226,7 +234,7 @@ export default function ManageMoviesPage() {
                 </div>
 
                 <button
-                  onClick={submit}
+                  onClick={handleSubmit}
                   className="mt-6 w-full rounded bg-blue-600 py-3 font-semibold text-white hover:bg-blue-500"
                 >
                   Save Movie

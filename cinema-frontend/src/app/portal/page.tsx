@@ -7,10 +7,9 @@ const PortalPage = () => {
   const router = useRouter();
 
     useEffect(() => {
-        // Define your async function inside useEffect
         const fetchData = async () => {
             try {
-                const response = await fetch('/api/auth/get-account-type?email=dbarfield4@gmail.com'); // Replace with your actual API endpoint
+                const response = await fetch('/api/auth/get-account-type?email=dbarfield4@gmail.com');
                 if (!response.ok) {
                     setAccountType("Customer")
                 } else {

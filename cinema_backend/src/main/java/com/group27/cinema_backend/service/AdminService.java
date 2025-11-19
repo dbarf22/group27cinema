@@ -43,15 +43,12 @@ public class AdminService {
         movie.setCastList(req.castList());
         movie.setProducer(req.producer());
         movie.setDuration(req.duration());
-        movie.setPoster(req.posterLink());
-        movie.setTrailer(req.trailerLink());
+        movie.setPoster(req.poster());
+        movie.setTrailer(req.trailer());
         movie.setRating(req.reviewScore());
         movie.setDescription(req.description());
         movie.setGenre(String.join(", ", req.genres()));
 
-        RatingCode rating = ratingCodeRepository.findByRatingCode(req.ratingCode())
-                .orElseThrow(() -> new RuntimeException("Invalid rating code"));
-        movie.setRating1(rating);
 
         movieRepository.save(movie);
     }

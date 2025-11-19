@@ -37,7 +37,7 @@ export default function LoginForm() {
             }
 
             const data = await res.json();
-            login(data.user, rememberMe); // uses login from sessioncontext
+            login(data.user, rememberMe);
 
             router.push("/");
 

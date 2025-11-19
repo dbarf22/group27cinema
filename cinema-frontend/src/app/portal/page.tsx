@@ -1,15 +1,20 @@
 "use client";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import {useSession} from '@/app/session/SessionContext';
+
 
 const PortalPage = () => {
   const [accountType, setAccountType] = useState("");
   const router = useRouter();
+  const {currentUser} = useSession();
+
 
     useEffect(() => {
         const fetchData = async () => {
             try {
-                const response = await fetch('/api/auth/get-account-type?email=dbarfield4@gmail.com');
+                let key = currentUser?.userKey;
+                const response = await fetch(`/api/auth/get-account-type?userKey=${key}`);
                 if (!response.ok) {
                     setAccountType("Customer")
                 } else {

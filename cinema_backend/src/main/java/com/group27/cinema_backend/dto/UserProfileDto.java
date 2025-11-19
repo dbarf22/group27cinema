@@ -17,6 +17,7 @@ public class UserProfileDto {
     private String state;
     private String zipCode;
     private List<Card> cards;
+    private String userKey;
 
 
     public UserProfileDto(User user) {
@@ -31,11 +32,14 @@ public class UserProfileDto {
         this.state = user.getState();
         this.zipCode = user.getZipCode();
         this.cards = user.getCards();
+        this.userKey = user.getUserKey();
     }
 
     public String getEmail() {
         return email;
     }
+
+    public String getUserKey() {return userKey;}
 
     public String getUsername() {
         return username;
@@ -76,4 +80,5 @@ public class UserProfileDto {
     public List<Card> getCards() {
         return cards;
     }
+
 }

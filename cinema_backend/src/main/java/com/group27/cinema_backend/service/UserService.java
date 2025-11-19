@@ -29,9 +29,9 @@ public class UserService {
         this.emailService = emailService;
     }
 
-    // Check if a user is an admin or not
-    public boolean findUserAccountType(String email) throws Exception {
-        User user = userRepository.findByEmail(email).orElseThrow(() -> new Exception("User not found"));
+    // Check if a user is an admin or not through their user key
+    public boolean findUserAccountType(String userKey) throws Exception {
+        User user = userRepository.findByUserKey(userKey).orElseThrow(() -> new Exception("User not found"));
         if (user.getAccountType().equals("Admin")) {
             return true;
         } else {
@@ -51,6 +51,7 @@ public class UserService {
 
         String token = UUID.randomUUID().toString();
         String encodedPassword = encoder.encode(request.password());
+        String userKey = UUID.randomUUID().toString();
 
         // builder for user takes 3 required fields: username, email, password
         // it then
@@ -64,7 +65,7 @@ public class UserService {
                 .state(request.state())
                 .zipCode(request.zipCode())
                 .cards(request.cards())
-
+                .userKey(userKey)
                 .status("Inactive")
                 .verificationToken(token)
                 .accountType("Customer")

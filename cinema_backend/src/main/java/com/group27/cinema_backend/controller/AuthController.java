@@ -28,9 +28,9 @@ public class AuthController {
 
     // TODO: Get acct status
     @GetMapping("/get-account-type")
-    public ResponseEntity<?> getAccountType(@RequestParam String email) {
+    public ResponseEntity<?> getAccountType(@RequestParam String userKey) {
         try {
-            if (userService.findUserAccountType(email)) {
+            if (userService.findUserAccountType(userKey)) {
                 return new ResponseEntity<>("User is an admin", HttpStatus.OK);
             } else {
                 return new  ResponseEntity<>("User is not an admin", HttpStatus.FORBIDDEN);

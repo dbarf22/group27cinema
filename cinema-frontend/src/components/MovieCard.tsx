@@ -8,10 +8,7 @@ export default function MovieCard({ movie }: { movie: Movie }) {
       ? movie.poster
       : "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='400' height='600'><rect width='100%' height='100%' fill='%23eee'/><text x='50%' y='50%' dominant-baseline='middle' text-anchor='middle' fill='%23999' font-size='20'>No Poster</text></svg>";
 
-  const showtimes = Array.isArray(movie.showtimes)
-    ? movie.showtimes.map((st: any) => (typeof st === "string" ? st : st.showtime || st.time || ""))
-      .filter(Boolean)
-    : [];
+  const showtimes = movie.showtimes ?? [];
 
   return (
     <div className="flex flex-col w-48 mx-auto">
@@ -34,13 +31,15 @@ export default function MovieCard({ movie }: { movie: Movie }) {
       {/* Showtimes Buttons */}
       {showtimes.length > 0 ? (
         <div className="mt-3 flex flex-wrap justify-center gap-2">
-          {showtimes.map((time: string, i: number) => (
+          {showtimes.map((st) => (
             <Link
-              key={i}
-              href={`/booking/${movie.id}?showtime=${encodeURIComponent(time)}`}
+              key={st.id}
+              href={`/booking/${movie.id}?showtime=${encodeURIComponent(
+                st.showtime
+              )}`}
               className="px-4 py-2 rounded-full text-xs font-bold text-blue-700 bg-blue-50 border border-blue-200 hover:bg-blue-100 transition"
             >
-              {new Date(time).toLocaleTimeString([], {
+              {new Date(st.showtime).toLocaleTimeString([], {
                 hour: "2-digit",
                 minute: "2-digit",
               })}
@@ -48,7 +47,9 @@ export default function MovieCard({ movie }: { movie: Movie }) {
           ))}
         </div>
       ) : (
-        <p className="mt-3 text-center text-sm text-gray-500">No showtimes available</p>
+        <p className="mt-3 text-center text-sm text-gray-500">
+          No showtimes available
+        </p>
       )}
     </div>
   );

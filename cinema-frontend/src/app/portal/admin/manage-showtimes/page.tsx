@@ -1,5 +1,6 @@
 "use client";
 import { useMemo, useState, useEffect } from "react";
+import DatePicker from "@/components/DatePicker";
 
 type Movie = { id: string; title: string };
 type Showroom = { id: string; name: string };
@@ -19,17 +20,19 @@ const TEST_SHOWROOMS: Showroom[] = [
 export default function ManageShowtimesPage() {
   const [movieId, setMovieId] = useState("");
   const [showroomId, setShowroomId] = useState("");
-  const [when, setWhen] = useState(""); // from <input type="datetime-local">
+  const [when, setWhen] = useState(""); // still used by normalizeToIso
   const [showtimes, setShowtimes] = useState<Showtime[]>([]);
   const [feedback, setFeedback] = useState<{ type: "success" | "error"; msg: string } | null>(
     null
   );
-const [movies, setMovies] = useState<Movie[]>([]);
+  const [movies, setMovies] = useState<Movie[]>([]);
+  const [selectedTime, setSelectedTime] = useState<Date | null>(new Date());
 
+  // Fetch movies from API when page is opened
   useEffect(() => {
     const getMovieList = async () => {
       try {
-        const res = await fetch('/api/movies');
+        const res = await fetch("/api/movies");
         const data = await res.json();
         setMovies(data);
       } catch (err) {
@@ -46,8 +49,9 @@ const [movies, setMovies] = useState<Movie[]>([]);
 
   const movieById = useMemo(
     () => Object.fromEntries(movies.map((m) => [m.id, m])),
-    []
+    [movies] // ✅ needs movies as dependency
   );
+
   const roomById = useMemo(
     () => Object.fromEntries(TEST_SHOWROOMS.map((r) => [r.id, r])),
     []
@@ -126,10 +130,20 @@ const [movies, setMovies] = useState<Movie[]>([]);
     setWhen("");
   }
 
+  async function addShowtimeCall() {
+    // Implement API call to add showtime to backend
+    try {
+      // TODO: Add showtime for a movie via API
+    } catch (err) {
+      console.error("Failed to add showtime:", err);
+    }
+  } // ✅ close function
+
   function removeShowtime(id: string) {
     clearFeedback();
     setShowtimes((prev) => prev.filter((s) => s.id !== id));
   }
+
   const [filterMovie, setFilterMovie] = useState<string>("all");
   const [filterRoom, setFilterRoom] = useState<string>("all");
 
@@ -170,6 +184,7 @@ const [movies, setMovies] = useState<Movie[]>([]);
             {feedback.msg}
           </div>
         )}
+
         <section className="rounded-2xl border bg-white p-6 shadow-sm">
           <h2 className="text-lg font-semibold text-gray-900">Schedule a Movie</h2>
           <p className="text-sm text-gray-600 mb-4">
@@ -211,12 +226,8 @@ const [movies, setMovies] = useState<Movie[]>([]);
 
             <div className="md:col-span-2">
               <label className="block text-sm font-medium text-gray-700">Date & Time</label>
-              <input
-                type="datetime-local"
-                className="mt-1 w-full rounded border border-gray-300 p-2"
-                value={when}
-                onChange={(e) => setWhen(e.target.value)}
-              />
+              {/* If you want DatePicker to actually drive `when`, you'll want to sync it here */}
+              <DatePicker selectedTime={selectedTime} setSelectedTime={setSelectedTime} />
             </div>
           </div>
 
@@ -240,6 +251,7 @@ const [movies, setMovies] = useState<Movie[]>([]);
             </button>
           </div>
         </section>
+
         <section className="rounded-2xl border bg-white p-6 shadow-sm">
           <div className="flex flex-wrap items-end gap-4">
             <div>
@@ -275,6 +287,7 @@ const [movies, setMovies] = useState<Movie[]>([]);
             </div>
           </div>
         </section>
+
         <section className="rounded-2xl border bg-white p-6 shadow-sm">
           <h3 className="text-lg font-semibold text-gray-900 mb-4">Scheduled Showtimes</h3>
 
@@ -294,8 +307,12 @@ const [movies, setMovies] = useState<Movie[]>([]);
                 <tbody>
                   {filteredShowtimes.map((s) => (
                     <tr key={s.id} className="text-sm">
-                      <td className="border-b px-3 py-2">{movieById[s.movieId]?.title ?? s.movieId}</td>
-                      <td className="border-b px-3 py-2">{roomById[s.showroomId]?.name ?? s.showroomId}</td>
+                      <td className="border-b px-3 py-2">
+                        {movieById[s.movieId]?.title ?? s.movieId}
+                      </td>
+                      <td className="border-b px-3 py-2">
+                        {roomById[s.showroomId]?.name ?? s.showroomId}
+                      </td>
                       <td className="border-b px-3 py-2">{formatLocal(s.when)}</td>
                       <td className="border-b px-3 py-2">
                         <button

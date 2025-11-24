@@ -10,8 +10,11 @@
     "start:all": "concurrently \"npm run backend\" \"npm run dev\""
   },
   "dependencies": {
+    "date-fns": "^4.1.0",
     "next": "15.5.4",
     "react": "19.1.0",
+    "react-date-picker": "^12.0.1",
+    "react-datepicker": "^8.9.0",
     "react-dom": "19.1.0",
     "react-phone-number-input": "^3.4.13"
   },

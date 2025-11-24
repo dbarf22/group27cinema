@@ -34,14 +34,13 @@ const emptyCard: Card = {
 
 export default function EditProfilePage() {
     const router = useRouter();
-    const {currentUser, login} = useSession();
+    const {currentUser, login, isRemembered} = useSession();
 
     const [msg, setMsg] = useState({error: '', ok: ''});
     const [busyProfile, setBusyProfile] = useState(false);
     const [busyAddress, setBusyAddress] = useState(false);
     const [busyPayments, setBusyPayments] = useState(false);
     const [busyPassword, setBusyPassword] = useState(false);
-
 
     const [username, setUsername] = useState('');
     const [email, setEmail] = useState('');
@@ -130,7 +129,7 @@ export default function EditProfilePage() {
             });
 
             const data = await res.json();
-            login(data.user);
+            login(data.user, isRemembered);
 
             if (!res.ok) {
                 const errorText = await res.text();
@@ -171,7 +170,7 @@ export default function EditProfilePage() {
             });
 
             const data = await res.json();
-            login(data.user);
+            login(data.user, isRemembered);
 
             if (!res.ok) {
                 const errorText = await res.text();
@@ -216,7 +215,7 @@ export default function EditProfilePage() {
             });
 
             const data = await res.json();
-            login(data.user);
+            login(data.user, isRemembered);
 
             if (!res.ok) {
                 const errorText = await res.text();

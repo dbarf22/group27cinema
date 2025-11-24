@@ -26,7 +26,7 @@ public class Booking {
     @ManyToOne(fetch = FetchType.LAZY)
     @OnDelete(action = OnDeleteAction.CASCADE)
     @JoinColumn(name = "screening_id")
-    private Screening screening;
+    private Showtime screening;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @OnDelete(action = OnDeleteAction.SET_NULL)
@@ -48,7 +48,8 @@ public class Booking {
     @Column(name = "created_at")
     private Instant createdAt;
 
-    @OneToMany(mappedBy = "booking")
+    @OneToMany
+    @JoinColumn(name = "booking_id")
     private Set<Ticket> tickets = new LinkedHashSet<>();
 
     public Integer getId() {
@@ -67,11 +68,11 @@ public class Booking {
         this.user = user;
     }
 
-    public Screening getScreening() {
+    public Showtime getScreening() {
         return screening;
     }
 
-    public void setScreening(Screening screening) {
+    public void setScreening(Showtime screening) {
         this.screening = screening;
     }
 

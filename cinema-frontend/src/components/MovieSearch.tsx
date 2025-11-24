@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 
 type Movie = {
@@ -88,7 +88,7 @@ export default function MovieSearch() {
               {m.title}
              </div>
              <div className="text-sm text-gray-600">
-              {m.genre?.join(', ') ?? "Unknown genre"} {m.year ? `${m.year}` : ""}
+              {m.genre ?? "Unknown genre"} {m.year ? `${m.year}` : ""}
              </div>
              </Link>
           </li>

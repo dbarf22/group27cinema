@@ -1,5 +1,6 @@
 package com.group27.cinema_backend.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 
 import java.util.LinkedHashSet;
@@ -16,8 +17,9 @@ public class RatingCode {
     @Column(name = "rating_code", length = 10)
     private String ratingCode;
 
+    @JsonIgnore
     @OneToMany(mappedBy = "rating")
-    private Set<Movie1> movies = new LinkedHashSet<>();
+    private Set<Movie> movies = new LinkedHashSet<>();
 
     public Integer getId() {
         return id;
@@ -35,11 +37,11 @@ public class RatingCode {
         this.ratingCode = ratingCode;
     }
 
-    public Set<Movie1> getMovies() {
+    public Set<Movie> getMovies() {
         return movies;
     }
 
-    public void setMovies(Set<Movie1> movies) {
+    public void setMovies(Set<Movie> movies) {
         this.movies = movies;
     }
 

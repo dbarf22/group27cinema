@@ -8,35 +8,47 @@ export default function MovieCard({ movie }: { movie: Movie }) {
       ? movie.poster
       : "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='400' height='600'><rect width='100%' height='100%' fill='%23eee'/><text x='50%' y='50%' dominant-baseline='middle' text-anchor='middle' fill='%23999' font-size='20'>No Poster</text></svg>";
 
+  const showtimes = Array.isArray(movie.showtimes)
+    ? movie.showtimes.map((st: any) => (typeof st === "string" ? st : st.showtime || st.time || ""))
+      .filter(Boolean)
+    : [];
+
   return (
-    <div className="flex flex-col max-w-screen-xl mx-auto w-48">
-      {/* POSTER & TITLE AS LINK */}
-      <Link href={`/movies/${movie.id}`} className="group w-full">
-        <div className="relative w-48 h-72 rounded-xl overflow-hidden shadow-md transition group-hover:shadow-lg">
-          <Image src={posterSrc} alt={`${movie.title} poster`} fill sizes="192px" className="object-cover" />
+    <div className="flex flex-col w-48 mx-auto">
+      {/* Poster + Title */}
+      <Link href={`/movies/${movie.id}`} className="group">
+        <div className="relative w-48 h-72 rounded-xl overflow-hidden shadow-md transition group-hover:shadow-xl">
+          <Image
+            src={posterSrc}
+            alt={`${movie.title} poster`}
+            fill
+            sizes="192px"
+            className="object-cover"
+          />
         </div>
-        <h3 className="mt-3 text-center text-lg font-semibold text-gray-900 group-hover:text-blue-700">
+        <h3 className="mt-3 text-center text-lg font-semibold text-gray-900 group-hover:text-blue-600 transition">
           {movie.title}
         </h3>
       </Link>
 
-      {/* SHOWTIMES - lead to specific booking page */}
-      {movie.showtimes?.length ? (
-        <div className="mt-2 flex flex-wrap justify-center gap-2">
-          {movie.showtimes.map((t, i) => (
+      {/* Showtimes Buttons */}
+      {showtimes.length > 0 ? (
+        <div className="mt-3 flex flex-wrap justify-center gap-2">
+          {showtimes.map((time: string, i: number) => (
             <Link
               key={i}
-              href={`/booking/${movie.id}?showtime=${encodeURIComponent(t)}`}
-              className="px-3 py-1 rounded-full text-xs font-semibold
-              text-blue-700 bg-white border border-blue-200 shadow-sm
-              hover:bg-blue-50 transition opacity-100 tracking-wider"
+              href={`/booking/${movie.id}?showtime=${encodeURIComponent(time)}`}
+              className="px-4 py-2 rounded-full text-xs font-bold text-blue-700 bg-blue-50 border border-blue-200 hover:bg-blue-100 transition"
             >
-              {t}
+              {new Date(time).toLocaleTimeString([], {
+                hour: "2-digit",
+                minute: "2-digit",
+              })}
             </Link>
           ))}
         </div>
       ) : (
-        <p className="max-w-screen-xl mx-auto mt-2 text-xs text-gray-500">No showtimes</p>
+        <p className="mt-3 text-center text-sm text-gray-500">No showtimes available</p>
       )}
     </div>
   );

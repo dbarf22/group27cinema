@@ -1,16 +1,31 @@
 "use client";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import {useSession} from '@/app/session/SessionContext';
+
 
 const PortalPage = () => {
   const [accountType, setAccountType] = useState("");
   const router = useRouter();
+  const {currentUser} = useSession();
 
-  useEffect(() => {
-    // Future API call to get user account type
-    // Waiting on the backend guys to write the route and then I'll update this
-    setAccountType("Admin");
-  }, []);
+
+    useEffect(() => {
+        const fetchData = async () => {
+            try {
+                let key = currentUser?.userKey;
+                const response = await fetch(`/api/auth/get-account-type?userKey=${key}`);
+                if (!response.ok) {
+                    setAccountType("Customer")
+                } else {
+                    setAccountType("Admin")
+                }
+            } catch (err) {
+                console.log(err);
+            }
+        };
+        fetchData();
+    }, []);
 
   const go = (path: string) => {
     console.log(`Navigate to: ${path}`);

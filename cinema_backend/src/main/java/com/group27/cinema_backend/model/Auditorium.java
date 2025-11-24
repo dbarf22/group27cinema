@@ -1,5 +1,6 @@
 package com.group27.cinema_backend.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
@@ -23,13 +24,16 @@ public class Auditorium {
     @ManyToOne(fetch = FetchType.LAZY)
     @OnDelete(action = OnDeleteAction.CASCADE)
     @JoinColumn(name = "theater_id")
+    @JsonIgnore
     private Theater theater;
 
-    @OneToMany(mappedBy = "auditorium")
-    private Set<Screening> screenings = new LinkedHashSet<>();
-
-    @OneToMany(mappedBy = "auditorium")
+    @OneToMany
+    @JoinColumn(name = "auditorium_id")
     private Set<Seat> seats = new LinkedHashSet<>();
+
+    @OneToMany
+    @JoinColumn(name = "auditorium_id")
+    private Set<Showtime> showtimes = new LinkedHashSet<>();
 
     public Integer getId() {
         return id;
@@ -63,20 +67,20 @@ public class Auditorium {
         this.theater = theater;
     }
 
-    public Set<Screening> getScreenings() {
-        return screenings;
-    }
-
-    public void setScreenings(Set<Screening> screenings) {
-        this.screenings = screenings;
-    }
-
     public Set<Seat> getSeats() {
         return seats;
     }
 
     public void setSeats(Set<Seat> seats) {
         this.seats = seats;
+    }
+
+    public Set<Showtime> getShowtimes() {
+        return showtimes;
+    }
+
+    public void setShowtimes(Set<Showtime> showtimes) {
+        this.showtimes = showtimes;
     }
 
 }

@@ -1,13 +1,16 @@
 package com.group27.cinema_backend.controller;
 
-import com.group27.cinema_backend.model.Movie;
-import com.group27.cinema_backend.repository.MovieRepository;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.bind.annotation.PathVariable;
 
-import java.util.*;
+import com.group27.cinema_backend.model.Movie;
+import com.group27.cinema_backend.repository.MovieRepository;
 
 @RestController
 public class GetController {
@@ -35,27 +38,29 @@ public class GetController {
     }
 
     @GetMapping("/api/movies/{id}")
-    public Movie getById(@PathVariable String id) {
-        Movie m = movieRepository.findById(id).orElse(null);
-        Movie n = new Movie();
-        n.setTitle("Movie not found");
-        return Objects.requireNonNullElse(m, n);
+    public Movie getById(@PathVariable Integer id) {
+        return movieRepository.findById(id)
+                .orElseGet(() -> {
+                    Movie notFound = new Movie();
+                    notFound.setTitle("Movie not found");
+                    return notFound;
+                });
     }
 
     @GetMapping("/api/movies/trailer")
-    public Map<String,String> getTrailer(@RequestParam() String id) {
-        String trailer = movieRepository.findById(id)
+    public Map<String,String> getTrailer(@RequestParam String id) {
+        String trailer = movieRepository.findById(Integer.parseInt(id))
                                     .map(Movie::getTrailer)
                                     .orElse("Movie not found");
-    return Collections.singletonMap("trailer", trailer);
+        return Collections.singletonMap("trailer", trailer);
     }
 
     @GetMapping("/api/movies/poster")
-    public Map<String,String> getPoster(@RequestParam() String id) {
-        String poster = movieRepository.findById(id)
+    public Map<String,String> getPoster(@RequestParam String id) {
+        String poster = movieRepository.findById(Integer.parseInt(id))
                                     .map(Movie::getPoster)
                                     .orElse("Movie not found");
-    return Collections.singletonMap("poster", poster);
+        return Collections.singletonMap("poster", poster);
     }
 
 }

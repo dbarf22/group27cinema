@@ -21,14 +21,22 @@ public class UserService {
     // These methods all used to be in auth controller but I am separating them now so AuthController
     // is strictly for routing http requests
 
-    //todo: change password
-
     // Constructor class that ensures dependency injection through spring
     public UserService(UserRepository userRepository, PasswordEncoder encoder,
                        EmailService emailService) {
         this.userRepository = userRepository;
         this.encoder = encoder;
         this.emailService = emailService;
+    }
+
+    // Check if a user is an admin or not through their user key
+    public boolean findUserAccountType(String userKey) throws Exception {
+        User user = userRepository.findByUserKey(userKey).orElseThrow(() -> new Exception("User not found"));
+        if (user.getAccountType().equals("Admin")) {
+            return true;
+        } else {
+            return false;
+        }
     }
 
     // Register User method, takes User
@@ -43,6 +51,7 @@ public class UserService {
 
         String token = UUID.randomUUID().toString();
         String encodedPassword = encoder.encode(request.password());
+        String userKey = UUID.randomUUID().toString();
 
         // builder for user takes 3 required fields: username, email, password
         // it then
@@ -56,7 +65,7 @@ public class UserService {
                 .state(request.state())
                 .zipCode(request.zipCode())
                 .cards(request.cards())
-
+                .userKey(userKey)
                 .status("Inactive")
                 .verificationToken(token)
                 .accountType("Customer")

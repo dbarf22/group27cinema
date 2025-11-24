@@ -1,55 +1,147 @@
 package com.group27.cinema_backend.model;
 
-import org.springframework.data.annotation.Id;
-import org.springframework.data.mongodb.core.mapping.Document;
+import jakarta.persistence.*;
 
-@Document("movie")
+import java.util.LinkedHashSet;
+import java.util.Set;
+
+@Entity
+@Table(name = "movies")
 public class Movie {
-
     @Id
-    public String id;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "movie_id", nullable = false)
+    private Integer id;
 
-    public String title;
+    @Column(name = "title", length = 50)
+    private String title;
+
+    @Column(name = "cast_list", length = 500)
+    private String castList;
+
+    @Column(name = "producer", length = 50)
+    private String producer;
+
+    @Column(name = "duration")
+    private Integer duration;
+
+    @Column(name = "poster", nullable = false)
+    private String poster;
+
+    @Column(name = "trailer", nullable = false)
+    private String trailer;
+
+    @Column(name = "rating")
+    private Float rating;
+
+    @ManyToOne()
+    @JoinColumn(name = "rating_id")
+    private RatingCode ratingCode;
+
+    @Column(name = "description")
+    private String description;
+
+    @Column(name = "genre", length = 50)
+    private String genre;
+
+    @OneToMany
+    @JoinColumn(name = "movie_id")
+    private Set<Showtime> showtimes = new LinkedHashSet<>();
+
+    public Integer getId() {
+        return id;
+    }
+
+    public void setId(Integer id) {
+        this.id = id;
+    }
+
+    public String getTitle() {
+        return title;
+    }
 
     public void setTitle(String title) {
         this.title = title;
     }
 
-    public int rating;
+    public String getCastList() {
+        return castList;
+    }
 
-    public String description;
+    public void setCastList(String castList) {
+        this.castList = castList;
+    }
 
-    public String poster;
+    public String getProducer() {
+        return producer;
+    }
+
+    public void setProducer(String producer) {
+        this.producer = producer;
+    }
+
+    public Integer getDuration() {
+        return duration;
+    }
+
+    public void setDuration(Integer duration) {
+        this.duration = duration;
+    }
 
     public String getPoster() {
         return poster;
+    }
+
+    public void setPoster(String poster) {
+        this.poster = poster;
     }
 
     public String getTrailer() {
         return trailer;
     }
 
-    public String trailer;
-
-    public String[] showtimes;
-
-    public String[] genre;
-
-    public Movie() {}
-
-    public Movie(String title, int rating, String description, String poster, String trailer, String[] genre, String[] showtimes) {
-        this.title = title;
-        this.rating = rating;
-        this.description = description;
-        this.poster = poster;
+    public void setTrailer(String trailer) {
         this.trailer = trailer;
-        this.showtimes = showtimes;
+    }
+
+    public Float getRating() {
+        return rating;
+    }
+
+    public void setRating(Float rating) {
+        this.rating = rating;
+    }
+
+    public RatingCode getRatingCode() {
+        return ratingCode;
+    }
+
+    public void setRatingCode(RatingCode ratingCode) {
+        this.ratingCode = ratingCode;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    public String getGenre() {
+        return genre;
+    }
+
+    public void setGenre(String genre) {
         this.genre = genre;
     }
 
-    @Override
-    public String toString() {
-        return title;
+    public Set<Showtime> getShowtimes() {
+        return showtimes;
+    }
+
+    public void setShowtimes(Set<Showtime> showtimes) {
+        this.showtimes = showtimes;
     }
 
 }

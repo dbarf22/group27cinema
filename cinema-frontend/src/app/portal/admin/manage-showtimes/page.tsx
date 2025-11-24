@@ -1,5 +1,5 @@
 "use client";
-import { useMemo, useState } from "react";
+import { useMemo, useState, useEffect } from "react";
 
 type Movie = { id: string; title: string };
 type Showroom = { id: string; name: string };
@@ -9,12 +9,6 @@ type Showtime = {
   showroomId: string;
   when: string; // ISO string
 };
-
-const TEST_MOVIES: Movie[] = [
-  { id: "m1", title: "Avatar" },
-  { id: "m2", title: "Dune: Part Two" },
-  { id: "m3", title: "Inside Out 2" },
-];
 
 const TEST_SHOWROOMS: Showroom[] = [
   { id: "r1", name: "Showroom A" },
@@ -30,9 +24,28 @@ export default function ManageShowtimesPage() {
   const [feedback, setFeedback] = useState<{ type: "success" | "error"; msg: string } | null>(
     null
   );
+const [movies, setMovies] = useState<Movie[]>([]);
+
+  useEffect(() => {
+    const getMovieList = async () => {
+      try {
+        const res = await fetch('/api/movies');
+        const data = await res.json();
+        setMovies(data);
+      } catch (err) {
+        console.error("Failed to fetch movie list:", err);
+      }
+    };
+
+    getMovieList();
+  }, []);
+
+  useEffect(() => {
+    console.log(movies);
+  }, [movies]);
 
   const movieById = useMemo(
-    () => Object.fromEntries(TEST_MOVIES.map((m) => [m.id, m])),
+    () => Object.fromEntries(movies.map((m) => [m.id, m])),
     []
   );
   const roomById = useMemo(
@@ -61,23 +74,16 @@ export default function ManageShowtimesPage() {
     });
   }
 
-  // Core rule: cannot schedule two movies in the same showroom at the same date/time
   function hasConflict(roomId: string, dtIso: string) {
     return showtimes.some((s) => s.showroomId === roomId && s.when === dtIso);
   }
 
   function normalizeToIso(datetimeLocal: string) {
-    // datetime-local gives "YYYY-MM-DDTHH:mm"
-    // store as ISO using local time to keep exact minute chosen
-    // Create ISO string without timezone shifting by constructing components.
     const [datePart, timePart] = datetimeLocal.split("T");
     if (!datePart || !timePart) return "";
     const [y, m, d] = datePart.split("-").map((n) => parseInt(n, 10));
     const [hh, mm] = timePart.split(":").map((n) => parseInt(n, 10));
     if ([y, m, d, hh, mm].some((n) => Number.isNaN(n))) return "";
-
-    // Build an ISO “local” string like YYYY-MM-DDTHH:mm:00 (no TZ), compare as string
-    // For strict equality we can keep this format consistent.
     const pad = (n: number) => String(n).padStart(2, "0");
     return `${y}-${pad(m)}-${pad(d)}T${pad(hh)}:${pad(mm)}:00`;
   }
@@ -117,7 +123,6 @@ export default function ManageShowtimesPage() {
       } at ${formatLocal(iso)}.`,
     });
 
-    // keep movie selection but reset date/time for quick adds
     setWhen("");
   }
 
@@ -125,8 +130,6 @@ export default function ManageShowtimesPage() {
     clearFeedback();
     setShowtimes((prev) => prev.filter((s) => s.id !== id));
   }
-
-  // Optional quick filter for usability
   const [filterMovie, setFilterMovie] = useState<string>("all");
   const [filterRoom, setFilterRoom] = useState<string>("all");
 
@@ -167,8 +170,6 @@ export default function ManageShowtimesPage() {
             {feedback.msg}
           </div>
         )}
-
-        {/* Add Showtime Form */}
         <section className="rounded-2xl border bg-white p-6 shadow-sm">
           <h2 className="text-lg font-semibold text-gray-900">Schedule a Movie</h2>
           <p className="text-sm text-gray-600 mb-4">
@@ -184,8 +185,8 @@ export default function ManageShowtimesPage() {
                 onChange={(e) => setMovieId(e.target.value)}
               >
                 <option value="">Select a movie…</option>
-                {TEST_MOVIES.map((m) => (
-                  <option key={m.id} value={m.id}>
+                {movies.map((m) => (
+                  <option key={m.title} value={m.title}>
                     {m.title}
                   </option>
                 ))}
@@ -239,8 +240,6 @@ export default function ManageShowtimesPage() {
             </button>
           </div>
         </section>
-
-        {/* Filters */}
         <section className="rounded-2xl border bg-white p-6 shadow-sm">
           <div className="flex flex-wrap items-end gap-4">
             <div>
@@ -251,7 +250,7 @@ export default function ManageShowtimesPage() {
                 onChange={(e) => setFilterMovie(e.target.value)}
               >
                 <option value="all">All</option>
-                {TEST_MOVIES.map((m) => (
+                {movies.map((m) => (
                   <option key={m.id} value={m.id}>
                     {m.title}
                   </option>
@@ -276,8 +275,6 @@ export default function ManageShowtimesPage() {
             </div>
           </div>
         </section>
-
-        {/* List of Showtimes */}
         <section className="rounded-2xl border bg-white p-6 shadow-sm">
           <h3 className="text-lg font-semibold text-gray-900 mb-4">Scheduled Showtimes</h3>
 

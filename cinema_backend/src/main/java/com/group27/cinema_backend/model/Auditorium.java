@@ -49,8 +49,7 @@ public class Auditorium {
     @JsonIgnore
     private Theater theater;
 
-    @OneToMany
-    @JoinColumn(name = "auditorium_id")
+    @OneToMany(mappedBy = "auditorium", cascade = CascadeType.ALL)
     private Set<Seat> seats = new LinkedHashSet<>();
 
     @OneToMany

@@ -13,6 +13,7 @@ import java.util.Set;
 public class Seat {
     @Id
     @Column(name = "seat_id", nullable = false)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
     @ManyToOne(fetch = FetchType.LAZY)

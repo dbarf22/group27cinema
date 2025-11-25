@@ -50,6 +50,7 @@ public class Auditorium {
     private Theater theater;
 
     @OneToMany(mappedBy = "auditorium", cascade = CascadeType.ALL)
+    @JsonIgnore
     private Set<Seat> seats = new LinkedHashSet<>();
 
     @OneToMany

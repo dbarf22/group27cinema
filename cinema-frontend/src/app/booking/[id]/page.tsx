@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { notFound } from 'next/navigation';
 import Image from 'next/image';
 import { Movie } from '@/types/movie';
+import { useSession } from '@/app/session/SessionContext';
 
 type Ticket = {
   id: number;
@@ -313,6 +314,8 @@ export default function BookingPage({
   searchParams: Promise<{ showtime?: string }>;
 }) {
   const router = useRouter();
+  const { currentUser } = useSession();
+
   const [movie, setMovie] = useState<Movie | null>(null);
   const [currentShowtime, setCurrentShowtime] = useState<string>('');
   const [step, setStep] = useState<'tickets' | 'seats' | 'confirmation'>('tickets');
@@ -320,6 +323,12 @@ export default function BookingPage({
   const [seats, setSeats] = useState<string[]>([]);
 
   useEffect(() => {
+    // If not logged in, send them to login page
+    if (!currentUser) {
+      router.push('/login');
+      return;
+    }
+
     const fetchData = async () => {
       const resolvedParams = await params;
       const resolvedSearchParams = await searchParams;
@@ -337,7 +346,18 @@ export default function BookingPage({
     };
 
     fetchData();
-  }, [params, searchParams]);
+  }, [params, searchParams, currentUser, router]);
+
+  // While redirecting / not logged in, don't show booking UI
+  if (!currentUser) {
+    return (
+      <main className="mx-auto max-w-3xl px-6 py-10">
+        <div className="text-center">
+          You must be logged in to book tickets. Redirecting to login...
+        </div>
+      </main>
+    );
+  }
 
   if (!movie) {
     return (

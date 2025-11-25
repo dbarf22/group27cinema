@@ -14,6 +14,7 @@ export default function ManageMoviesPage() {
   const [description, setDescription] = useState("");
   const [genreInput, setGenreInput] = useState("");
   const [genres, setGenres] = useState<string[]>([]);
+  const [director, setDirector] = useState("");
 
   const [showtimeInput, setShowtimeInput] = useState("");
   const [showtimes, setShowtimes] = useState<string[]>([]);
@@ -100,6 +101,7 @@ export default function ManageMoviesPage() {
           ratingCode,
           description,
           genres,
+          director,
         }),
       });
 
@@ -257,7 +259,7 @@ export default function ManageMoviesPage() {
                   {/* TITLE */}
                   <div>
                     <label className="block text-sm font-medium text-gray-700">
-                      Title *
+                      Title
                     </label>
                     <input
                       className="mt-1 w-full rounded border p-2"
@@ -278,7 +280,7 @@ export default function ManageMoviesPage() {
                   {/* CAST */}
                   <div>
                     <label className="block text-sm font-medium text-gray-700">
-                      Cast List *
+                      Cast List
                     </label>
                     <input
                       className="mt-1 w-full rounded border p-2"
@@ -294,6 +296,20 @@ export default function ManageMoviesPage() {
                         {errors.castList}
                       </p>
                     )}
+                  </div>
+
+                  <div>
+                      <label className="block text-sm font-medium text-gray-700">
+                          Director
+                      </label>
+                      <input
+                          className="mt-1 w-full rounded border p-2"
+                          value={director}
+                          onChange={(e) => {
+                              setDirector(e.target.value);
+                          }}
+                          placeholder={"Christopher Nolan"}
+                      />
                   </div>
 
                   {/* PRODUCER */}

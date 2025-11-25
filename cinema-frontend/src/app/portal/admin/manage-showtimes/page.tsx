@@ -1,168 +1,240 @@
 "use client";
-import { useMemo, useState, useEffect } from "react";
-import DatePicker from "@/components/DatePicker";
 
-type Movie = { id: string; title: string };
-type Showroom = { id: string; name: string };
-type Showtime = {
-  id: string;
-  movieId: string;
-  showroomId: string;
-  when: string; // ISO string
+import { useEffect, useState } from "react";
+
+type Movie = { id: number; title: string };
+
+type ShowroomShowtime = {
+  id: number;
+  showtime: string;
+  availableSeats: number;
+  createdAt: string | null;
+  bookings: any[];
 };
 
-const TEST_SHOWROOMS: Showroom[] = [
-  { id: "r1", name: "Showroom A" },
-  { id: "r2", name: "Showroom B" },
-  { id: "r3", name: "Showroom C" },
-];
+type Showroom = {
+  id: number;
+  auditoriumName: string;
+  numberOfSeats: number;
+  showtimes: ShowroomShowtime[];
+};
+
+type ShowtimeRow = {
+  id: number;
+  showtime: string;
+  auditoriumId: number | null;
+};
 
 export default function ManageShowtimesPage() {
-  const [movieId, setMovieId] = useState("");
-  const [showroomId, setShowroomId] = useState("");
-  const [when, setWhen] = useState(""); // still used by normalizeToIso
-  const [showtimes, setShowtimes] = useState<Showtime[]>([]);
-  const [feedback, setFeedback] = useState<{ type: "success" | "error"; msg: string } | null>(
+  const [movies, setMovies] = useState<Movie[]>([]);
+  const [showrooms, setShowrooms] = useState<Showroom[]>([]);
+  const [showtimes, setShowtimes] = useState<ShowtimeRow[]>([]);
+
+  const [selectedMovieId, setSelectedMovieId] = useState<number | null>(null);
+  const [selectedShowroomId, setSelectedShowroomId] = useState<number | null>(
     null
   );
-  const [movies, setMovies] = useState<Movie[]>([]);
-  const [selectedTime, setSelectedTime] = useState<Date | null>(new Date());
+  const [when, setWhen] = useState<string>("");
 
-  // Fetch movies from API when page is opened
+  const [message, setMessage] = useState<{
+    type: "success" | "error";
+    text: string;
+  } | null>(null);
+
   useEffect(() => {
-    const getMovieList = async () => {
-      try {
-        const res = await fetch("/api/movies");
-        const data = await res.json();
-        setMovies(data);
-      } catch (err) {
-        console.error("Failed to fetch movie list:", err);
-      }
-    };
-
-    getMovieList();
+    fetch("/api/movies")
+      .then((res) => res.json())
+      .then(setMovies)
+      .catch(() => {});
   }, []);
 
   useEffect(() => {
-    console.log(movies);
-  }, [movies]);
+    refreshShowrooms();
+  }, []);
 
-  const movieById = useMemo(
-    () => Object.fromEntries(movies.map((m) => [m.id, m])),
-    [movies] // ✅ needs movies as dependency
-  );
-
-  const roomById = useMemo(
-    () => Object.fromEntries(TEST_SHOWROOMS.map((r) => [r.id, r])),
-    []
-  );
-
-  const sortedShowtimes = useMemo(
-    () => [...showtimes].sort((a, b) => a.when.localeCompare(b.when)),
-    [showtimes]
-  );
-
-  function clearFeedback() {
-    setFeedback(null);
+  async function refreshShowrooms(): Promise<Showroom[] | null> {
+    try {
+      const res = await fetch("/api/showrooms");
+      if (!res.ok) return null;
+      const data = await res.json();
+      const normalized: Showroom[] = data.map((r: any) => ({
+        id: r.id,
+        auditoriumName: r.auditoriumName,
+        numberOfSeats: r.numberOfSeats,
+        showtimes: r.showtimes ?? [],
+      }));
+      setShowrooms(normalized);
+      return normalized;
+    } catch {
+      return null;
+    }
   }
 
-  function formatLocal(dtIso: string) {
-    const d = new Date(dtIso);
-    if (Number.isNaN(d.getTime())) return dtIso;
-    return d.toLocaleString(undefined, {
-      year: "numeric",
-      month: "short",
-      day: "2-digit",
-      hour: "2-digit",
-      minute: "2-digit",
-    });
+  function clearMessage() {
+    setMessage(null);
   }
 
-  function hasConflict(roomId: string, dtIso: string) {
-    return showtimes.some((s) => s.showroomId === roomId && s.when === dtIso);
+  function findAuditoriumIdForShowtime(
+    showtimeId: number,
+    rooms: Showroom[]
+  ): number | null {
+    for (const room of rooms) {
+      if (room.showtimes?.some((st) => st.id === showtimeId)) {
+        return room.id;
+      }
+    }
+    return null;
   }
 
-  function normalizeToIso(datetimeLocal: string) {
-    const [datePart, timePart] = datetimeLocal.split("T");
-    if (!datePart || !timePart) return "";
-    const [y, m, d] = datePart.split("-").map((n) => parseInt(n, 10));
-    const [hh, mm] = timePart.split(":").map((n) => parseInt(n, 10));
-    if ([y, m, d, hh, mm].some((n) => Number.isNaN(n))) return "";
-    const pad = (n: number) => String(n).padStart(2, "0");
-    return `${y}-${pad(m)}-${pad(d)}T${pad(hh)}:${pad(mm)}:00`;
+  async function loadShowtimesForMovie(
+    movieId: number,
+    roomsOverride?: Showroom[]
+  ) {
+    try {
+      const res = await fetch(`/api/admin/movies/${movieId}/showtimes`);
+      if (!res.ok) {
+        setShowtimes([]);
+        return;
+      }
+      const data = await res.json();
+      const roomsToUse = roomsOverride ?? showrooms;
+      const rows: ShowtimeRow[] = data.map((s: any) => {
+        const auditoriumId = findAuditoriumIdForShowtime(s.id, roomsToUse);
+        return {
+          id: s.id,
+          showtime: s.showtime ?? s.when,
+          auditoriumId,
+        };
+      });
+      setShowtimes(rows);
+    } catch {
+      setShowtimes([]);
+    }
   }
 
-  function addShowtime() {
-    clearFeedback();
-
-    if (!movieId || !showroomId || !when) {
-      setFeedback({ type: "error", msg: "Please select a movie, showroom, and date/time." });
+  function handleMovieSelect(value: string) {
+    clearMessage();
+    if (!value) {
+      setSelectedMovieId(null);
+      setShowtimes([]);
       return;
     }
-    const iso = normalizeToIso(when);
-    if (!iso) {
-      setFeedback({ type: "error", msg: "Invalid date/time value." });
-      return;
-    }
-    if (hasConflict(showroomId, iso)) {
-      const roomName = roomById[showroomId]?.name ?? "this showroom";
-      setFeedback({
+    const id = Number(value);
+    setSelectedMovieId(id);
+    loadShowtimesForMovie(id);
+  }
+
+  function hasConflict(auditoriumId: number, isoInstant: string) {
+    const newTime = new Date(isoInstant).getTime();
+    return showtimes.some(
+      (s) =>
+        s.auditoriumId === auditoriumId &&
+        new Date(s.showtime).getTime() === newTime
+    );
+  }
+
+  async function handleAddShowtime() {
+    clearMessage();
+
+    if (!selectedMovieId || !selectedShowroomId || !when) {
+      setMessage({
         type: "error",
-        msg: `Conflict: ${roomName} already has a showtime at ${formatLocal(iso)}.`,
+        text: "Please select a movie, showroom, and date/time.",
       });
       return;
     }
 
-    const newItem: Showtime = {
-      id: crypto.randomUUID(),
-      movieId,
-      showroomId,
-      when: iso,
-    };
-    setShowtimes((prev) => [...prev, newItem]);
-    setFeedback({
-      type: "success",
-      msg: `Showtime scheduled: ${movieById[movieId].title} in ${
-        roomById[showroomId].name
-      } at ${formatLocal(iso)}.`,
-    });
-
-    setWhen("");
-  }
-
-  async function addShowtimeCall() {
-    // Implement API call to add showtime to backend
-    try {
-      // TODO: Add showtime for a movie via API
-    } catch (err) {
-      console.error("Failed to add showtime:", err);
+    const localDate = new Date(when);
+    if (Number.isNaN(localDate.getTime())) {
+      setMessage({ type: "error", text: "Invalid date/time." });
+      return;
     }
-  } // ✅ close function
 
-  function removeShowtime(id: string) {
-    clearFeedback();
-    setShowtimes((prev) => prev.filter((s) => s.id !== id));
+    const isoInstant = localDate.toISOString();
+
+    if (hasConflict(selectedShowroomId, isoInstant)) {
+      setMessage({
+        type: "error",
+        text: "Conflict: this showroom already has a movie at that date/time.",
+      });
+      return;
+    }
+
+    try {
+      const res = await fetch(
+        `/api/admin/movies/${selectedMovieId}/showtimes`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            showtime: isoInstant,
+            auditoriumId: selectedShowroomId,
+            availableSeats: 0,
+          }),
+        }
+      );
+
+      if (!res.ok) {
+        setMessage({ type: "error", text: "Failed to save showtime." });
+        return;
+      }
+
+      await res.json();
+
+      const latestRooms = (await refreshShowrooms()) ?? showrooms;
+      await loadShowtimesForMovie(selectedMovieId, latestRooms);
+
+      setMessage({ type: "success", text: "Showtime added successfully." });
+      setWhen("");
+    } catch {
+      setMessage({
+        type: "error",
+        text: "Server error while saving showtime.",
+      });
+    }
   }
 
-  const [filterMovie, setFilterMovie] = useState<string>("all");
-  const [filterRoom, setFilterRoom] = useState<string>("all");
+  async function handleRemoveShowtime(showtimeId: number) {
+    clearMessage();
+    if (!selectedMovieId) return;
 
-  const filteredShowtimes = useMemo(() => {
-    return sortedShowtimes.filter((s) => {
-      const byMovie = filterMovie === "all" || s.movieId === filterMovie;
-      const byRoom = filterRoom === "all" || s.showroomId === filterRoom;
-      return byMovie && byRoom;
-    });
-  }, [sortedShowtimes, filterMovie, filterRoom]);
+    setShowtimes((prev) => prev.filter((s) => s.id !== showtimeId));
+
+    try {
+      await fetch(
+        `/api/admin/movies/${selectedMovieId}/showtimes/${showtimeId}`,
+        { method: "DELETE" }
+      );
+
+      const latestRooms = (await refreshShowrooms()) ?? showrooms;
+      await loadShowtimesForMovie(selectedMovieId, latestRooms);
+    } catch {
+      setMessage({
+        type: "error",
+        text: "Failed to delete showtime from server.",
+      });
+    }
+  }
+
+  function formatLocal(iso: string) {
+    const d = new Date(iso);
+    if (Number.isNaN(d.getTime())) return iso;
+    return d.toLocaleString();
+  }
+
+  const selectedMovie = selectedMovieId
+    ? movies.find((m) => m.id === selectedMovieId)
+    : null;
 
   return (
-    <div className="min-h-screen bg-gray-50 py-10 px-4">
+    <div>
       <div className="mx-auto max-w-5xl space-y-8">
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div>
-            <h1 className="text-3xl font-bold text-gray-900">Manage Showtimes</h1>
+            <h1 className="text-3xl font-bold text-gray-900">Schedule a Movie</h1>
             <p className="text-gray-600">
-              Add showtimes and review conflicts across showrooms.
+              Choose a movie, showroom, and time. Prevent double-booking
+              automatically.
             </p>
           </div>
           <a
@@ -173,95 +245,35 @@ export default function ManageShowtimesPage() {
           </a>
         </div>
 
-        {feedback && (
+        {message && (
           <div
             className={`rounded-lg border px-4 py-3 text-sm ${
-              feedback.type === "error"
+              message.type === "error"
                 ? "border-red-300 bg-red-50 text-red-800"
                 : "border-green-300 bg-green-50 text-green-800"
             }`}
           >
-            {feedback.msg}
+            {message.text}
           </div>
         )}
 
         <section className="rounded-2xl border bg-white p-6 shadow-sm">
-          <h2 className="text-lg font-semibold text-gray-900">Schedule a Movie</h2>
+          <h2 className="text-lg font-semibold text-gray-900">Add Showtime</h2>
           <p className="text-sm text-gray-600 mb-4">
-            Choose a movie, showroom, and date/time. Conflicts are blocked automatically.
+            Pick a movie, showroom, and date/time, then add the showtime.
           </p>
 
-          <div className="grid gap-4 md:grid-cols-2">
+          <div className="grid gap-4 md:grid-cols-3">
             <div>
-              <label className="block text-sm font-medium text-gray-700">Movie</label>
+              <label className="block text-sm font-medium text-gray-700">
+                Movie
+              </label>
               <select
                 className="mt-1 w-full rounded border border-gray-300 p-2 bg-white"
-                value={movieId}
-                onChange={(e) => setMovieId(e.target.value)}
+                value={selectedMovieId ?? ""}
+                onChange={(e) => handleMovieSelect(e.target.value)}
               >
                 <option value="">Select a movie…</option>
-                {movies.map((m) => (
-                  <option key={m.title} value={m.title}>
-                    {m.title}
-                  </option>
-                ))}
-              </select>
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700">Showroom</label>
-              <select
-                className="mt-1 w-full rounded border border-gray-300 p-2 bg-white"
-                value={showroomId}
-                onChange={(e) => setShowroomId(e.target.value)}
-              >
-                <option value="">Select a showroom…</option>
-                {TEST_SHOWROOMS.map((r) => (
-                  <option key={r.id} value={r.id}>
-                    {r.name}
-                  </option>
-                ))}
-              </select>
-            </div>
-
-            <div className="md:col-span-2">
-              <label className="block text-sm font-medium text-gray-700">Date & Time</label>
-              {/* If you want DatePicker to actually drive `when`, you'll want to sync it here */}
-              <DatePicker selectedTime={selectedTime} setSelectedTime={setSelectedTime} />
-            </div>
-          </div>
-
-          <div className="mt-5 flex gap-3">
-            <button
-              onClick={addShowtime}
-              className="rounded bg-blue-600 px-4 py-2 font-semibold text-white hover:bg-blue-500"
-            >
-              Add Showtime
-            </button>
-            <button
-              onClick={() => {
-                setMovieId("");
-                setShowroomId("");
-                setWhen("");
-                clearFeedback();
-              }}
-              className="rounded border border-gray-300 px-4 py-2 font-semibold hover:bg-gray-50"
-            >
-              Reset
-            </button>
-          </div>
-        </section>
-
-        <section className="rounded-2xl border bg-white p-6 shadow-sm">
-          <div className="flex flex-wrap items-end gap-4">
-            <div>
-              <label className="block text-sm font-medium text-gray-700">Filter by Movie</label>
-              <select
-                className="mt-1 w-56 rounded border border-gray-300 p-2 bg-white"
-                value={filterMovie}
-                onChange={(e) => setFilterMovie(e.target.value)}
-              >
-                <option value="all">All</option>
                 {movies.map((m) => (
                   <option key={m.id} value={m.id}>
                     {m.title}
@@ -271,30 +283,70 @@ export default function ManageShowtimesPage() {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700">Filter by Showroom</label>
+              <label className="block text-sm font-medium text-gray-700">
+                Showroom
+              </label>
               <select
-                className="mt-1 w-56 rounded border border-gray-300 p-2 bg-white"
-                value={filterRoom}
-                onChange={(e) => setFilterRoom(e.target.value)}
+                className="mt-1 w-full rounded border border-gray-300 p-2 bg-white"
+                value={selectedShowroomId ?? ""}
+                onChange={(e) =>
+                  setSelectedShowroomId(
+                    e.target.value === "" ? null : Number(e.target.value)
+                  )
+                }
+                disabled={!selectedMovieId}
               >
-                <option value="all">All</option>
-                {TEST_SHOWROOMS.map((r) => (
+                <option value="">Select a showroom…</option>
+                {showrooms.map((r) => (
                   <option key={r.id} value={r.id}>
-                    {r.name}
+                    {r.auditoriumName}
                   </option>
                 ))}
               </select>
             </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700">
+                Date & Time
+              </label>
+              <input
+                type="datetime-local"
+                className="mt-1 w-full rounded border border-gray-300 p-2"
+                value={when}
+                onChange={(e) => setWhen(e.target.value)}
+                disabled={!selectedMovieId}
+              />
+            </div>
           </div>
+
+          <button
+            onClick={handleAddShowtime}
+            className="mt-5 rounded bg-blue-600 px-4 py-2 font-semibold text-white hover:bg-blue-500"
+          >
+            Add Showtime
+          </button>
         </section>
 
         <section className="rounded-2xl border bg-white p-6 shadow-sm">
-          <h3 className="text-lg font-semibold text-gray-900 mb-4">Scheduled Showtimes</h3>
+          <h2 className="text-lg font-semibold text-gray-900">
+            Showtimes for Selected Movie
+          </h2>
+          <p className="text-sm text-gray-600 mb-2">
+            {selectedMovie
+              ? `Movie: ${selectedMovie.title}`
+              : "Select a movie above to view its scheduled showtimes."}
+          </p>
 
-          {filteredShowtimes.length === 0 ? (
-            <p className="text-sm text-gray-600">No showtimes yet.</p>
-          ) : (
-            <div className="overflow-x-auto">
+          {(!selectedMovieId || showtimes.length === 0) && (
+            <p className="text-sm text-gray-600">
+              {selectedMovieId
+                ? "No showtimes scheduled yet."
+                : "Choose a movie to see its showtimes."}
+            </p>
+          )}
+
+          {selectedMovieId && showtimes.length > 0 && (
+            <div className="overflow-x-auto mt-3">
               <table className="min-w-full border-collapse">
                 <thead>
                   <tr className="bg-gray-100 text-left text-sm text-gray-700">
@@ -305,18 +357,21 @@ export default function ManageShowtimesPage() {
                   </tr>
                 </thead>
                 <tbody>
-                  {filteredShowtimes.map((s) => (
+                  {showtimes.map((s) => (
                     <tr key={s.id} className="text-sm">
                       <td className="border-b px-3 py-2">
-                        {movieById[s.movieId]?.title ?? s.movieId}
+                        {selectedMovie ? selectedMovie.title : "Unknown movie"}
                       </td>
                       <td className="border-b px-3 py-2">
-                        {roomById[s.showroomId]?.name ?? s.showroomId}
+                        {showrooms.find((r) => r.id === s.auditoriumId)
+                          ?.auditoriumName ?? "Unknown showroom"}
                       </td>
-                      <td className="border-b px-3 py-2">{formatLocal(s.when)}</td>
+                      <td className="border-b px-3 py-2">
+                        {formatLocal(s.showtime)}
+                      </td>
                       <td className="border-b px-3 py-2">
                         <button
-                          onClick={() => removeShowtime(s.id)}
+                          onClick={() => handleRemoveShowtime(s.id)}
                           className="rounded border border-gray-300 px-3 py-1 text-xs font-semibold hover:bg-gray-50"
                         >
                           Remove

@@ -41,12 +41,19 @@ public class Movie {
     @Column(name = "description")
     private String description;
 
+    @Column(name = "director")
+    private String director;
+
     @Column(name = "genre", length = 50)
     private String genre;
 
     @OneToMany
     @JoinColumn(name = "movie_id")
     private Set<Showtime> showtimes = new LinkedHashSet<>();
+
+    public String getDirector() {
+        return director;
+    }
 
     public Integer getId() {
         return id;

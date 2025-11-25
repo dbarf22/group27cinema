@@ -5,7 +5,21 @@ export type Movie = {
     description: string;
     poster: string;
     trailer: string;
-    showtimes: string[];
-    genre: string[];
+    showtimes: {
+        id: number;
+        showtime: string;
+        availableSeats: number;
+        createdAt: number | null;
+        bookings: [];
+    }[];
+    ratingCode: {
+        id: number;
+        ratingCode: string;
+    };
+    genre: string;
+    producer: string;
+    duration: number;
+    director: string;
+    castList: string;
   };
   

@@ -532,15 +532,6 @@ export default function ManageMoviesPage() {
           </div>
         </section>
 
-        {/* SCHEDULE MOVIE TIMES PLACEHOLDER */}
-        <section className="rounded-2xl border bg-white p-6 shadow-sm">
-          <div className="text-lg font-semibold text-gray-900">
-            Schedule Movie Times
-          </div>
-          <p className="mt-1 text-sm text-gray-600">
-            Add new movie times and edit existing schedules.
-          </p>
-        </section>
 
         {/* MANAGE PROMOTIONS CARD WITH TOGGLE */}
         <section className="rounded-2xl border bg-white shadow-sm">

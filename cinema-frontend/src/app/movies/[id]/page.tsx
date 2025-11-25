@@ -58,14 +58,23 @@ export default async function MovieDetails(
             <div className="text-center space-y-2">
                 <h1 className="text-4xl font-bold">{movie.title}</h1>
                 <p className="text-gray-700">
-                    {movie.genre} · Rating: {movie.rating}/5
+                    {movie.genre} · Rating: {movie.rating}/5 · MPAA Rating: {movie.ratingCode.ratingCode}
                 </p>
+                <p className={"text-gray-700"}>
+                    Cast: {movie.castList}
+                </p>
+                <p className={"text-gray-700"}>
+                    Director: {movie.director} · Producer: {movie.producer}
+                </p>
+
             </div>
 
             {/* MOVIE DESCRIPTION */}
             {movie.description && (
                 <p className="text-lg leading-7">{movie.description}</p>
             )}
+
+
 
             {/* SHOWTIMES */}
             {Array.isArray(movie.showtimes) && movie.showtimes.length > 0 && (

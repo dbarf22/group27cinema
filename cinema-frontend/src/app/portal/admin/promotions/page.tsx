@@ -1,7 +1,13 @@
 "use client";
-import { useMemo, useState } from "react";
+import { useMemo, useState, FormEvent } from "react";
 
-type CreateErrors = { code?: string; discount?: string; start?: string; end?: string };
+type CreateErrors = {
+  code?: string;
+  discount?: string;
+  start?: string;
+  end?: string;
+  description?: string;
+};
 
 export default function ManagePromotionsPage() {
   const [createOpen, setCreateOpen] = useState(true);
@@ -15,6 +21,8 @@ export default function ManagePromotionsPage() {
     description: "",
   });
   const [errs, setErrs] = useState<CreateErrors>({});
+  const [promoIsSubmitting, setPromoIsSubmitting] = useState(false);
+  const [promoSuccessMessage, setPromoSuccessMessage] = useState("");
 
   const [emailForm, setEmailForm] = useState({
     subject: "",
@@ -22,40 +30,94 @@ export default function ManagePromotionsPage() {
     promoCode: "",
   });
 
+  // Simple enable/disable check for the button
   const isCreateValid = useMemo(() => {
     const d = Number(promo.discount);
     if (!promo.code.trim()) return false;
-    if (promo.discount.trim() === "" || Number.isNaN(d) || d < 0 || d > 100) return false;
+    if (promo.discount.trim() === "" || Number.isNaN(d) || d < 0 || d > 100)
+      return false;
     if (!promo.start || !promo.end) return false;
-    if (promo.start && promo.end && new Date(promo.start) > new Date(promo.end)) return false;
+    if (promo.start && promo.end && new Date(promo.start) > new Date(promo.end))
+      return false;
+    if (!promo.description.trim()) return false;
     return true;
   }, [promo]);
 
+  // --- PROMOTIONS VALIDATION ---
   const validateCreate = () => {
     const next: CreateErrors = {};
-    if (!promo.code.trim()) next.code = "Promo code is required.";
-    const d = Number(promo.discount);
-    if (promo.discount.trim() === "" || Number.isNaN(d) || d < 0 || d > 100)
-      next.discount = "Discount must be a number between 0 and 100.";
-    if (!promo.start) next.start = "Start date is required.";
-    if (!promo.end) next.end = "End date is required.";
-    if (promo.start && promo.end && new Date(promo.start) > new Date(promo.end))
+
+    if (!promo.code.trim()) next.code = "Promotion code is required.";
+
+    if (!promo.discount.trim()) {
+      next.discount = "Discount is required.";
+    } else {
+      const d = Number(promo.discount);
+      if (Number.isNaN(d) || d < 0 || d > 100) {
+        next.discount = "Discount must be between 0 and 100.";
+      }
+    }
+
+    if (!promo.start.trim()) next.start = "Start date is required.";
+    if (!promo.end.trim()) next.end = "End date is required.";
+    if (promo.start && promo.end && new Date(promo.start) > new Date(promo.end)) {
       next.end = "End date must be on or after start date.";
+    }
+
+    if (!promo.description.trim())
+      next.description = "Description is required.";
+
     setErrs(next);
     return Object.keys(next).length === 0;
   };
 
-  const submitCreate = () => {
+  async function handlePromoSubmit(e: FormEvent<HTMLFormElement>) {
+    e.preventDefault();
+
     if (!validateCreate()) return;
-    console.log("Create Promotion (frontend only):", {
-      code: promo.code,
-      discount: Number(promo.discount),
-      start: promo.start,
-      end: promo.end,
-      desc: promo.description,
-    });
-    alert("Promotion created (frontend only). Check console.");
-  };
+    if (promoIsSubmitting) return;
+
+    setPromoIsSubmitting(true);
+    setPromoSuccessMessage("");
+
+    try {
+      const res = await fetch("/api/admin/promotions/create", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          promoCode: promo.code,
+          discount: Number(promo.discount),
+          startDate: promo.start,
+          endDate: promo.end,
+          description: promo.description,
+        }),
+      });
+
+      if (!res.ok) throw new Error("Failed to add promotion");
+
+      setPromoSuccessMessage("Promotion saved successfully!");
+
+      // Reset promo form
+      setPromo({
+        code: "",
+        discount: "",
+        start: "",
+        end: "",
+        description: "",
+      });
+      setErrs({});
+
+      setTimeout(() => setPromoSuccessMessage(""), 3000);
+    } catch (err) {
+      console.error("Error saving promotion", err);
+      setPromoSuccessMessage("Something went wrong saving the promotion.");
+      setTimeout(() => setPromoSuccessMessage(""), 3000);
+    } finally {
+      setPromoIsSubmitting(false);
+    }
+  }
 
   const submitEmail = () => {
     if (!emailForm.subject.trim() || !emailForm.message.trim()) {
@@ -68,7 +130,7 @@ export default function ManagePromotionsPage() {
       promoCode: emailForm.promoCode || null,
       onlySubscribedUsers: true,
     });
-    alert("Promotion email queued (frontend only). Check console.");
+    alert("frontend only (email not set up yet)");
   };
 
   return (
@@ -77,7 +139,9 @@ export default function ManagePromotionsPage() {
         <div className="flex items-center justify-between">
           <div className="space-y-1">
             <h1 className="text-3xl font-bold text-gray-900">Manage Promotions</h1>
-            <p className="text-gray-600">Create promotions and email them to subscribed users.</p>
+            <p className="text-gray-600">
+              Create promotions and email them to subscribed users.
+            </p>
           </div>
 
           <a
@@ -88,6 +152,7 @@ export default function ManagePromotionsPage() {
           </a>
         </div>
 
+        {/* CREATE PROMOTION */}
         <section className="rounded-2xl border bg-white shadow-sm">
           <button
             type="button"
@@ -98,10 +163,14 @@ export default function ManagePromotionsPage() {
           >
             <div>
               <div className="text-lg font-semibold text-gray-900">Create Promotion</div>
-              <div className="text-sm text-gray-600">Required: promo code, start/end date, discount %</div>
+              <div className="text-sm text-gray-600">
+                Required: promo code, start/end date, discount %, description
+              </div>
             </div>
             <svg
-              className={`h-5 w-5 text-gray-700 transition-transform ${createOpen ? "rotate-180" : ""}`}
+              className={`h-5 w-5 text-gray-700 transition-transform ${
+                createOpen ? "rotate-180" : ""
+              }`}
               viewBox="0 0 20 20"
               fill="currentColor"
             >
@@ -121,88 +190,142 @@ export default function ManagePromotionsPage() {
           >
             <div className="min-h-0">
               <div className="border-t px-6 py-6 grid gap-6">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700">Promo Code *</label>
-                  <input
-                    className={`mt-1 w-full rounded border p-2 ${
-                      errs.code ? "border-red-500" : "border-gray-300"
-                    }`}
-                    value={promo.code}
-                    onChange={(e) =>
-                      setPromo((p) => ({ ...p, code: e.target.value.toUpperCase() }))
-                    }
-                    placeholder="SAVE10"
-                  />
-                  {errs.code && <p className="mt-2 text-sm text-red-600">{errs.code}</p>}
-                </div>
-
-                <div className="max-w-xs">
-                  <label className="block text-sm font-medium text-gray-700">Discount % *</label>
-                  <input
-                    type="number"
-                    min={0}
-                    max={100}
-                    className={`mt-1 w-full rounded border p-2 ${
-                      errs.discount ? "border-red-500" : "border-gray-300"
-                    }`}
-                    value={promo.discount}
-                    onChange={(e) => setPromo((p) => ({ ...p, discount: e.target.value }))}
-                    placeholder="10"
-                  />
-                  {errs.discount && <p className="mt-2 text-sm text-red-600">{errs.discount}</p>}
-                </div>
-
-                <div className="grid gap-4 md:grid-cols-2">
+                <form onSubmit={handlePromoSubmit} className="grid gap-6">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700">Start Date *</label>
+                    <label className="block text-sm font-medium text-gray-700">
+                      Promo Code *
+                    </label>
                     <input
-                      type="date"
                       className={`mt-1 w-full rounded border p-2 ${
-                        errs.start ? "border-red-500" : "border-gray-300"
+                        errs.code ? "border-red-500" : "border-gray-300"
                       }`}
-                      value={promo.start}
-                      onChange={(e) => setPromo((p) => ({ ...p, start: e.target.value }))}
+                      value={promo.code}
+                      onChange={(e) =>
+                        setPromo((p) => ({
+                          ...p,
+                          code: e.target.value.toUpperCase(),
+                        }))
+                      }
+                      onBlur={validateCreate}
+                      placeholder="SAVE10"
                     />
-                    {errs.start && <p className="mt-2 text-sm text-red-600">{errs.start}</p>}
+                    {errs.code && (
+                      <p className="mt-2 text-sm text-red-600">{errs.code}</p>
+                    )}
                   </div>
+
+                  <div className="max-w-xs">
+                    <label className="block text-sm font-medium text-gray-700">
+                      Discount % *
+                    </label>
+                    <input
+                      type="number"
+                      min={0}
+                      max={100}
+                      className={`mt-1 w-full rounded border p-2 ${
+                        errs.discount ? "border-red-500" : "border-gray-300"
+                      }`}
+                      value={promo.discount}
+                      onChange={(e) =>
+                        setPromo((p) => ({ ...p, discount: e.target.value }))
+                      }
+                      onBlur={validateCreate}
+                      placeholder="10"
+                    />
+                    {errs.discount && (
+                      <p className="mt-2 text-sm text-red-600">
+                        {errs.discount}
+                      </p>
+                    )}
+                  </div>
+
+                  <div className="grid gap-4 md:grid-cols-2">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700">
+                        Start Date * 
+                      </label>
+                      <input
+                        type="date"
+                        className={`mt-1 w-full rounded border p-2 ${
+                          errs.start ? "border-red-500" : "border-gray-300"
+                        }`}
+                        value={promo.start}
+                        onChange={(e) =>
+                          setPromo((p) => ({ ...p, start: e.target.value }))
+                        }
+                        onBlur={validateCreate}
+                      />
+                      {errs.start && (
+                        <p className="mt-2 text-sm text-red-600">{errs.start}</p>
+                      )}
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700">
+                        End Date *
+                      </label>
+                      <input
+                        type="date"
+                        className={`mt-1 w-full rounded border p-2 ${
+                          errs.end ? "border-red-500" : "border-gray-300"
+                        }`}
+                        value={promo.end}
+                        onChange={(e) =>
+                          setPromo((p) => ({ ...p, end: e.target.value }))
+                        }
+                        onBlur={validateCreate}
+                      />
+                      {errs.end && (
+                        <p className="mt-2 text-sm text-red-600">{errs.end}</p>
+                      )}
+                    </div>
+                  </div>
+
                   <div>
-                    <label className="block text-sm font-medium text-gray-700">End Date *</label>
-                    <input
-                      type="date"
-                      className={`mt-1 w-full rounded border p-2 ${
-                        errs.end ? "border-red-500" : "border-gray-300"
+                    <label className="block text-sm font-medium text-gray-700">
+                      Description *
+                    </label>
+                    <textarea
+                      className={`mt-1 w-full rounded border p-2 min-h-24 ${
+                        errs.description ? "border-red-500" : "border-gray-300"
                       }`}
-                      value={promo.end}
-                      onChange={(e) => setPromo((p) => ({ ...p, end: e.target.value }))}
+                      value={promo.description}
+                      onChange={(e) =>
+                        setPromo((p) => ({ ...p, description: e.target.value }))
+                      }
+                      onBlur={validateCreate}
+                      placeholder="Describe the promotion, terms, etc."
                     />
-                    {errs.end && <p className="mt-2 text-sm text-red-600">{errs.end}</p>}
+                    {errs.description && (
+                      <p className="mt-2 text-sm text-red-600">
+                        {errs.description}
+                      </p>
+                    )}
                   </div>
-                </div>
 
-                <div>
-                  <label className="block text-sm font-medium text-gray-700">Description (optional)</label>
-                  <textarea
-                    className="mt-1 w-full rounded border border-gray-300 p-2 min-h-24"
-                    value={promo.description}
-                    onChange={(e) => setPromo((p) => ({ ...p, description: e.target.value }))}
-                    placeholder="Describe the promotion, terms, etc."
-                  />
-                </div>
+                  {promoSuccessMessage && (
+                    <div className="rounded bg-green-100 text-green-800 px-4 py-2 text-sm">
+                      {promoSuccessMessage}
+                    </div>
+                  )}
 
-                <button
-                  onClick={submitCreate}
-                  disabled={!isCreateValid}
-                  className={`rounded px-4 py-2 font-semibold text-white ${
-                    isCreateValid ? "bg-blue-600 hover:bg-blue-500" : "bg-blue-300 cursor-not-allowed"
-                  }`}
-                >
-                  Create Promotion
-                </button>
+                  <button
+                    type="submit"
+                    disabled={!isCreateValid || promoIsSubmitting}
+                    className={`rounded px-4 py-2 font-semibold text-white ${
+                      !isCreateValid || promoIsSubmitting
+                        ? "bg-blue-300 cursor-not-allowed"
+                        : "bg-blue-600 hover:bg-blue-500"
+                    }`}
+                  >
+                    {promoIsSubmitting ? "Saving Promotion..." : "Create Promotion"}
+                  </button>
+                </form>
               </div>
             </div>
           </div>
         </section>
 
+        {/* EMAIL PROMOTION SECTION (still frontend-only) */}
         <section className="rounded-2xl border bg-white shadow-sm">
           <button
             type="button"
@@ -216,7 +339,9 @@ export default function ManagePromotionsPage() {
               <div className="text-sm text-gray-600">Send to subscribed users only</div>
             </div>
             <svg
-              className={`h-5 w-5 text-gray-700 transition-transform ${emailOpen ? "rotate-180" : ""}`}
+              className={`h-5 w-5 text-gray-700 transition-transform ${
+                emailOpen ? "rotate-180" : ""
+              }`}
               viewBox="0 0 20 20"
               fill="currentColor"
             >
@@ -241,7 +366,9 @@ export default function ManagePromotionsPage() {
                   <input
                     className="mt-1 w-full rounded border border-gray-300 p-2"
                     value={emailForm.subject}
-                    onChange={(e) => setEmailForm((f) => ({ ...f, subject: e.target.value }))}
+                    onChange={(e) =>
+                      setEmailForm((f) => ({ ...f, subject: e.target.value }))
+                    }
                     placeholder="This weekend only: SAVE 10%"
                   />
                 </div>
@@ -251,33 +378,50 @@ export default function ManagePromotionsPage() {
                   <textarea
                     className="mt-1 w-full rounded border border-gray-300 p-2 min-h-28"
                     value={emailForm.message}
-                    onChange={(e) => setEmailForm((f) => ({ ...f, message: e.target.value }))}
+                    onChange={(e) =>
+                      setEmailForm((f) => ({ ...f, message: e.target.value }))
+                    }
                     placeholder="Write your promotional email message here…"
                   />
                 </div>
 
                 <div className="max-w-sm">
-                  <label className="block text-sm font-medium text-gray-700">Promo Code (optional)</label>
+                  <label className="block text-sm font-medium text-gray-700">
+                    Promo Code (optional)
+                  </label>
                   <input
                     className="mt-1 w-full rounded border border-gray-300 p-2"
                     value={emailForm.promoCode}
                     onChange={(e) =>
-                      setEmailForm((f) => ({ ...f, promoCode: e.target.value.toUpperCase() }))
+                      setEmailForm((f) => ({
+                        ...f,
+                        promoCode: e.target.value.toUpperCase(),
+                      }))
                     }
                     placeholder="SAVE10"
                   />
                 </div>
 
                 <div className="flex items-start gap-3">
-                  <input type="checkbox" className="mt-1 h-4 w-4 rounded border-gray-300" checked readOnly />
+                  <input
+                    type="checkbox"
+                    className="mt-1 h-4 w-4 rounded border-gray-300"
+                    checked
+                    readOnly
+                  />
                   <div>
-                    <div className="text-sm text-gray-800">Send only to subscribed users</div>
-                    <div className="text-xs text-gray-500">This is enforced and cannot be changed.</div>
+                    <div className="text-sm text-gray-800">
+                      Send only to subscribed users
+                    </div>
+                    <div className="text-xs text-gray-500">
+                      This is enforced and cannot be changed.
+                    </div>
                   </div>
                 </div>
 
                 <div className="flex flex-col sm:flex-row gap-3">
                   <button
+                    type="button"
                     onClick={submitEmail}
                     className="rounded bg-blue-600 px-4 py-2 font-semibold text-white hover:bg-blue-500"
                   >
@@ -300,11 +444,6 @@ export default function ManagePromotionsPage() {
               </div>
             </div>
           </div>
-        </section>
-
-        <section className="rounded-2xl border bg-white p-6 shadow-sm">
-          <div className="text-lg font-semibold text-gray-900">Promotion History</div>
-          <p className="mt-1 text-sm text-gray-600">Coming soon: recent promos, performance metrics, etc.</p>
         </section>
       </div>
     </div>

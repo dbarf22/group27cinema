@@ -55,7 +55,7 @@ const PortalPage = () => {
           >
             <h2 className="text-xl font-semibold text-gray-800 mb-2">Manage Movies</h2>
             <p className="text-gray-600 text-sm">
-              Add, edit, or remove movies and update details.
+              Add new movies.
             </p>
           </div>
 

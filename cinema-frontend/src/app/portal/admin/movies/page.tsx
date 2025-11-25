@@ -1,6 +1,11 @@
 "use client";
 import { FormEvent, useState, useEffect } from "react";
 
+const MAX_TITLE = 50;
+const MAX_CAST = 500;
+const MAX_PRODUCER = 50;
+const MAX_DESCRIPTION = 255;
+
 export default function ManageMoviesPage() {
   const [open, setOpen] = useState(false);
   const [title, setTitle] = useState("");
@@ -16,42 +21,53 @@ export default function ManageMoviesPage() {
   const [genres, setGenres] = useState<string[]>([]);
   const [director, setDirector] = useState("");
 
-  const [showtimeInput, setShowtimeInput] = useState("");
-  const [showtimes, setShowtimes] = useState<string[]>([]);
-
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [successMessage, setSuccessMessage] = useState("");
-
   const [errors, setErrors] = useState<Record<string, string>>({});
 
-  // --- PROMOTIONS STATE ---
   const [promoCode, setPromoCode] = useState("");
   const [promoDiscount, setPromoDiscount] = useState("");
   const [promoStart, setPromoStart] = useState("");
   const [promoEnd, setPromoEnd] = useState("");
   const [promoDescription, setPromoDescription] = useState("");
-
   const [promoIsSubmitting, setPromoIsSubmitting] = useState(false);
   const [promoSuccessMessage, setPromoSuccessMessage] = useState("");
   const [promoErrors, setPromoErrors] = useState<Record<string, string>>({});
-
   const [promoOpen, setPromoOpen] = useState(false);
 
   const validateFields = () => {
     const newErrors: Record<string, string> = {};
 
     if (!title.trim()) newErrors.title = "Title is required.";
+    if (title.length > MAX_TITLE)
+      newErrors.title = `Title must be at most ${MAX_TITLE} characters.`;
+
     if (!castList.trim()) newErrors.castList = "Cast list is required.";
+    if (castList.length > MAX_CAST)
+      newErrors.castList = `Cast list must be at most ${MAX_CAST} characters.`;
+
     if (!producer.trim()) newErrors.producer = "Producer is required.";
+    if (producer.length > MAX_PRODUCER)
+      newErrors.producer = `Producer must be at most ${MAX_PRODUCER} characters.`;
+
     if (duration === null || duration <= 0)
       newErrors.duration = "Duration is required.";
+
     if (!poster.trim()) newErrors.poster = "Poster URL is required.";
     if (!trailer.trim()) newErrors.trailer = "Trailer URL is required.";
+
     if (!reviewScore.trim())
       newErrors.reviewScore = "Review score is required.";
+
     if (!ratingCode.trim()) newErrors.ratingCode = "Rating code is required.";
-    if (!description.trim()) newErrors.description = "Description is required.";
-    if (genres.length === 0) newErrors.genres = "At least one genre required.";
+
+    if (!description.trim())
+      newErrors.description = "Description is required.";
+    if (description.length > MAX_DESCRIPTION)
+      newErrors.description = `Description must be at most ${MAX_DESCRIPTION} characters.`;
+
+    if (genres.length === 0)
+      newErrors.genres = "At least one genre required.";
 
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
@@ -59,7 +75,7 @@ export default function ManageMoviesPage() {
 
   useEffect(() => {
     console.log(promoStart);
-  }, [promoStart])
+  }, [promoStart]);
 
   const addGenre = () => {
     if (!genreInput.trim()) return;
@@ -72,20 +88,26 @@ export default function ManageMoviesPage() {
     const updated = genres.filter((x) => x !== g);
     setGenres(updated);
     if (updated.length === 0)
-      setErrors((prev) => ({ ...prev, genres: "At least one genre required." }));
+      setErrors((prev) => ({
+        ...prev,
+        genres: "At least one genre required.",
+      }));
   };
 
   async function handleSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
 
     if (!validateFields()) return;
-
     if (isSubmitting) return;
+
     setIsSubmitting(true);
     setSuccessMessage("");
 
+    const reviewScoreNumber =
+      reviewScore.trim() === "" ? null : Number(reviewScore);
+
     try {
-      const res = await fetch("/api/admin/movies/add", {
+      const res = await fetch("http://localhost:8080/api/admin/movies/add", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -97,7 +119,7 @@ export default function ManageMoviesPage() {
           duration,
           poster,
           trailer,
-          reviewScore,
+          reviewScore: reviewScoreNumber,
           ratingCode,
           description,
           genres,
@@ -105,11 +127,14 @@ export default function ManageMoviesPage() {
         }),
       });
 
-      if (!res.ok) throw new Error("Failed to add movie");
+      if (!res.ok) {
+        const text = await res.text();
+        console.error("Add movie failed:", res.status, text);
+        throw new Error("Failed to add movie");
+      }
 
       setSuccessMessage("Movie added successfully!");
 
-      // Reset form
       setTitle("");
       setCastList("");
       setProducer("");
@@ -120,6 +145,7 @@ export default function ManageMoviesPage() {
       setRatingCode("");
       setDescription("");
       setGenres([]);
+      setDirector("");
 
       setTimeout(() => setSuccessMessage(""), 3000);
     } catch (err) {
@@ -150,7 +176,6 @@ export default function ManageMoviesPage() {
           </a>
         </div>
 
-        {/* ADD MOVIE CARD */}
         <section className="rounded-2xl border bg-white shadow-sm">
           <button
             type="button"
@@ -189,7 +214,6 @@ export default function ManageMoviesPage() {
             <div className="min-h-0">
               <div className="border-t px-6 py-6">
                 <form onSubmit={handleSubmit} className="space-y-5">
-                  {/* TITLE */}
                   <div>
                     <label className="block text-sm font-medium text-gray-700">
                       Title
@@ -197,6 +221,7 @@ export default function ManageMoviesPage() {
                     <input
                       className="mt-1 w-full rounded border p-2"
                       value={title}
+                      maxLength={MAX_TITLE}
                       onChange={(e) => {
                         setTitle(e.target.value);
                         setErrors((prev) => ({ ...prev, title: "" }));
@@ -210,7 +235,6 @@ export default function ManageMoviesPage() {
                     )}
                   </div>
 
-                  {/* CAST */}
                   <div>
                     <label className="block text-sm font-medium text-gray-700">
                       Cast List
@@ -218,6 +242,7 @@ export default function ManageMoviesPage() {
                     <input
                       className="mt-1 w-full rounded border p-2"
                       value={castList}
+                      maxLength={MAX_CAST}
                       onChange={(e) => {
                         setCastList(e.target.value);
                         setErrors((prev) => ({ ...prev, castList: "" }));
@@ -232,20 +257,19 @@ export default function ManageMoviesPage() {
                   </div>
 
                   <div>
-                      <label className="block text-sm font-medium text-gray-700">
-                          Director
-                      </label>
-                      <input
-                          className="mt-1 w-full rounded border p-2"
-                          value={director}
-                          onChange={(e) => {
-                              setDirector(e.target.value);
-                          }}
-                          placeholder={"Christopher Nolan"}
-                      />
+                    <label className="block text-sm font-medium text-gray-700">
+                      Director
+                    </label>
+                    <input
+                      className="mt-1 w-full rounded border p-2"
+                      value={director}
+                      onChange={(e) => {
+                        setDirector(e.target.value);
+                      }}
+                      placeholder="Christopher Nolan"
+                    />
                   </div>
 
-                  {/* PRODUCER */}
                   <div>
                     <label className="block text-sm font-medium text-gray-700">
                       Producer *
@@ -253,6 +277,7 @@ export default function ManageMoviesPage() {
                     <input
                       className="mt-1 w-full rounded border p-2"
                       value={producer}
+                      maxLength={MAX_PRODUCER}
                       onChange={(e) => {
                         setProducer(e.target.value);
                         setErrors((prev) => ({ ...prev, producer: "" }));
@@ -266,7 +291,6 @@ export default function ManageMoviesPage() {
                     )}
                   </div>
 
-                  {/* DURATION */}
                   <div>
                     <label className="block text-sm font-medium text-gray-700">
                       Duration (minutes) *
@@ -289,7 +313,6 @@ export default function ManageMoviesPage() {
                     )}
                   </div>
 
-                  {/* REVIEW SCORE */}
                   <div>
                     <label className="block text-sm font-medium text-gray-700">
                       Review Score (1–5) *
@@ -303,7 +326,10 @@ export default function ManageMoviesPage() {
                       value={reviewScore}
                       onChange={(e) => {
                         setReviewScore(e.target.value);
-                        setErrors((prev) => ({ ...prev, reviewScore: "" }));
+                        setErrors((prev) => ({
+                          ...prev,
+                          reviewScore: "",
+                        }));
                       }}
                       placeholder="4.7"
                     />
@@ -314,7 +340,6 @@ export default function ManageMoviesPage() {
                     )}
                   </div>
 
-                  {/* RATING CODE */}
                   <div>
                     <label className="block text-sm font-medium text-gray-700">
                       Rating Code *
@@ -325,12 +350,17 @@ export default function ManageMoviesPage() {
                       value={ratingCode}
                       onChange={(e) => {
                         setRatingCode(e.target.value);
-                        setErrors((prev) => ({ ...prev, ratingCode: "" }));
+                        setErrors((prev) => ({
+                          ...prev,
+                          ratingCode: "",
+                        }));
                       }}
                     >
                       <option value="">Select rating</option>
                       <option value="G">G – General Audiences</option>
-                      <option value="PG">PG – Parental Guidance Suggested</option>
+                      <option value="PG">
+                        PG – Parental Guidance Suggested
+                      </option>
                       <option value="PG-13">
                         PG-13 – Parents Strongly Cautioned
                       </option>
@@ -347,7 +377,6 @@ export default function ManageMoviesPage() {
                     )}
                   </div>
 
-                  {/* DESCRIPTION */}
                   <div>
                     <label className="block text-sm font-medium text-gray-700">
                       Description *
@@ -355,9 +384,13 @@ export default function ManageMoviesPage() {
                     <textarea
                       className="mt-1 w-full rounded border p-2 min-h-24"
                       value={description}
+                      maxLength={MAX_DESCRIPTION}
                       onChange={(e) => {
                         setDescription(e.target.value);
-                        setErrors((prev) => ({ ...prev, description: "" }));
+                        setErrors((prev) => ({
+                          ...prev,
+                          description: "",
+                        }));
                       }}
                       placeholder="A team of explorers travel through a wormhole..."
                     />
@@ -366,9 +399,11 @@ export default function ManageMoviesPage() {
                         {errors.description}
                       </p>
                     )}
+                    <p className="text-xs text-gray-500 mt-1">
+                      {description.length}/{MAX_DESCRIPTION} characters
+                    </p>
                   </div>
 
-                  {/* POSTER URL */}
                   <div>
                     <label className="block text-sm font-medium text-gray-700">
                       Poster URL *
@@ -389,7 +424,6 @@ export default function ManageMoviesPage() {
                     )}
                   </div>
 
-                  {/* TRAILER URL */}
                   <div>
                     <label className="block text-sm font-medium text-gray-700">
                       Trailer URL *
@@ -410,7 +444,6 @@ export default function ManageMoviesPage() {
                     )}
                   </div>
 
-                  {/* GENRES */}
                   <div>
                     <label className="block text-sm font-medium text-gray-700">
                       Genres *
@@ -456,14 +489,12 @@ export default function ManageMoviesPage() {
                     </div>
                   </div>
 
-                  {/* SUCCESS MESSAGE */}
                   {successMessage && (
                     <div className="rounded bg-green-100 text-green-800 px-4 py-2 text-sm mb-2">
                       {successMessage}
                     </div>
                   )}
 
-                  {/* SUBMIT BUTTON */}
                   <button
                     type="submit"
                     disabled={isSubmitting}
@@ -481,8 +512,6 @@ export default function ManageMoviesPage() {
           </div>
         </section>
       </div>
-      </div>
+    </div>
   );
 }
-
-

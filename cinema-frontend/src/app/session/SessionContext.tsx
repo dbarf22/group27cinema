@@ -14,7 +14,7 @@ type User = {
   state: string;
   zipCode: string;
   cards: Card[];
-  userKey: string;
+  accountType: string; // Add this line
 };
 
 type Card = {
@@ -31,9 +31,8 @@ type Card = {
 type SessionContextInfo = {
     currentUser: User | null;
     isLoading: boolean;
-    login: (user: User, rememberMe: boolean) => void;
+    login: (user: User, rememberMe?: boolean) => void;
     logout: () => void;
-    isRemembered: boolean;
 };
 
 const SessionContext = createContext<SessionContextInfo | undefined>(undefined);
@@ -41,19 +40,12 @@ const SessionContext = createContext<SessionContextInfo | undefined>(undefined);
 export function SessionProvider({ children }: { children: ReactNode }) {
     const [currentUser, setCurrentUser] = useState<User | null>(null);
     const [isLoading, setIsLoading] = useState(true);
-    const [isRemembered, setIsRemembered] = useState(false);
 
     useEffect(() => {
         try {
-            const storedUserInLocal = localStorage.getItem('currentUser');
-            const storedUserInSession = sessionStorage.getItem('currentUser');
-
-            let storedUser = storedUserInLocal || storedUserInSession;
-            let remembered = Boolean(storedUserInLocal);
-
+            const storedUser = localStorage.getItem('currentUser') || sessionStorage.getItem('currentUser');
             if (storedUser) {
                 setCurrentUser(JSON.parse(storedUser));
-                setIsRemembered(remembered);
             }
         } catch (e) {
             console.error("Failed to parse user from localStorage", e);
@@ -63,13 +55,9 @@ export function SessionProvider({ children }: { children: ReactNode }) {
         setIsLoading(false);
     }, []);
 
-    const login = (user: User, rememberMe: boolean) => {
+    const login = (user: User, rememberMe: boolean = false) => {
         setCurrentUser(user);
-        setIsRemembered(rememberMe);
         try {
-            sessionStorage.removeItem("currentUser");
-            localStorage.removeItem("currentUser");
-
             const storage = rememberMe ? localStorage : sessionStorage;
             storage.setItem('currentUser', JSON.stringify(user));
         } catch (e) {
@@ -79,12 +67,11 @@ export function SessionProvider({ children }: { children: ReactNode }) {
 
     const logout = () => {
         setCurrentUser(null);
-        setIsRemembered(false);
         sessionStorage.removeItem("currentUser");
         localStorage.removeItem('currentUser');
     };
 
-    const value = { currentUser, isLoading, login, logout, isRemembered };
+    const value = { currentUser, isLoading, login, logout };
 
     if (isLoading) {
         return null;

@@ -2,6 +2,7 @@ package com.group27.cinema_backend.service;
 
 import java.util.List;
 
+import jakarta.persistence.EntityNotFoundException;
 import org.springframework.stereotype.Service;
 
 import com.group27.cinema_backend.dto.AddMovieRequest;
@@ -37,20 +38,18 @@ public class AdminService {
         this.emailService = emailService;
     }
 
-    public void addMovie(AddMovieRequest req) {
-        Movie movie = new Movie();
-        movie.setTitle(req.title());
-        movie.setCastList(req.castList());
-        movie.setProducer(req.producer());
-        movie.setDuration(req.duration());
-        movie.setPoster(req.poster());
-        movie.setTrailer(req.trailer());
-        movie.setRating(req.reviewScore());
-        movie.setDescription(req.description());
-        movie.setGenre(String.join(", ", req.genres()));
-
-
+    public void addMovie(Movie movie) throws Exception {
+        if (movieRepository.findByTitle(movie.getTitle()) != null) {
+            throw new Exception("Movie already exists.");
+        }
         movieRepository.save(movie);
+    }
+
+    public void deleteMovie(int id) throws Exception{
+        if (!movieRepository.existsById(id)) {
+            throw new Exception("Movie does not exist!");
+        }
+        movieRepository.deleteById(id);
     }
 
     public void createPromotion(CreatePromotionRequest req) {

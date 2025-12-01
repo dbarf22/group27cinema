@@ -55,6 +55,10 @@ public class Movie {
         return director;
     }
 
+    public void setDirector(String director) {
+        this.director = director;
+    }
+
     public Integer getId() {
         return id;
     }

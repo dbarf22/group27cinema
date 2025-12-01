@@ -20,6 +20,7 @@ export default function Header() {
         <h1
           onClick={() => go('/')}
           className="text-2xl font-bold tracking-tight cursor-pointer hover:underline"
+          id={"home"}
         >
           Cinema E-Booking System
         </h1>

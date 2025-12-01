@@ -1,11 +1,9 @@
 package com.group27.cinema_backend.controller;
 
+import com.group27.cinema_backend.model.Movie;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import com.group27.cinema_backend.dto.AddMovieRequest;
 import com.group27.cinema_backend.dto.CreatePromotionRequest;
@@ -24,9 +22,23 @@ public class AdminController {
     }
 
     @PostMapping("/movies/add")
-    public ResponseEntity<String> addMovie(@RequestBody AddMovieRequest request) {
-        adminService.addMovie(request);
-        return ResponseEntity.ok("Movie added successfully!");
+    public ResponseEntity<String> addMovie(@RequestBody Movie movie) {
+        try {
+            adminService.addMovie(movie);
+            return ResponseEntity.ok("Movie added successfully!");
+        } catch (Exception e) {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @DeleteMapping("/movies/{id}")
+    public ResponseEntity<String> deleteMovie(@PathVariable Integer id) {
+        try {
+            adminService.deleteMovie(id);
+            return ResponseEntity.ok("Movie deleted successfully!");
+        }  catch (Exception e) {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 
     @PostMapping("/promotions/create")

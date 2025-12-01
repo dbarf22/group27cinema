@@ -76,11 +76,5 @@ public class GetController {
         return ResponseEntity.ok("Movie has been deleted.");
     }
 
-    // POST endpoint for creating movies
-    @PostMapping("/api/movies")
-    public ResponseEntity<?> createMovie(@RequestBody Movie movie) {
-        Movie savedMovie = movieRepository.save(movie);
-        return ResponseEntity.ok(savedMovie);
-    }
 
 }

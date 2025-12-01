@@ -119,10 +119,12 @@ export default function ManageMoviesPage() {
           duration,
           poster,
           trailer,
-          reviewScore: reviewScoreNumber,
-          ratingCode,
+          rating: reviewScoreNumber,
+          ratingCode: {
+            id: Number(ratingCode),
+          },
           description,
-          genres,
+          genre: genres.join(", "),
           director,
         }),
       });
@@ -327,17 +329,17 @@ export default function ManageMoviesPage() {
                       }}
                     >
                       <option value="">Select rating</option>
-                      <option value="G">G – General Audiences</option>
-                      <option value="PG">
+                      <option value="1">G – General Audiences</option>
+                      <option value="2">
                         PG – Parental Guidance Suggested
                       </option>
-                      <option value="PG-13">
+                      <option value="3">
                         PG-13 – Parents Strongly Cautioned
                       </option>
-                      <option value="R">R – Restricted</option>
-                      <option value="NC-17">NC-17 – Adults Only</option>
-                      <option value="Unrated">Unrated</option>
-                      <option value="Not Rated">Not Rated</option>
+                      <option value="4">R – Restricted</option>
+                      <option value="5">NC-17 – Adults Only</option>
+                      <option value="6">Unrated</option>
+                      <option value="7">Not Rated</option>
                     </select>
 
                     {errors.ratingCode && (
@@ -465,9 +467,8 @@ export default function ManageMoviesPage() {
                   </div>
 
                   {successMessage && (
-                    <div className="rounded bg-green-100 text-green-800 px-4 py-2 text-sm mb-2">
+                    <div className="rounded bg-green-100 text-green-800 px-4 py-2 text-sm mb-2" id={"successMessage"}>
                       {successMessage}
-                        id={"successMessage"}
                     </div>
                   )}
 

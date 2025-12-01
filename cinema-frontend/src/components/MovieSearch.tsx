@@ -25,7 +25,7 @@ export default function MovieSearch() {
     setError(null);
     try {
       const param = query.trim() ? `?${by}=${encodeURIComponent(query)}` : "";
-      const res = await fetch(`/api/movies${param}`);
+      const res = await fetch(`/api/movies${param}`, {cache: "no-store"});
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
       const data = await res.json();
       setItems(Array.isArray(data) ? data : []);

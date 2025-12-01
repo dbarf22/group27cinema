@@ -1,8 +1,7 @@
 describe('login system', () => {
     it('login test', () => {
-        cy.visit('http://localhost:3000' +
-            '')
-        cy.get('[data-testid="login"]').click();
+        cy.visit('http://localhost:3000')
+        cy.get('#login').click();
         cy.get('[name="email"]').click();
         cy.get('[name="email"]').type('dbarfield4@gmail.com');
         cy.get('[name="password"]').click();
@@ -10,23 +9,25 @@ describe('login system', () => {
         cy.get('[name="rememberMe"]').check();
         cy.get('[data-testid="loginFormSubmit"]').click();
         cy.wait(1000);
-        cy.get('[data-testid="logout"]').should('have.text', 'Logout')
+        cy.get('#logout').should('have.text', 'Logout')
     });
 
     it('logout', function () {
         cy.visit('http://localhost:3000')
-        cy.get('button.bg-white').click();
+        cy.get('#login').click();
         cy.get('[name="email"]').click();
         cy.get('[name="email"]').type('dbarfield4@gmail.com');
         cy.get('[name="password"]').type('1234');
         cy.get('button.w-full').click();
-        cy.get('div.flex.gap-4 button:nth-child(3)').click();
-        cy.get('[data-testid="login"]').should('have.text', 'Login');
+        cy.get('#logout').should('have.text', 'Logout')
+        cy.get('#logout').click();
+        cy.wait(1000)
+        cy.get('#login').should('have.text', 'Login');
     });
 
     it('Edit Profile', function () {
         cy.visit('http://localhost:3000')
-        cy.get('[data-testid="login"]').click();
+        cy.get('#login').click();
         cy.get('[name="email"]').click();
         cy.get('[name="email"]').type('dbarfield4@gmail.com');
         cy.get('[name="password"]').click();

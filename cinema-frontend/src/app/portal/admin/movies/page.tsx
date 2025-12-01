@@ -183,6 +183,7 @@ export default function ManageMoviesPage() {
                     </label>
                     <input
                       className="mt-1 w-full rounded border p-2"
+                      id="title"
                       value={title}
                       maxLength={MAX_TITLE}
                       onChange={(e) => {
@@ -203,6 +204,7 @@ export default function ManageMoviesPage() {
                       Cast List
                     </label>
                     <input
+                      id={"castList"}
                       className="mt-1 w-full rounded border p-2"
                       value={castList}
                       maxLength={MAX_CAST}
@@ -224,6 +226,7 @@ export default function ManageMoviesPage() {
                       Director
                     </label>
                     <input
+                      id={"director"}
                       className="mt-1 w-full rounded border p-2"
                       value={director}
                       onChange={(e) => {
@@ -238,6 +241,7 @@ export default function ManageMoviesPage() {
                       Producer *
                     </label>
                     <input
+                      id={"producer"}
                       className="mt-1 w-full rounded border p-2"
                       value={producer}
                       maxLength={MAX_PRODUCER}
@@ -259,6 +263,7 @@ export default function ManageMoviesPage() {
                       Duration (minutes) *
                     </label>
                     <input
+                        id={"duration"}
                       type="number"
                       className="mt-1 w-full rounded border p-2"
                       value={duration ?? ""}
@@ -281,6 +286,7 @@ export default function ManageMoviesPage() {
                       Review Score (1–5) *
                     </label>
                     <input
+                        id={"reviewScore"}
                       type="number"
                       min="1"
                       max="5"
@@ -310,6 +316,7 @@ export default function ManageMoviesPage() {
 
                     <select
                       className="mt-1 w-full rounded border p-2 bg-white"
+                      id={"ratingCode"}
                       value={ratingCode}
                       onChange={(e) => {
                         setRatingCode(e.target.value);
@@ -345,6 +352,7 @@ export default function ManageMoviesPage() {
                       Description *
                     </label>
                     <textarea
+                        id={"description"}
                       className="mt-1 w-full rounded border p-2 min-h-24"
                       value={description}
                       maxLength={MAX_DESCRIPTION}
@@ -372,6 +380,7 @@ export default function ManageMoviesPage() {
                       Poster URL *
                     </label>
                     <input
+                        id={"poster"}
                       className="mt-1 w-full rounded border p-2"
                       value={poster}
                       onChange={(e) => {
@@ -392,6 +401,7 @@ export default function ManageMoviesPage() {
                       Trailer URL *
                     </label>
                     <input
+                        id={"trailer"}
                       className="mt-1 w-full rounded border p-2"
                       value={trailer}
                       onChange={(e) => {
@@ -413,6 +423,7 @@ export default function ManageMoviesPage() {
                     </label>
                     <div className="mt-1 flex gap-2">
                       <input
+                          id={"genre"}
                         className="flex-1 rounded border p-2"
                         value={genreInput}
                         onChange={(e) => setGenreInput(e.target.value)}
@@ -420,6 +431,7 @@ export default function ManageMoviesPage() {
                       />
                       <button
                         type="button"
+                        id={"addGenre"}
                         onClick={addGenre}
                         className="rounded bg-blue-600 px-4 py-2 font-semibold text-white hover:bg-blue-500"
                       >
@@ -455,11 +467,13 @@ export default function ManageMoviesPage() {
                   {successMessage && (
                     <div className="rounded bg-green-100 text-green-800 px-4 py-2 text-sm mb-2">
                       {successMessage}
+                        id={"successMessage"}
                     </div>
                   )}
 
                   <button
                     type="submit"
+                    id={"submitButton"}
                     disabled={isSubmitting}
                     className={`mt-2 w-full rounded py-3 font-semibold text-white ${
                       isSubmitting

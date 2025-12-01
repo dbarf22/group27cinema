@@ -280,11 +280,13 @@ export default function EditProfilePage() {
             <h1 className="text-2xl font-semibold text-center mb-4">Edit Profile</h1>
 
             {msg.error ? (
-                <div className="mb-4 rounded border border-red-200 bg-red-50 p-3 text-sm text-red-700">{msg.error}</div>
+                <div className="mb-4 rounded border border-red-200 bg-red-50 p-3 text-sm text-red-700"
+                     id={"errorMessage"}>{msg.error}</div>
             ) : null}
             {msg.ok ? (
                 <div
-                    className="mb-4 rounded border border-green-200 bg-green-50 p-3 text-sm text-green-700">{msg.ok}</div>
+                    className="mb-4 rounded border border-green-200 bg-green-50 p-3 text-sm text-green-700"
+                    id={"successMessage"}>{msg.ok}</div>
             ) : null}
 
             <form onSubmit={handleProfile} className="space-y-4 border-b pb-6 mb-6">
@@ -343,7 +345,8 @@ export default function EditProfilePage() {
                     RECEIVE PROMOTIONS?
                 </label>
                 <button type="submit" disabled={busyProfile}
-                        className="w-full rounded bg-black px-4 py-2 text-white disabled:opacity-50">
+                        className="w-full rounded bg-black px-4 py-2 text-white disabled:opacity-50"
+                id={"submitProfileChange"}>
                     {busyProfile ? 'Updating…' : 'Update Profile'}
                 </button>
             </form>
@@ -353,6 +356,7 @@ export default function EditProfilePage() {
                     type="button"
                     onClick={() => setShowAddress(s => !s)}
                     className="mb-4 flex w-full items-center justify-between text-left text-lg font-medium"
+                    data-testid={"expandHomeAddress"}
                 >
                     Home Address <span>{showAddress ? '−' : '+'}</span>
                 </button>
@@ -391,7 +395,8 @@ export default function EditProfilePage() {
                             />
                         </div>
                         <button type="submit" disabled={busyAddress}
-                                className="w-full rounded bg-black px-4 py-2 text-white disabled:opacity-50">
+                                className="w-full rounded bg-black px-4 py-2 text-white disabled:opacity-50"
+                        id={"submitAddressChange"}>
                             {busyAddress ? 'Updating…' : 'Update Address'}
                         </button>
                     </form>
@@ -403,6 +408,7 @@ export default function EditProfilePage() {
                     type="button"
                     onClick={() => setShowPayments(s => !s)}
                     className="mb-4 flex w-full items-center justify-between text-left text-lg font-medium"
+                    data-testid={"expandPaymentMethods"}
                 >
                     Payment Methods <span>{showPayments ? '−' : '+'}</span>
                 </button>
@@ -436,6 +442,7 @@ export default function EditProfilePage() {
                                         </select>
                                         <input
                                             placeholder="Card number"
+                                            id={"cardNumber"}
 
                                             onChange={e => updateCard(i, 'cardNumber', e.target.value)}
                                             required
@@ -444,6 +451,7 @@ export default function EditProfilePage() {
                                         />
                                         <input
                                             placeholder="00"
+                                            id={"cardExpMonth"}
                                             value={c.expMonth}
                                             onChange={e => updateCard(i, 'expMonth', e.target.value)}
                                             required
@@ -453,6 +461,7 @@ export default function EditProfilePage() {
                                         <input
                                             placeholder="0000"
                                             value={c.expYear}
+                                            id={"cardExpYear"}
                                             onChange={e => updateCard(i, 'expYear', e.target.value)}
                                             required
                                             maxLength={4}
@@ -461,18 +470,21 @@ export default function EditProfilePage() {
                                         <input
                                             placeholder="123 Example Rd"
                                             value={c.billingStreet}
+                                            id={"cardBillingStreet"}
                                             onChange={e => updateCard(i, 'billingStreet', e.target.value)}
                                             className="sm:col-span-2 rounded border px-3 py-2"
                                         />
                                         <input
                                             placeholder="Athens"
                                             value={c.billingCity}
+                                            id={"cardBillingCity"}
                                             onChange={e => updateCard(i, 'billingCity', e.target.value)}
                                             className="rounded border px-3 py-2"
                                         />
                                         <input
                                             placeholder="GA"
                                             value={c.billingState}
+                                            id={"cardBillingState"}
                                             onChange={e => updateCard(i, 'billingState', e.target.value)}
                                             maxLength={2}
                                             className="rounded border px-3 py-2"
@@ -480,6 +492,7 @@ export default function EditProfilePage() {
                                         <input
                                             placeholder="30606"
                                             value={c.billingZip}
+                                            id={"cardBillingZip"}
                                             onChange={e => updateCard(i, 'billingZip', e.target.value)}
                                             className="rounded border px-3 py-2"
                                         />
@@ -500,7 +513,9 @@ export default function EditProfilePage() {
                         </div>
 
                         {cards.length > 0 && (
-                            <button type="submit" disabled={busyPayments}
+                            <button type="submit"
+                                    disabled={busyPayments}
+                                    id={"submitPaymentChange"}
                                     className="w-full rounded bg-black px-4 py-2 text-white disabled:opacity-50">
                                 {busyPayments ? 'Updating…' : 'Update Payment Methods'}
                             </button>
@@ -514,6 +529,7 @@ export default function EditProfilePage() {
                     type="button"
                     onClick={() => setShowPassword(s => !s)}
                     className="mb-4 flex w-full items-center justify-between text-left text-lg font-medium"
+                    data-testid={"expandChangePassword"}
                 >
                     Change Password <span>{showPassword ? '−' : '+'}</span>
                 </button>

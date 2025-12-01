@@ -32,6 +32,7 @@ export default function Header() {
               <button
                 onClick={() => go('/profile/edit')}
                 className="bg-white text-blue-700 font-semibold px-4 py-2 rounded hover:bg-gray-100 transition"
+                data-testid={"editProfile"}
               >
                 Edit Profile
               </button>
@@ -39,13 +40,15 @@ export default function Header() {
               <button
                 onClick={handleLogout}
                 className="bg-white text-blue-700 font-semibold px-4 py-2 rounded hover:bg-gray-100 transition"
+                data-testid={"logout"}
               >
                 Logout
               </button>
               <button
                 onClick={() => go('/portal')}
                 className="bg-white text-blue-700 font-semibold px-4 py-2 rounded hover:bg-gray-100 transition"
-                >
+                data-testid={"portal"}
+              >
                 Portal
               </button>
             </>
@@ -53,6 +56,7 @@ export default function Header() {
             <button
               onClick={() => go('/login')}
               className="bg-white text-blue-700 font-semibold px-4 py-2 rounded hover:bg-gray-100 transition"
+              data-testid={"login"}
             >
               Login
             </button>

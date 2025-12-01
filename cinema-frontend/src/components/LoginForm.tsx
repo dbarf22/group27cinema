@@ -122,6 +122,7 @@ export default function LoginForm() {
           <button
             type="submit"
             className="w-full rounded-xl bg-black px-4 py-2.5 font-semibold text-white hover:bg-neutral-900 transition"
+            data-testid={"loginFormSubmit"}
           >
             Log In
           </button>

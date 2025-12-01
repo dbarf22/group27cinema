@@ -167,7 +167,6 @@ export default function ManageMoviesPage() {
               Add new titles and manage showtimes, genres, and more.
             </p>
           </header>
-
           <a
             href="/portal"
             className="inline-flex items-center gap-2 rounded border border-gray-300 px-4 py-2 font-semibold text-gray-800 hover:bg-gray-50"
@@ -175,44 +174,8 @@ export default function ManageMoviesPage() {
             ← Back to Admin
           </a>
         </div>
-
-        <section className="rounded-2xl border bg-white shadow-sm">
-          <button
-            type="button"
-            onClick={() => setOpen((v) => !v)}
-            className="flex w-full items-center justify-between px-6 py-4 text-left"
-          >
-            <div>
-              <div className="text-lg font-semibold text-gray-900">
-                Add Movie
-              </div>
-              <div className="text-sm text-gray-600">
-                Click to {open ? "hide" : "show"} the form
-              </div>
-            </div>
-            <svg
-              className={`h-5 w-5 transition-transform ${
-                open ? "rotate-180" : ""
-              }`}
-              viewBox="0 0 20 20"
-              fill="currentColor"
-            >
-              <path
-                fillRule="evenodd"
-                d="M5.23 7.21a.75.75 0 011.06.02L10 10.173l3.71-2.94a.75.75 0 11.94 1.17l-4.2 3.33a.75.75 0 01-.94 0l-4.2-3.33a.75.75 0 01-.08-1.06z"
-                clipRule="evenodd"
-              />
-            </svg>
-          </button>
-
-          <div
-            id="add-movie-content"
-            className={`grid overflow-hidden transition-all duration-300 ${
-              open ? "grid-rows-[1fr] opacity-100" : "grid-rows-[0fr] opacity-0"
-            }`}
-          >
-            <div className="min-h-0">
-              <div className="border-t px-6 py-6">
+          <div className="min-h-0">
+              <div className="px-6 py-6">
                 <form onSubmit={handleSubmit} className="space-y-5">
                   <div>
                     <label className="block text-sm font-medium text-gray-700">
@@ -510,8 +473,6 @@ export default function ManageMoviesPage() {
               </div>
             </div>
           </div>
-        </section>
-      </div>
     </div>
   );
 }

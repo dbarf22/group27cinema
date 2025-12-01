@@ -2,14 +2,8 @@ package com.group27.cinema_backend.controller;
 
 import com.group27.cinema_backend.model.Movie;
 import com.group27.cinema_backend.repository.MovieRepository;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.*;
 
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.http.ResponseEntity;
 
 import java.util.*;
@@ -76,10 +70,17 @@ public class GetController {
         return ResponseEntity.ok(saved);
     }
 
+    @DeleteMapping("/api/movies/{id}")
+    public ResponseEntity<?> deleteMovie(@PathVariable int id) {
+        movieRepository.deleteById(id);
+        return ResponseEntity.ok("Movie has been deleted.");
+    }
+
     // POST endpoint for creating movies
     @PostMapping("/api/movies")
     public ResponseEntity<?> createMovie(@RequestBody Movie movie) {
         Movie savedMovie = movieRepository.save(movie);
         return ResponseEntity.ok(savedMovie);
     }
+
 }

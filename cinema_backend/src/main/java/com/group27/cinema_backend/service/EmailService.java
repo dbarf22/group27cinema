@@ -2,18 +2,23 @@ package com.group27.cinema_backend.service;
 
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
-import org.springframework.stereotype.Service;
 
-@Service
-public class EmailService {
+public enum EmailService {
 
-    private final JavaMailSender mailSender;
+    INSTANCE;
 
-    public EmailService(JavaMailSender mailSender) {
+    private JavaMailSender mailSender;
+
+    public void setMailSender(JavaMailSender mailSender) {
         this.mailSender = mailSender;
     }
 
     public void sendEmail(String to, String subject, String text) {
+
+        if (mailSender==null) {
+            throw new IllegalStateException("MailSender didn't initialize");
+        }
+
         SimpleMailMessage message = new SimpleMailMessage();
         message.setTo(to);
         message.setSubject(subject);

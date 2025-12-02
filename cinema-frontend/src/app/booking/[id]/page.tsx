@@ -354,7 +354,7 @@ function BookingConfirmation({
             <div className="mb-4 rounded-lg border border-blue-200 bg-blue-50 p-4 text-sm">
               <div className="font-semibold mb-1">Saved Card</div>
               <div>
-                {savedCard.cardType} ending in {savedCard.cardNumber.slice(-4)}
+                {savedCard.cardType} ending in {savedCard.lastFour}
               </div>
               <div>
                 Expires {savedCard.expMonth}/{savedCard.expYear.slice(-2)}

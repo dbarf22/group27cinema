@@ -22,6 +22,7 @@ type Card = {
   billingCity: string;
   billingState: string;
   billingZip: string;
+  lastFour: string;
 };
 
 const ageCategories = [
@@ -282,7 +283,7 @@ function BookingConfirmation({
   // Pre-fill fields if there's a saved card, otherwise blank
   const [cardholderName, setCardholderName] = useState<string>("");
   const [cardNumber, setCardNumber] = useState<string>(
-    savedCard ? `**** **** **** ${savedCard.cardNumber.slice(-4)}` : ""
+    savedCard ? `**** **** **** ${savedCard.lastFour}` : ""
   );
   const [expMonth, setExpMonth] = useState<string>(savedCard?.expMonth ?? "");
   const [expYear, setExpYear] = useState<string>(

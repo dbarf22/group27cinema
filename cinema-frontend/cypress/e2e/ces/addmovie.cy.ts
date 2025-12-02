@@ -65,5 +65,6 @@ describe('template spec', () => {
 
       });
       cy.reload();
+
   })
 })

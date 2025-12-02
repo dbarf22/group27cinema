@@ -391,7 +391,7 @@ function BookingConfirmation({
               className="w-full border rounded px-3 py-2"
               placeholder={
                 savedCard
-                  ? `**** **** **** ${savedCard.cardNumber.slice(-4)}`
+                  ? `**** **** **** ${savedCard.lastFour}`
                   : "1234 5678 9012 3456"
               }
             />

@@ -116,19 +116,20 @@ function SeatSelection({
   movie, 
   showtime, 
   tickets, 
+  rows,
+  seatsPerRow,
   onBack, 
   onConfirm 
 }: { 
   movie: Movie; 
   showtime: string; 
   tickets: Ticket[]; 
+  rows: string[];
+  seatsPerRow: number;
   onBack: () => void;
   onConfirm: (seats: string[]) => void;
 }) {
   const [selectedSeats, setSelectedSeats] = useState<string[]>([]);
-  
-  const rows = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H'];
-  const seatsPerRow = 12;
 
   // Mock occupied seats - in real app, fetch from backend
   const occupiedSeats = ['A3', 'A4', 'B5', 'C6', 'C7', 'D8'];
@@ -321,6 +322,9 @@ export default function BookingPage({
   const [step, setStep] = useState<'tickets' | 'seats' | 'confirmation'>('tickets');
   const [tickets, setTickets] = useState<Ticket[]>([]);
   const [seats, setSeats] = useState<string[]>([]);
+  const [rows, setRows] = useState<string[]>(['A', 'B', 'C', 'D']);
+  const [seatsPerRow, setSeatsPerRow] = useState<number>(10);
+
 
   useEffect(() => {
     // If not logged in, send them to login page
@@ -330,22 +334,58 @@ export default function BookingPage({
     }
 
     const fetchData = async () => {
-      const resolvedParams = await params;
-      const resolvedSearchParams = await searchParams;
-      
-      const res = await fetch(`/api/movies/${resolvedParams.id}`);
-      if (!res.ok) {
-        notFound();
-      }
-      const movieData = await res.json();
-      setMovie(movieData);
-      
-      if (resolvedSearchParams.showtime) {
-        setCurrentShowtime(resolvedSearchParams.showtime);
-      }
-    };
+    const resolvedParams = await params;
+    const resolvedSearchParams = await searchParams;
 
-    fetchData();
+    // 1) Fetch the movie
+    const res = await fetch(`/api/movies/${resolvedParams.id}`);
+    if (!res.ok) {
+      notFound();
+    }
+    const movieData = await res.json();
+    setMovie(movieData);
+
+    // 2) Decide which showtime string we are using
+    const selectedShowtime: string =
+      resolvedSearchParams.showtime ||
+      movieData.showtimes?.[0]?.showtime ||
+      "";
+
+    setCurrentShowtime(selectedShowtime);
+
+    // If we still don't have a showtime, we can't size the auditorium
+    if (!selectedShowtime) return;
+
+    // 3) Fetch auditoriums (showrooms)
+    const audRes = await fetch("/api/showrooms");
+    if (!audRes.ok) {
+      return;
+    }
+    const auditoriums = await audRes.json();
+
+    // 4) Find the auditorium whose showtimes contain this showtime
+    const matchingAuditorium = auditoriums.find((aud: any) =>
+      aud.showtimes?.some((st: any) => st.showtime === selectedShowtime)
+    );
+
+    if (!matchingAuditorium) {
+      return;
+    }
+
+    // 5) Use its rows/columns to size the seat map
+    const rowCount: number = matchingAuditorium.rows ?? 10;
+    const colCount: number = matchingAuditorium.columns ?? 10;
+
+    // Generate labels: A, B, C, ... up to rowCount
+    const rowLabels = Array.from({ length: rowCount }, (_, i) =>
+      String.fromCharCode("A".charCodeAt(0) + i)
+    );
+
+    setRows(rowLabels);
+    setSeatsPerRow(colCount);
+  };
+  fetchData();
+
   }, [params, searchParams, currentUser, router]);
 
   // While redirecting / not logged in, don't show booking UI
@@ -396,6 +436,8 @@ export default function BookingPage({
           movie={movie}
           showtime={currentShowtime}
           tickets={tickets}
+          rows={rows}
+          seatsPerRow={seatsPerRow}
           onBack={() => setStep('tickets')}
           onConfirm={handleSeatsConfirm}
         />

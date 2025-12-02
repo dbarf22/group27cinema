@@ -16,17 +16,14 @@ import java.util.UUID;
 public class UserService {
     private final UserRepository userRepository;
     private final PasswordEncoder encoder;
-    private final EmailService emailService;
 
     // These methods all used to be in auth controller but I am separating them now so AuthController
     // is strictly for routing http requests
 
     // Constructor class that ensures dependency injection through spring
-    public UserService(UserRepository userRepository, PasswordEncoder encoder,
-                       EmailService emailService) {
+    public UserService(UserRepository userRepository, PasswordEncoder encoder) {
         this.userRepository = userRepository;
         this.encoder = encoder;
-        this.emailService = emailService;
     }
 
     // Check if a user is an admin or not through their user key
@@ -86,7 +83,7 @@ public class UserService {
         String subject = "Verification Needed";
         String link = "http://localhost:8080/api/auth/verify?token=" + newUser.getVerificationToken();
         String body = "Please click the link in order to activate your account.\n" + link;
-        emailService.sendEmail(newUser.getEmail(), subject, body);
+        EmailService.INSTANCE.sendEmail(newUser.getEmail(), subject, body);
         return newUser;
     }
 
@@ -177,7 +174,7 @@ public class UserService {
             String subject = "Verification Needed";
             String link = "http://localhost:3000/reset-password?token=" + user.getVerificationToken();
             String body = "Please click the link in order to change your password.\n" + link;
-            emailService.sendEmail(user.getEmail(), subject, body);
+            EmailService.INSTANCE.sendEmail(user.getEmail(), subject, body);
         }
     }
 
@@ -194,7 +191,7 @@ public class UserService {
 
         String subject = "Password has been changed successfully";
         String body = "Your password has been changed successfully.\n";
-        emailService.sendEmail(user.getEmail(), subject, body);
+        EmailService.INSTANCE.sendEmail(user.getEmail(), subject, body);
     }
 
     public void changePassword(String email, String newPassword, String oldPassword) throws Exception {
@@ -210,7 +207,7 @@ public class UserService {
 
             String subject = "Password has been changed successfully";
             String body = "Your password has been changed successfully.\n";
-            emailService.sendEmail(user.getEmail(), subject, body);
+            EmailService.INSTANCE.sendEmail(user.getEmail(), subject, body);
         } else {
             throw new Exception("Password is incorrect.");
         }

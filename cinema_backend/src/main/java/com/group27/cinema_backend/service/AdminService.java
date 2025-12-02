@@ -24,18 +24,15 @@ public class AdminService {
     private final RatingCodeRepository ratingCodeRepository;
     private final PromotionRepository promotionRepository;
     private final UserRepository userRepository;
-    private final EmailService emailService;
 
     public AdminService(MovieRepository movieRepository,
                         RatingCodeRepository ratingCodeRepository,
                         PromotionRepository promotionRepository,
-                        UserRepository userRepository,
-                        EmailService emailService) {
+                        UserRepository userRepository) {
         this.movieRepository = movieRepository;
         this.ratingCodeRepository = ratingCodeRepository;
         this.promotionRepository = promotionRepository;
         this.userRepository = userRepository;
-        this.emailService = emailService;
     }
 
     public void addMovie(Movie movie) throws Exception {
@@ -71,7 +68,7 @@ public class AdminService {
         }
 
         for (User user : recipients) {
-            emailService.sendEmail(user.getEmail(), req.subject(), finalMessage);
+            EmailService.INSTANCE.sendEmail(user.getEmail(), req.subject(), finalMessage);
         }
         return recipients.size();
     }

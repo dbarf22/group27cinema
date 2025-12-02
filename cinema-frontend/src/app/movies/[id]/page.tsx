@@ -18,9 +18,6 @@ function getYouTubeId(url: string): string | null {
         if (parsed.hostname.includes("youtube.com")) {
             return parsed.searchParams.get("v");
         }
-        if (parsed.hostname === "youtu.be") {
-            return parsed.pathname.slice(1);
-        }
     } catch {
         return null;
     }

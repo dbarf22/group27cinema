@@ -6,6 +6,37 @@ const MAX_CAST = 500;
 const MAX_PRODUCER = 50;
 const MAX_DESCRIPTION = 255;
 
+// enforces consistent trailer URL from a youtube.com/watch/v.... link
+const isValidTrailerURL = (value: string): boolean => {
+  try {
+    const url = new URL(value);
+    const host = url.hostname.toLowerCase();
+
+    return (
+      (url.protocol === "http:" || url.protocol === "https:") &&
+      (host === "www.youtube.com" || host === "youtube.com") &&
+      url.pathname === "/watch" &&
+      !!url.searchParams.get("v")
+    );
+  } catch {
+    return false;
+  }
+};
+
+// enforces consistent poster URL from a m.media-amazon.com/images.... link
+const isValidPosterURL = (value: string): boolean => {
+  try {
+    const url = new URL(value);
+    return (
+      (url.protocol === "http:" || url.protocol === "https:") &&
+      url.hostname === "m.media-amazon.com" &&
+      url.pathname.startsWith("/images/")
+    );
+  } catch {
+    return false;
+  }
+};
+
 export default function ManageMoviesPage() {
   const [open, setOpen] = useState(false);
   const [title, setTitle] = useState("");
@@ -53,8 +84,20 @@ export default function ManageMoviesPage() {
     if (duration === null || duration <= 0)
       newErrors.duration = "Duration is required.";
 
-    if (!poster.trim()) newErrors.poster = "Poster URL is required.";
-    if (!trailer.trim()) newErrors.trailer = "Trailer URL is required.";
+    if (!poster.trim()) {
+      newErrors.poster = "Poster URL is required.";
+    } else if (!isValidPosterURL(poster.trim())) {
+      newErrors.poster =
+        "Poster must be an m.media-amazon.com/images/... URL.";
+  }
+
+
+    if (!trailer.trim()) {
+      newErrors.trailer = "Trailer URL is required.";
+    } else if (!isValidTrailerURL(trailer.trim())) {
+      newErrors.trailer =
+        "Trailer must be a youtube.com/watch?v=... URL.";
+    }
 
     if (!reviewScore.trim())
       newErrors.reviewScore = "Review score is required.";
@@ -181,7 +224,7 @@ export default function ManageMoviesPage() {
                 <form onSubmit={handleSubmit} className="space-y-5">
                   <div>
                     <label className="block text-sm font-medium text-gray-700">
-                      Title
+                      Title *
                     </label>
                     <input
                       className="mt-1 w-full rounded border p-2"
@@ -203,7 +246,7 @@ export default function ManageMoviesPage() {
 
                   <div>
                     <label className="block text-sm font-medium text-gray-700">
-                      Cast List
+                      Cast List *
                     </label>
                     <input
                       id={"castList"}
@@ -225,7 +268,7 @@ export default function ManageMoviesPage() {
 
                   <div>
                     <label className="block text-sm font-medium text-gray-700">
-                      Director
+                      Director *
                     </label>
                     <input
                       id={"director"}
@@ -389,7 +432,7 @@ export default function ManageMoviesPage() {
                         setPoster(e.target.value);
                         setErrors((prev) => ({ ...prev, poster: "" }));
                       }}
-                      placeholder="https://image.jpg"
+                      placeholder="https://m.media-amazon.com/images/..."
                     />
                     {errors.poster && (
                       <p className="text-red-600 text-sm mt-1">

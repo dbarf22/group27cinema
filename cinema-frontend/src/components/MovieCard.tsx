@@ -2,13 +2,34 @@ import Image from "next/image";
 import Link from "next/link";
 import { Movie } from "@/types/movie";
 
-export default function MovieCard({ movie }: { movie: Movie }) {
+type MovieCardProps = {
+  movie: Movie;
+  selectedTime: Date | null;
+};
+
+function isSameDay(a: Date, b: Date) { 
+  return (
+    a.getFullYear() === b.getFullYear() &&
+    a.getMonth() === b.getMonth() &&
+    a.getDate() === b.getDate()
+  );
+}
+
+export default function MovieCard({ movie, selectedTime }: MovieCardProps) {
   const posterSrc =
     movie.poster?.trim()
       ? movie.poster
       : "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='400' height='600'><rect width='100%' height='100%' fill='%23eee'/><text x='50%' y='50%' dominant-baseline='middle' text-anchor='middle' fill='%23999' font-size='20'>No Poster</text></svg>";
 
-  const showtimes = movie.showtimes ?? [];
+  const allShowtimes = movie.showtimes ?? [];
+
+  const showtimes = 
+    selectedTime == null ? allShowtimes : allShowtimes.filter((st) => {
+      return isSameDay(new Date(st.showtime), selectedTime);
+    });
+
+    //sorts showtimes chronologically
+    showtimes.sort((a, b) => new Date(a.showtime).getTime() - new Date(b.showtime).getTime());
 
   return (
     <div className="flex flex-col w-48 mx-auto">

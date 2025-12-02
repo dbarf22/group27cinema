@@ -7,10 +7,12 @@ import {useMemo, useRef, useState} from "react";
 
 export default function MovieSection({
   title,
-  movies
+  movies,
+  selectedTime,
 }: {
   title: string;
   movies: Movie[];
+  selectedTime: Date | null;
 }) {
 
   const [searchQuery, setSearchQuery] = useState("");
@@ -28,7 +30,7 @@ export default function MovieSection({
 
   const filteredMovies = useMemo(() =>{
       return movieFilter(searchQuery);},
-      [searchQuery]
+      [searchQuery, movies]
   )
 
   return (
@@ -40,7 +42,7 @@ export default function MovieSection({
       ) : (
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {filteredMovies.map((m) => (
-            <MovieCard key={m.id} movie={m} />
+            <MovieCard key={m.id} movie={m} selectedTime={selectedTime}/>
           ))}
         </div>
       )}

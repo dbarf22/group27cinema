@@ -52,7 +52,6 @@ const PortalPage = () => {
           <div
             onClick={() => go("portal/admin/movies")}
             className="cursor-pointer bg-white shadow-md rounded-xl p-6 border hover:shadow-lg transition"
-            id={'addMovie'}
           >
             <h2 className="text-xl font-semibold text-gray-800 mb-2">Manage Movies</h2>
             <p className="text-gray-600 text-sm">

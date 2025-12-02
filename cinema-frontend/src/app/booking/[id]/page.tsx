@@ -13,6 +13,17 @@ type Ticket = {
   price: number;
 };
 
+type Card = {
+  cardType: string;
+  cardNumber: string;
+  expMonth: string;
+  expYear: string;
+  billingStreet: string;
+  billingCity: string;
+  billingState: string;
+  billingZip: string;
+};
+
 const ageCategories = [
   { id: 'child', label: 'Child (Under 12)', price: 8 },
   { id: 'adult', label: 'Adult', price: 12 },
@@ -251,60 +262,192 @@ function SeatSelection({
   );
 }
 
-// Confirmation Component
 function BookingConfirmation({ 
   movie, 
   showtime, 
   tickets, 
   seats, 
+  savedCard,
   onNewBooking 
 }: { 
   movie: Movie; 
   showtime: string; 
   tickets: Ticket[]; 
   seats: string[];
+  savedCard: Card | null;
   onNewBooking: () => void;
 }) {
   const total = tickets.reduce((sum, t) => sum + t.price, 0);
 
+  // Pre-fill fields if there's a saved card, otherwise blank
+  const [cardholderName, setCardholderName] = useState<string>("");
+  const [cardNumber, setCardNumber] = useState<string>(
+    savedCard ? `**** **** **** ${savedCard.cardNumber.slice(-4)}` : ""
+  );
+  const [expMonth, setExpMonth] = useState<string>(savedCard?.expMonth ?? "");
+  const [expYear, setExpYear] = useState<string>(
+    savedCard?.expYear ? savedCard.expYear.slice(-2) : ""
+  );
+  const [cvc, setCvc] = useState<string>("");
+
+  const [isPaying, setIsPaying] = useState(false);
+
+  const handlePayment = async (e: React.FormEvent) => {
+    e.preventDefault();
+
+    if (!cardNumber || !expMonth || !expYear || !cvc) {
+      alert("Please fill in your card details to complete payment.");
+      return;
+    }
+
+    setIsPaying(true);
+
+    try {
+      // TODO: replace with real payment later
+      await new Promise((resolve) => setTimeout(resolve, 600));
+      onNewBooking();
+    } catch (err) {
+      console.error(err);
+      alert("Payment failed. Please try again.");
+    } finally {
+      setIsPaying(false);
+    }
+  };
+
   return (
-    <div className="max-w-2xl mx-auto">
-      <div className="bg-white rounded-lg border p-8 text-center">
-        <div className="text-6xl mb-4">🎉</div>
-        <h2 className="text-3xl font-bold mb-4">Booking Confirmed!</h2>
-        
-        <div className="bg-gray-50 rounded-lg p-6 mb-6 text-left space-y-3">
+    <div className="max-w-3xl mx-auto space-y-6">
+      <div className="bg-white rounded-lg border p-8">
+        <h2 className="text-3xl font-bold mb-4 text-center">
+          Review & Pay
+        </h2>
+
+        {/* Booking summary */}
+        <div className="bg-gray-50 rounded-lg p-6 mb-6 space-y-3">
           <div>
             <span className="font-semibold">Movie:</span> {movie.title}
           </div>
           <div>
-            <span className="font-semibold">Showtime:</span> {new Date(showtime).toLocaleString()}
+            <span className="font-semibold">Showtime:</span>{" "}
+            {new Date(showtime).toLocaleString()}
           </div>
           <div>
-            <span className="font-semibold">Tickets:</span> {tickets.length}
+            <span className="font-semibold">Tickets:</span>{" "}
+            {tickets.length}
           </div>
           <div>
-            <span className="font-semibold">Seats:</span> {seats.join(', ')}
+            <span className="font-semibold">Seats:</span>{" "}
+            {seats.join(", ")}
           </div>
           <div className="border-t pt-3 text-xl">
-            <span className="font-semibold">Total:</span> ${total.toFixed(2)}
+            <span className="font-semibold">Total:</span>{" "}
+            ${total.toFixed(2)}
           </div>
         </div>
 
-        <p className="text-gray-600 mb-6">
-          A confirmation email has been sent to your registered email address.
-        </p>
+        {/* Payment section */}
+        <form onSubmit={handlePayment} className="space-y-4">
+          <h3 className="text-xl font-semibold mb-2">Payment Method</h3>
 
-        <button
-          onClick={onNewBooking}
-          className="bg-blue-600 text-white px-8 py-3 rounded-lg hover:bg-blue-700 transition font-semibold"
-        >
-          Book Another Movie
-        </button>
+          {/* Saved card display if exist */}
+          {savedCard && (
+            <div className="mb-4 rounded-lg border border-blue-200 bg-blue-50 p-4 text-sm">
+              <div className="font-semibold mb-1">Saved Card</div>
+              <div>
+                {savedCard.cardType} ending in {savedCard.cardNumber.slice(-4)}
+              </div>
+              <div>
+                Expires {savedCard.expMonth}/{savedCard.expYear.slice(-2)}
+              </div>
+              <div className="mt-2 text-xs text-gray-600">
+                You can use this saved card or update the fields below.
+              </div>
+            </div>
+          )}
+
+          {/* Cardholder Name */}
+          <div>
+            <label className="block text-sm font-medium mb-1">
+              Cardholder Name
+            </label>
+            <input
+              type="text"
+              value={cardholderName}
+              onChange={(e) => setCardholderName(e.target.value)}
+              className="w-full border rounded px-3 py-2"
+              placeholder="Name on card"
+            />
+          </div>
+
+          {/* Card Number */}
+          <div>
+            <label className="block text-sm font-medium mb-1">
+              Card Number
+            </label>
+            <input
+              type="text"
+              value={cardNumber}
+              onChange={(e) => setCardNumber(e.target.value)}
+              className="w-full border rounded px-3 py-2"
+              placeholder={
+                savedCard
+                  ? `**** **** **** ${savedCard.cardNumber.slice(-4)}`
+                  : "1234 5678 9012 3456"
+              }
+            />
+          </div>
+
+          {/* Expiration + CVC */}
+          <div className="flex gap-3">
+            <div className="flex-1">
+              <label className="block text-sm font-medium mb-1">
+                Expiration (MM/YY)
+              </label>
+              <div className="flex gap-2">
+                <input
+                  type="text"
+                  value={expMonth}
+                  onChange={(e) => setExpMonth(e.target.value)}
+                  className="w-1/2 border rounded px-3 py-2"
+                  placeholder="MM"
+                />
+                <input
+                  type="text"
+                  value={expYear}
+                  onChange={(e) => setExpYear(e.target.value)}
+                  className="w-1/2 border rounded px-3 py-2"
+                  placeholder="YY"
+                />
+              </div>
+            </div>
+
+            <div className="w-24">
+              <label className="block text-sm font-medium mb-1">
+                CVC
+              </label>
+              <input
+                type="password"
+                value={cvc}
+                onChange={(e) => setCvc(e.target.value)}
+                className="w-full border rounded px-3 py-2"
+                placeholder="CVC"
+              />
+            </div>
+          </div>
+
+          <button
+            type="submit"
+            disabled={isPaying}
+            className="mt-4 w-full bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700 transition font-semibold disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            {isPaying ? "Processing..." : "Complete Payment"}
+          </button>
+        </form>
       </div>
     </div>
   );
 }
+
+
 
 // Main Booking Page
 export default function BookingPage({
@@ -324,7 +467,6 @@ export default function BookingPage({
   const [seats, setSeats] = useState<string[]>([]);
   const [rows, setRows] = useState<string[]>(['A', 'B', 'C', 'D']);
   const [seatsPerRow, setSeatsPerRow] = useState<number>(10);
-
 
   useEffect(() => {
     // If not logged in, send them to login page
@@ -449,6 +591,7 @@ export default function BookingPage({
           showtime={currentShowtime}
           tickets={tickets}
           seats={seats}
+          savedCard={(currentUser as any)?.cards?.[0] ?? null}
           onNewBooking={handleNewBooking}
         />
       )}

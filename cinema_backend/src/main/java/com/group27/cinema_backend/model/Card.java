@@ -50,6 +50,17 @@ public class Card {
     @JoinColumn(name = "card_id")
     private Set<Booking> bookings = new LinkedHashSet<>();
 
+    @Column(name = "last_four")
+    private String lastFour;
+
+    public String getLastFour() {
+        return lastFour;
+    }
+
+    public void setLastFour(String lastFour) {
+        this.lastFour = lastFour;
+    }
+
     public Integer getId() {
         return id;
     }

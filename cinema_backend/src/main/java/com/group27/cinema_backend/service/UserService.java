@@ -74,6 +74,8 @@ public class UserService {
 
         if (newUser.getCards() != null) {
             for (Card card : newUser.getCards()) {
+                int length = card.getCardNumber().length();
+                card.setLastFour(card.getCardNumber().substring(length-4));
                 card.setCardNumber(encoder.encode(card.getCardNumber()));
                 card.setUser(newUser);
             }
@@ -102,6 +104,7 @@ public class UserService {
     public User loginUser(String email, String password) {
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new RuntimeException("Invalid email or password."));
+        String hashedPassword = user.getHashedPassword();
 
         if (!encoder.matches(password, user.getHashedPassword())) {
             throw new RuntimeException("Invalid email or password.");
@@ -150,6 +153,8 @@ public class UserService {
         if (updatedUser.getCards() != null && !updatedUser.getCards().isEmpty()) {
             user.getCards().clear();
             for (Card card : updatedUser.getCards()) {
+                int length = card.getCardNumber().length();
+                card.setLastFour(card.getCardNumber().substring(length-4));
                 card.setCardNumber(encoder.encode(card.getCardNumber()));
                 card.setUser(user);
                 user.getCards().add(card);

@@ -85,10 +85,11 @@ public class CheckoutController {
         booking.setUser(userRepo.findById(request.getUserID()).orElseThrow(() ->
                 new RuntimeException("User not found.")));
 
-        BigDecimal pricePerTicket = BigDecimal.valueOf(12.00); // TODO: plug in real pricing if needed
-        booking.setTotalPrice(
-                pricePerTicket.multiply(BigDecimal.valueOf(request.getSeatIds().size()))
-        );
+        float adultPrice = request.getAdultTickets() * 12;
+        float childPrice = request.getChildTickets() * 8;
+        float seniorPrice = request.getSeniorTickets() * 8;
+
+        float finalPrice = adultPrice + childPrice + seniorPrice;
 
         booking = bookingRepo.save(booking);
 
@@ -105,12 +106,14 @@ public class CheckoutController {
             Ticket t = new Ticket();
             t.setBooking(booking);
             t.setSeat(seat);
-            t.setPrice(pricePerTicket);
+            t.setPrice(BigDecimal.valueOf(finalPrice));
             t.setTicketType("STANDARD");
 
             ticketsToSave.add(t);
         }
         ticketRepo.saveAll(ticketsToSave);
+
+
 
         // 6) build response
         resp.setSuccess(true);

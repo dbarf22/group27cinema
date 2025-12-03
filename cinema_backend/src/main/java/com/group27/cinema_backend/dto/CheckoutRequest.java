@@ -16,6 +16,40 @@ public class CheckoutRequest {
 
     private int promoID;
 
+    private int seniorTickets;
+
+    private int childTickets;
+
+    private int adultTickets;
+
+    public void setPromoID(int promoID) {
+        this.promoID = promoID;
+    }
+
+    public int getSeniorTickets() {
+        return seniorTickets;
+    }
+
+    public void setSeniorTickets(int seniorTickets) {
+        this.seniorTickets = seniorTickets;
+    }
+
+    public int getChildTickets() {
+        return childTickets;
+    }
+
+    public void setChildTickets(int childTickets) {
+        this.childTickets = childTickets;
+    }
+
+    public int getAdultTickets() {
+        return adultTickets;
+    }
+
+    public void setAdultTickets(int adultTickets) {
+        this.adultTickets = adultTickets;
+    }
+
     public int getPromoID() {
         return promoID;
     }

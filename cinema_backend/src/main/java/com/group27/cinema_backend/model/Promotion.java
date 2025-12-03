@@ -5,6 +5,7 @@ import java.time.LocalDateTime;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -40,6 +41,7 @@ public class Promotion {
     private LocalDateTime createdAt = LocalDateTime.now();
 
     @OneToMany(mappedBy = "promotion")
+    @JsonIgnore
     private Set<Booking> bookings = new LinkedHashSet<>();
 
     

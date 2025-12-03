@@ -48,6 +48,7 @@ public class Booking {
     @ManyToOne(fetch = FetchType.LAZY)
     @OnDelete(action = OnDeleteAction.SET_NULL)
     @JoinColumn(name = "promotion_id")
+    @JsonIgnore
     private Promotion promotion;
 
     @ColumnDefault("CURRENT_TIMESTAMP")

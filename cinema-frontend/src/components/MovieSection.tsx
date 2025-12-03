@@ -40,7 +40,7 @@ export default function MovieSection({
       {movies.length === 0 ? (
         <p className="text-sm text-gray-600">Nothing to show here yet.</p>
       ) : (
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        <div className="grid grid-cols-4 gap-4">
           {filteredMovies.map((m) => (
             <MovieCard key={m.id} movie={m} selectedTime={selectedTime}/>
           ))}

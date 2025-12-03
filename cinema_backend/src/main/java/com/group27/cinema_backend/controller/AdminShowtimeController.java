@@ -4,6 +4,8 @@ import java.time.Instant;
 import java.util.List;
 import java.util.Map;
 
+import com.group27.cinema_backend.model.Auditorium;
+import com.group27.cinema_backend.repository.AuditoriumRepository;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -24,9 +26,11 @@ import com.group27.cinema_backend.service.ShowtimeService;
 public class AdminShowtimeController {
 
     private final ShowtimeService showtimeService;
+    private final AuditoriumRepository auditoriumRepository;
 
-    public AdminShowtimeController(ShowtimeService showtimeService) {
+    public AdminShowtimeController(ShowtimeService showtimeService, AuditoriumRepository auditoriumRepository) {
         this.showtimeService = showtimeService;
+        this.auditoriumRepository = auditoriumRepository;
     }
 
     // GET all showtimes for a movie
@@ -44,7 +48,8 @@ public class AdminShowtimeController {
     ) {
         String showtimeStr = (String) body.get("showtime");
         Integer auditoriumId = body.get("auditoriumId") == null ? null : (Integer) body.get("auditoriumId");
-        Integer availableSeats = body.get("availableSeats") == null ? 0 : (Integer) body.get("availableSeats");
+        Auditorium a = auditoriumRepository.findAuditoriumById(auditoriumId);
+        int availableSeats = a.getNumberOfSeats();
 
         Instant inst = Instant.parse(showtimeStr);
 

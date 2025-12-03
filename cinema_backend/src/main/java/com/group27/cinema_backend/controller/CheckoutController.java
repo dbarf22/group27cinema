@@ -6,10 +6,7 @@ import com.group27.cinema_backend.model.Booking;
 import com.group27.cinema_backend.model.Seat;
 import com.group27.cinema_backend.model.Showtime;
 import com.group27.cinema_backend.model.Ticket;
-import com.group27.cinema_backend.repository.BookingRepository;
-import com.group27.cinema_backend.repository.SeatRepository;
-import com.group27.cinema_backend.repository.ShowtimeRepository;
-import com.group27.cinema_backend.repository.TicketRepository;
+import com.group27.cinema_backend.repository.*;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -28,17 +25,22 @@ public class CheckoutController {
     private final SeatRepository seatRepo;
     private final TicketRepository ticketRepo;
     private final ShowtimeRepository showtimeRepo;
+    private final CardRepository cardRepo;
+    private final UserRepository userRepo;
 
     public CheckoutController(
             BookingRepository bookingRepo,
             SeatRepository seatRepo,
             TicketRepository ticketRepo,
-            ShowtimeRepository showtimeRepo
+            ShowtimeRepository showtimeRepo, CardRepository cardRepo,
+            UserRepository userRepo
     ) {
         this.bookingRepo = bookingRepo;
         this.seatRepo = seatRepo;
         this.ticketRepo = ticketRepo;
         this.showtimeRepo = showtimeRepo;
+        this.cardRepo = cardRepo;
+        this.userRepo = userRepo;
     }
 
     // POST /api/checkout  → create a booking + tickets
@@ -77,6 +79,11 @@ public class CheckoutController {
         Booking booking = new Booking();
         booking.setScreening(screening);
         booking.setNumberOfTickets(request.getSeatIds().size());
+        booking.setCard(cardRepo.findCardById(request.getCardID()).orElseThrow(() ->
+                new RuntimeException("Card not found")));
+
+        booking.setUser(userRepo.findById(request.getUserID()).orElseThrow(() ->
+                new RuntimeException("User not found.")));
 
         BigDecimal pricePerTicket = BigDecimal.valueOf(12.00); // TODO: plug in real pricing if needed
         booking.setTotalPrice(

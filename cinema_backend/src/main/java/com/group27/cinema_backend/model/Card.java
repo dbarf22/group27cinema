@@ -39,6 +39,9 @@ public class Card {
     @Column(name = "card_number", nullable = false)
     private String cardNumber;
 
+    @Column(name = "cardholder", nullable = false, length = 100)
+    private String cardholder;
+
     @Column(name = "cvv", length = 4)
     private String cvv;
 
@@ -107,6 +110,14 @@ public class Card {
         this.cardNumber = cardNumber;
     }
 
+    public String getCardholder() {
+        return cardholder;
+    }
+
+    public void setCardholder(String cardholder) {
+        this.cardholder = cardholder;
+    }
+
     public String getCvv() {
         return cvv;
     }
@@ -170,5 +181,4 @@ public class Card {
     public void setBookings(Set<Booking> bookings) {
         this.bookings = bookings;
     }
-
 }

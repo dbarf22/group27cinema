@@ -32,49 +32,46 @@ export default function MovieCard({ movie, selectedTime }: MovieCardProps) {
     showtimes.sort((a, b) => new Date(a.showtime).getTime() - new Date(b.showtime).getTime());
 
   return (
-    <div className="flex flex-col w-48 mx-auto">
-      {/* Poster + Title */}
-      <Link href={`/movies/${movie.id}`} className="group">
-        <div className="relative w-48 h-72 rounded-xl overflow-hidden shadow-md transition group-hover:shadow-xl">
-          <Image
-            src={posterSrc}
-            alt={`${movie.title} poster`}
-            fill
-            sizes="192px"
-            className="object-cover"
-          />
-        </div>
-        <h3 className="mt-3 text-center text-lg font-semibold text-gray-900 group-hover:text-blue-600 transition">
-          {movie.title}
-        </h3>
-      </Link>
-
-      {/* Showtimes Buttons */}
-      {showtimes.length > 0 ? (
-        <div className="mt-3 flex flex-wrap justify-center gap-2">
-          {showtimes.map((st) => (
-            <Link
-              key={st.id}
-              href={`/booking/${movie.id}?showtime=${encodeURIComponent(
-                st.showtime
-              )}`}
-              className="px-4 py-2 rounded-full text-xs font-bold text-blue-700 bg-blue-50 border border-blue-200 hover:bg-blue-100 transition"
-            >
-              {new Date(st.showtime).toLocaleTimeString([], {
-                hour: "2-digit",
-                minute: "2-digit",
-                day: "2-digit",
-                month: "2-digit",
-                year: "2-digit",
-              })}
-            </Link>
-          ))}
-        </div>
-      ) : (
-        <p className="mt-3 text-center text-sm text-gray-500">
-          No showtimes available
-        </p>
-      )}
-    </div>
+      <div>
+          <div className="card bg-base-100 card-border overflow-hidden ">
+              {/* Poster + Title */}
+              <Link href={`/movies/${movie.id}`} className="group">
+                  <figure className={"aspect-2/3"}>
+                      <img
+                          src={posterSrc}
+                          alt={`${movie.title} poster`}
+                          className="h-full w-full object-cover"
+                      />
+                  </figure>
+              </Link>
+                  <div className={"card-body text-center justify-center px-2"}>
+                      <h3 className={"card-title text-center justify-center"}>
+                          {movie.title}
+                      </h3>
+                      {showtimes.length > 0 ? (
+                          <div className="text-center justify-center">
+                              {showtimes.map((st) => (
+                                  <Link
+                                      key={st.id}
+                                      href={`/booking/${movie.id}?showtime=${encodeURIComponent(
+                                          st.showtime
+                                      )}`}
+                                      className="btn btn-xs btn-secondary ms-1"
+                                  >
+                                      {new Date(st.showtime).toLocaleTimeString([], {
+                                          hour: "2-digit",
+                                          minute: "2-digit",
+                                      })}
+                                  </Link>
+                              ))}
+                          </div>
+                      ) : (
+                          <p>
+                              No showtimes available
+                          </p>
+                      )}
+                  </div>
+          </div>
+      </div>
   );
 }

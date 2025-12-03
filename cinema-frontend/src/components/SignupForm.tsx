@@ -57,7 +57,6 @@ export default function SignupForm() {
   }
 
   function removeCard(cardIndex: number) {
-    if (cards.length <= 1) return;
     setCards((prev) => prev.filter((_, i) => i !== cardIndex));
   }
 
@@ -148,18 +147,18 @@ export default function SignupForm() {
 
   return (
     <div className="mx-auto mt-14 px-4 max-w-4xl">
-      <div className="rounded-2xl border border-gray-200 bg-white shadow-sm p-8">
+      <div className="collapse collapse-open bg-base-100 border-base-300 border mb-4 shadow-sm p-8">
         {!showVerify ? (
           <>
             <h1 className="text-3xl text-center tracking-wide">CREATE ACCOUNT</h1>
-            <p className="mt-1 text-center text-sm text-gray-600">
+            <p className="mt-1 text-center text-sm ">
               Provide your details to register
             </p>
 
             {error && (
               <div
                 role="alert"
-                className="mt-4 text-sm text-red-700 bg-red-50 p-2 rounded border border-red-200"
+                className="mt-4 text-sm text-error-content bg-error p-2 rounded border"
               >
                 {error}
               </div>
@@ -168,76 +167,64 @@ export default function SignupForm() {
             <form onSubmit={handleSubmit} className="mt-6 space-y-8">
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
-                  <label htmlFor="username" className="block text-sm font-medium text-gray-700 mb-1">
-                    Username
-                  </label>
                   <input
                     id="username"
                     name="username"
                     type="text"
+                    placeholder={"Username"}
                     required
-                    className="w-full px-3 py-2 rounded-xl border border-gray-300 outline-none focus:ring-2 focus:ring-black"
+                    className="w-full px-3 py-2 input"
                   />
                 </div>
                 <div>
-                  <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
-                    Email Address
-                  </label>
                   <input
                     id="email"
                     name="email"
                     type="email"
+                    placeholder={"Email"}
                     required
-                    className="w-full px-3 py-2 rounded-xl border border-gray-300 outline-none focus:ring-2 focus:ring-black"
+                    className="w-full px-3 py-2 input"
                   />
                 </div>
                 <div>
-                  <label htmlFor="firstName" className="block text-sm font-medium text-gray-700 mb-1">
-                    First Name
-                  </label>
                   <input
                     id="firstName"
                     name="firstName"
                     type="text"
+                    placeholder={"First Name"}
                     required
-                    className="w-full px-3 py-2 rounded-xl border border-gray-300 outline-none focus:ring-2 focus:ring-black"
+                    className="w-full px-3 py-2 input"
                   />
                 </div>
                 <div>
-                  <label htmlFor="lastName" className="block text-sm font-medium text-gray-700 mb-1">
-                    Last Name
-                  </label>
                   <input
                     id="lastName"
                     name="lastName"
                     type="text"
+                    placeholder={"Last Name"}
                     required
-                    className="w-full px-3 py-2 rounded-xl border border-gray-300 outline-none focus:ring-2 focus:ring-black"
+                    className="w-full px-3 py-2 input"
                   />
                 </div>
                 <div>
-                    <label htmlFor={"phoneNumber"} className="block text-sm font-medium text-gray-700 mb-1">
-                        Phone Number
-                    </label>
                     <PhoneInput
                         id="phoneNumber"
                         name="phoneNumber"
                         value={phoneNumber}
                         onChange={(value: E164Number) => setPhoneNumber(value || undefined)}
                         defaultCountry="US"
-                        className="w-full px-3 py-2 rounded-xl border border-gray-300 bg-white focus-within:ring-2 focus-within:ring-black"
+                        placeholder={"Phone Number"}
+                        className="w-full px-3 py-2 input"
                     />
                 </div>
                 <div>
-                    <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-1">
-                        Password
-                    </label>
                     <input
                         id="password"
                         name="password"
                         type="password"
+                        placeholder={"Password"}
                         required
-                        className="w-full px-3 py-2 rounded-xl border border-gray-300 outline-none focus:ring-2 focus:ring-black"
+                        className="w-full px-3 py-2 input"
                     />
                 </div>
               </div>
@@ -247,200 +234,184 @@ export default function SignupForm() {
                         type={"checkbox"}
                         id={"wantsPromotions"}
                         name={"wantsPromotions"}
-                        className={"h-4 w-4 rounded border-gray-300 text-black focus:ring-black"}
+                        className={"h-4 w-4 checkbox"}
                     />
-                    <label htmlFor={"wantsPromotions"} className={"text-sm text-gray-700"}>
+                    <label htmlFor={"wantsPromotions"} className={"text-sm"}>
                         I want to receive promotions.
                     </label>
                 </div>
 
               <div className="space-y-2">
-                <button
-                  type="button"
-                  onClick={() => setShowAddress((v) => !v)}
-                  className="w-full flex items-center justify-between text-left font-medium text-gray-700 hover:text-black"
-                >
-                  Add Home Address (Optional)
-                  <span className="text-lg">{showAddress ? "▾" : "▸"}</span>
-                </button>
+                  <div className={"collapse collapse-arrow bg-base-100 border-base-300 border mb-4 shadow-sm"}>
+                      <input type={"checkbox"}/>
+                      <div className={"collapse-title font-semibold"}>Add Address Information (optional)</div>
+                      <div className={"collapse-content text-sm"}>
 
-                {showAddress && (
                   <div className="mt-2 ml-2 space-y-3">
-                    <div>
-                      <label htmlFor="street" className="block text-sm font-medium text-gray-700 mb-1">
-                        Street
-                      </label>
-                      <input
-                        id="street"
-                        name="street"
-                        type="text"
-                        className="w-full px-3 py-2 rounded-xl border border-gray-300 outline-none focus:ring-2 focus:ring-black"
-                      />
-                    </div>
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                       <div>
-                        <label htmlFor="city" className="block text-sm font-medium text-gray-700 mb-1">
-                          City
-                        </label>
-                        <input
-                          id="city"
-                          name="city"
-                          type="text"
-                          className="w-full px-3 py-2 rounded-xl border border-gray-300 outline-none focus:ring-2 focus:ring-black"
-                        />
+
+                          <input
+                              placeholder="Street Address"
+                              id="street"
+                              name="street"
+                              type="text"
+                              className="w-full px-3 py-2 input"
+                          />
                       </div>
-                      <div>
-                        <label htmlFor="state" className="block text-sm font-medium text-gray-700 mb-1">
-                          State
-                        </label>
-                        <input
-                          id="state"
-                          name="state"
-                          type="text"
-                          className="w-full px-3 py-2 rounded-xl border border-gray-300 outline-none focus:ring-2 focus:ring-black"
-                        />
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                          <div>
+                              <input
+                                  placeholder={"City"}
+                                  id="city"
+                                  name="city"
+                                  type="text"
+                                  className="w-full px-3 py-2 input"
+                              />
+                          </div>
+                          <div>
+
+                              <input
+                                  placeholder={"State"}
+                                  id="state"
+                                  name="state"
+                                  type="text"
+                                  className="w-full px-3 py-2 input"
+                              />
+                          </div>
+                          <div>
+                              <input
+                                  placeholder={"Zip Code"}
+                                  id="zipCode"
+                                  name="zipCode"
+                                  type="text"
+                                  className="w-full px-3 py-2 input"
+                              />
+                          </div>
                       </div>
-                      <div>
-                        <label htmlFor="zipCode" className="block text-sm font-medium text-gray-700 mb-1">
-                          Zip Code
-                        </label>
-                        <input
-                          id="zipCode"
-                          name="zipCode"
-                          type="text"
-                          className="w-full px-3 py-2 rounded-xl border border-gray-300 outline-none focus:ring-2 focus:ring-black"
-                        />
-                      </div>
-                    </div>
                   </div>
-                )}
+                      </div>
+                  </div>
+
               </div>
 
               <div className="space-y-2">
-                <button
-                  type="button"
-                  onClick={togglePayments}
-                  className="w-full flex items-center justify-between text-left font-medium text-gray-700 hover:text-black"
-                >
-                  Add Payment Methods (Optional)
-                  <span className="text-lg">{showPayments ? "▾" : "▸"}</span>
-                </button>
-
-                {showPayments && (
+                  <div className={"collapse collapse-arrow bg-base-100 border-base-300 border mb-4 shadow-sm"}>
+                      <input type={"checkbox"}/>
+                      <div className={"collapse-title font-semibold"}>Add Payment Information (optional)</div>
+                      <div className={"collapse-content text-sm"}>
                   <div className="mt-2 ml-2 space-y-6">
-                    {cards.map((card, cardIndex) => (
-                      <div key={cardIndex} className="rounded-xl border border-gray-200 p-4">
-                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                          <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-1">Card Type</label>
-                            <select
-                              value={card.cardType}
-                              onChange={(e) => updateCard(cardIndex, "cardType", e.target.value)}
-                              className="w-full px-3 py-2 rounded-xl border border-gray-300 outline-none focus:ring-2 focus:ring-black"
-                            >
-                              <option value="">Select</option>
-                              <option value="Visa">Visa</option>
-                              <option value="MasterCard">MasterCard</option>
-                              <option value="Discover">Discover</option>
-                            </select>
+                      {cards.map((card, cardIndex) => (
+                          <div key={cardIndex} className="card card-border bg-base-300 p-4">
+                              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                  <div>
+                                      <select
+                                          value={card.cardType}
+                                          onChange={(e) => updateCard(cardIndex, "cardType", e.target.value)}
+                                          className="w-full px-3 py-2 btn btn-neutral"
+                                      >
+                                          <option value="">Select Card Type</option>
+                                          <option value="Visa">Visa</option>
+                                          <option value="MasterCard">MasterCard</option>
+                                          <option value="Discover">Discover</option>
+                                      </select>
+                                  </div>
+                                  <div>
+                                      <input
+                                          type="text"
+                                          placeholder={'Card Number'}
+                                          value={card.cardNumber}
+                                          onChange={(e) => updateCard(cardIndex, "cardNumber", e.target.value)}
+                                          className="w-full px-3 py-2 input"
+                                      />
+                                  </div>
+                                  <div>
+                                      <input
+                                          type="text"
+                                          value={card.expMonth}
+                                          onChange={(e) => updateCard(cardIndex, "expMonth", e.target.value)}
+                                          className="w-full px-3 py-2 input"
+                                          placeholder={"Expiration Month"}
+                                      />
+                                  </div>
+                                  <div>
+                                      <input
+                                          type="text"
+                                          value={card.expYear}
+                                          onChange={(e) => updateCard(cardIndex, "expYear", e.target.value)}
+                                          className="w-full px-3 py-2 input"
+                                          placeholder="Expiration Year"
+                                      />
+                                  </div>
+                                  <div className="sm:col-span-2">
+                                      <input
+                                          type="text"
+                                          placeholder={"Billing Street"}
+                                          value={card.billingStreet}
+                                          onChange={(e) => updateCard(cardIndex, "billingStreet", e.target.value)}
+                                          className="w-full px-3 py-2 input"
+                                      />
+                                  </div>
+                                  <div>
+                                      <input
+                                          type="text"
+                                          placeholder={"Billing City"}
+                                          value={card.billingCity}
+                                          onChange={(e) => updateCard(cardIndex, "billingCity", e.target.value)}
+                                          className="w-full px-3 py-2 input"
+                                      />
+                                  </div>
+                                  <div>
+                                      <input
+                                          type="text"
+                                          placeholder={"Billing State"}
+                                          value={card.billingState}
+                                          onChange={(e) => updateCard(cardIndex, "billingState", e.target.value)}
+                                          className="w-full px-3 py-2 input"
+                                      />
+                                  </div>
+                                  <div>
+                                      <input
+                                          type="text"
+                                          placeholder={"Billing Zip"}
+                                          value={card.billingZip}
+                                          onChange={(e) => updateCard(cardIndex, "billingZip", e.target.value)}
+                                          className="w-full px-3 py-2 input"
+                                      />
+                                  </div>
+                              </div>
+                              <div className="mt-3 flex justify-end gap-2">
+                                  {cards.length > 0 && (
+                                      <button
+                                          type="button"
+                                          onClick={() => removeCard(cardIndex)}
+                                          className="px-3 py-2 text-sm btn btn-error text-error-content"
+                                      >
+                                          Remove
+                                      </button>
+                                  )}
+                              </div>
                           </div>
-                          <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-1">Card Number</label>
-                            <input
-                              type="text"
-                              value={card.cardNumber}
-                              onChange={(e) => updateCard(cardIndex, "cardNumber", e.target.value)}
-                              className="w-full px-3 py-2 rounded-xl border border-gray-300 outline-none focus:ring-2 focus:ring-black"
-                            />
-                          </div>
-                          <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-1">Expiration Month</label>
-                            <input
-                              type="text"
-                              value={card.expMonth}
-                              onChange={(e) => updateCard(cardIndex, "expMonth", e.target.value)}
-                              className="w-full px-3 py-2 rounded-xl border border-gray-300 outline-none focus:ring-2 focus:ring-black"
-                              placeholder="MM"
-                            />
-                          </div>
-                          <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-1">Expiration Year</label>
-                            <input
-                              type="text"
-                              value={card.expYear}
-                              onChange={(e) => updateCard(cardIndex, "expYear", e.target.value)}
-                              className="w-full px-3 py-2 rounded-xl border border-gray-300 outline-none focus:ring-2 focus:ring-black"
-                              placeholder="YYYY"
-                            />
-                          </div>
-                          <div className="sm:col-span-2">
-                            <label className="block text-sm font-medium text-gray-700 mb-1">Billing Street</label>
-                            <input
-                              type="text"
-                              value={card.billingStreet}
-                              onChange={(e) => updateCard(cardIndex, "billingStreet", e.target.value)}
-                              className="w-full px-3 py-2 rounded-xl border border-gray-300 outline-none focus:ring-2 focus:ring-black"
-                            />
-                          </div>
-                          <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-1">Billing City</label>
-                            <input
-                              type="text"
-                              value={card.billingCity}
-                              onChange={(e) => updateCard(cardIndex, "billingCity", e.target.value)}
-                              className="w-full px-3 py-2 rounded-xl border border-gray-300 outline-none focus:ring-2 focus:ring-black"
-                            />
-                          </div>
-                          <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-1">Billing State</label>
-                            <input
-                              type="text"
-                              value={card.billingState}
-                              onChange={(e) => updateCard(cardIndex, "billingState", e.target.value)}
-                              className="w-full px-3 py-2 rounded-xl border border-gray-300 outline-none focus:ring-2 focus:ring-black"
-                            />
-                          </div>
-                          <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-1">Billing Zip</label>
-                            <input
-                              type="text"
-                              value={card.billingZip}
-                              onChange={(e) => updateCard(cardIndex, "billingZip", e.target.value)}
-                              className="w-full px-3 py-2 rounded-xl border border-gray-300 outline-none focus:ring-2 focus:ring-black"
-                            />
-                          </div>
-                        </div>
-                        <div className="mt-3 flex justify-end gap-2">
-                          {cards.length > 1 && (
-                            <button
+                      ))}
+                      <div className="flex items-center gap-3">
+                          <button
                               type="button"
-                              onClick={() => removeCard(cardIndex)}
-                              className="px-3 py-2 text-sm rounded-xl border border-gray-300 hover:bg-gray-50"
-                            >
-                              Remove
-                            </button>
-                          )}
-                        </div>
+                              onClick={addCard}
+                              disabled={cards.length >= maxCards}
+                              className="text-sm btn btn-neutral"
+                          >
+                              + Add Another Card
+                          </button>
+                          <span className="text-sm ">{cards.length}/{maxCards}</span>
                       </div>
-                    ))}
-                    <div className="flex items-center gap-3">
-                      <button
-                        type="button"
-                        onClick={addCard}
-                        disabled={cards.length >= maxCards}
-                        className="text-sm text-gray-700 underline hover:text-black disabled:opacity-50"
-                      >
-                        + Add Another Card
-                      </button>
-                      <span className="text-sm text-gray-600">{cards.length}/{maxCards}</span>
-                    </div>
                   </div>
-                )}
+                      </div>
+                  </div>
+
               </div>
 
               <button
                 type="submit"
-                className="w-full rounded-xl bg-black px-4 py-2.5 font-semibold text-white hover:bg-neutral-900 transition"
+                className="w-full  px-4 py-2.5 btn btn-neutral"
               >
                 Sign Up
               </button>
@@ -449,7 +420,7 @@ export default function SignupForm() {
         ) : (
           <div className="text-center">
             <h2 className="text-2xl font-semibold mb-2">Verification Code Sent!</h2>
-            <p className="text-sm text-gray-700 mb-6">
+            <p className="text-sm  mb-6">
               Please check your email and enter the verification code below:
             </p>
             <div className="max-w-sm mx-auto">

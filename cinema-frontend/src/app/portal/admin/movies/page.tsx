@@ -73,7 +73,10 @@ export default function ManageMoviesPage() {
     if (title.length > MAX_TITLE)
       newErrors.title = `Title must be at most ${MAX_TITLE} characters.`;
 
-    if (!castList.trim()) newErrors.castList = "Cast list is required.";
+      if (!director.trim()) newErrors.director = "Director is required.";
+
+
+      if (!castList.trim()) newErrors.castList = "Cast list is required.";
     if (castList.length > MAX_CAST)
       newErrors.castList = `Cast list must be at most ${MAX_CAST} characters.`;
 
@@ -207,14 +210,14 @@ export default function ManageMoviesPage() {
       <div className="mx-auto max-w-3xl space-y-8">
         <div className="flex items-center justify-between">
           <header>
-            <h1 className="text-3xl font-bold text-gray-800">Manage Movies</h1>
-            <p className="text-gray-600">
+            <h1 className="text-3xl font-bold ">Manage Movies</h1>
+            <p >
               Add new titles and manage showtimes, genres, and more.
             </p>
           </header>
           <a
             href="/portal"
-            className="inline-flex items-center gap-2 rounded border border-gray-300 px-4 py-2 font-semibold text-gray-800 hover:bg-gray-50"
+            className="inline-flex items-center gap-2 btn btn-neutral px-4 py-2 font-semibold "
           >
             ← Back to Admin
           </a>
@@ -223,11 +226,8 @@ export default function ManageMoviesPage() {
               <div className="px-6 py-6">
                 <form onSubmit={handleSubmit} className="space-y-5">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700">
-                      Title *
-                    </label>
                     <input
-                      className="mt-1 w-full rounded border p-2"
+                      className="input mt-1 w-full p-2"
                       id="title"
                       value={title}
                       maxLength={MAX_TITLE}
@@ -235,108 +235,98 @@ export default function ManageMoviesPage() {
                         setTitle(e.target.value);
                         setErrors((prev) => ({ ...prev, title: "" }));
                       }}
-                      placeholder="Interstellar"
+                      placeholder="Title"
                     />
                     {errors.title && (
-                      <p className="text-red-600 text-sm mt-1">
+                      <p className="text-error text-sm mt-1">
                         {errors.title}
                       </p>
                     )}
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-gray-700">
-                      Cast List *
-                    </label>
                     <input
                       id={"castList"}
-                      className="mt-1 w-full rounded border p-2"
+                      className="input mt-1 w-full p-2"
                       value={castList}
                       maxLength={MAX_CAST}
                       onChange={(e) => {
                         setCastList(e.target.value);
                         setErrors((prev) => ({ ...prev, castList: "" }));
                       }}
-                      placeholder="Matthew McConaughey, Anne Hathaway"
+                      placeholder="Cast List"
                     />
                     {errors.castList && (
-                      <p className="text-red-600 text-sm mt-1">
+                      <p className="text-error text-sm mt-1">
                         {errors.castList}
                       </p>
                     )}
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-gray-700">
-                      Director *
-                    </label>
                     <input
                       id={"director"}
-                      className="mt-1 w-full rounded border p-2"
+                      className="input mt-1 w-full p-2"
                       value={director}
                       onChange={(e) => {
                         setDirector(e.target.value);
                       }}
-                      placeholder="Christopher Nolan"
+                      placeholder="Director"
                     />
+                      {errors.director && (
+                          <p className="text-error text-sm mt-1">
+                              {errors.director}
+                          </p>
+                      )}
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-gray-700">
-                      Producer *
-                    </label>
                     <input
                       id={"producer"}
-                      className="mt-1 w-full rounded border p-2"
+                      className="input mt-1 w-full p-2"
                       value={producer}
                       maxLength={MAX_PRODUCER}
                       onChange={(e) => {
                         setProducer(e.target.value);
                         setErrors((prev) => ({ ...prev, producer: "" }));
                       }}
-                      placeholder="Christopher Nolan"
+                      placeholder="Producer"
                     />
                     {errors.producer && (
-                      <p className="text-red-600 text-sm mt-1">
+                      <p className="text-error text-sm mt-1">
                         {errors.producer}
                       </p>
                     )}
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-gray-700">
-                      Duration (minutes) *
-                    </label>
                     <input
                         id={"duration"}
                       type="number"
-                      className="mt-1 w-full rounded border p-2"
+                      className="input mt-1 w-full p-2"
                       value={duration ?? ""}
                       onChange={(e) => {
                         const v = e.target.value;
                         setDuration(v === "" ? null : Number(v));
                         setErrors((prev) => ({ ...prev, duration: "" }));
                       }}
-                      placeholder="169"
+                      placeholder="Duration (minutes)"
                     />
                     {errors.duration && (
-                      <p className="text-red-600 text-sm mt-1">
+                      <p className="text-error text-sm mt-1">
                         {errors.duration}
                       </p>
                     )}
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-gray-700">
-                      Review Score (1–5) *
-                    </label>
                     <input
-                        id={"reviewScore"}
+                      id={"reviewScore"}
                       type="number"
                       min="1"
                       max="5"
                       step="0.1"
-                      className="mt-1 w-full rounded border p-2"
+                      className="input mt-1 w-full p-2"
                       value={reviewScore}
                       onChange={(e) => {
                         setReviewScore(e.target.value);
@@ -345,22 +335,18 @@ export default function ManageMoviesPage() {
                           reviewScore: "",
                         }));
                       }}
-                      placeholder="4.7"
+                      placeholder="Review Score"
                     />
                     {errors.reviewScore && (
-                      <p className="text-red-600 text-sm mt-1">
+                      <p className="text-error text-sm mt-1">
                         {errors.reviewScore}
                       </p>
                     )}
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-gray-700">
-                      Rating Code *
-                    </label>
-
                     <select
-                      className="mt-1 w-full rounded border p-2 bg-white"
+                      className="btn btn-neutral mt-1 w-full p-2 text-left"
                       id={"ratingCode"}
                       value={ratingCode}
                       onChange={(e) => {
@@ -386,19 +372,16 @@ export default function ManageMoviesPage() {
                     </select>
 
                     {errors.ratingCode && (
-                      <p className="text-red-600 text-sm mt-1">
+                      <p className="text-error text-sm mt-1">
                         {errors.ratingCode}
                       </p>
                     )}
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-gray-700">
-                      Description *
-                    </label>
                     <textarea
                         id={"description"}
-                      className="mt-1 w-full rounded border p-2 min-h-24"
+                      className="mt-1 w-full input p-2 min-h-24"
                       value={description}
                       maxLength={MAX_DESCRIPTION}
                       onChange={(e) => {
@@ -408,84 +391,76 @@ export default function ManageMoviesPage() {
                           description: "",
                         }));
                       }}
-                      placeholder="A team of explorers travel through a wormhole..."
+                      placeholder="Description"
                     />
                     {errors.description && (
-                      <p className="text-red-600 text-sm mt-1">
+                      <p className="text-error text-sm mt-1">
                         {errors.description}
                       </p>
                     )}
-                    <p className="text-xs text-gray-500 mt-1">
+                    <p className="text-xs mt-1">
                       {description.length}/{MAX_DESCRIPTION} characters
                     </p>
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-gray-700">
-                      Poster URL *
-                    </label>
                     <input
                         id={"poster"}
-                      className="mt-1 w-full rounded border p-2"
+                      className="mt-1 w-full input p-2"
                       value={poster}
                       onChange={(e) => {
                         setPoster(e.target.value);
                         setErrors((prev) => ({ ...prev, poster: "" }));
                       }}
-                      placeholder="https://m.media-amazon.com/images/..."
+                      placeholder="Poster URL"
                     />
                     {errors.poster && (
-                      <p className="text-red-600 text-sm mt-1">
+                      <p className="text-error text-sm mt-1">
                         {errors.poster}
                       </p>
                     )}
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-gray-700">
-                      Trailer URL *
-                    </label>
+
                     <input
                         id={"trailer"}
-                      className="mt-1 w-full rounded border p-2"
+                      className="mt-1 w-full input p-2"
                       value={trailer}
                       onChange={(e) => {
                         setTrailer(e.target.value);
                         setErrors((prev) => ({ ...prev, trailer: "" }));
                       }}
-                      placeholder="https://youtube.com/watch?v=..."
+                      placeholder="Trailer URL"
                     />
                     {errors.trailer && (
-                      <p className="text-red-600 text-sm mt-1">
+                      <p className="text-error text-sm mt-1">
                         {errors.trailer}
                       </p>
                     )}
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-gray-700">
-                      Genres *
-                    </label>
                     <div className="mt-1 flex gap-2">
                       <input
                           id={"genre"}
-                        className="flex-1 rounded border p-2"
+                        className="flex-1 input p-2"
                         value={genreInput}
                         onChange={(e) => setGenreInput(e.target.value)}
-                        placeholder="Action"
+                        placeholder="Add a genre"
                       />
                       <button
                         type="button"
                         id={"addGenre"}
                         onClick={addGenre}
-                        className="rounded bg-blue-600 px-4 py-2 font-semibold text-white hover:bg-blue-500"
+                        className="btn btn-neutral"
                       >
                         Add
                       </button>
                     </div>
 
                     {errors.genres && (
-                      <p className="text-red-600 text-sm mt-1">
+                      <p className="text-error text-sm mt-1">
                         {errors.genres}
                       </p>
                     )}
@@ -494,13 +469,13 @@ export default function ManageMoviesPage() {
                       {genres.map((g) => (
                         <span
                           key={g}
-                          className="flex items-center gap-2 rounded-full bg-gray-200 px-3 py-1"
+                          className="flex items-center gap-2 badge px-3 py-1"
                         >
                           {g}
                           <button
                             type="button"
                             onClick={() => removeGenre(g)}
-                            className="text-sm font-bold text-red-500 hover:text-red-700"
+                            className="text-sm font-bold text-error-content"
                           >
                             ×
                           </button>
@@ -519,10 +494,10 @@ export default function ManageMoviesPage() {
                     type="submit"
                     id={"submitButton"}
                     disabled={isSubmitting}
-                    className={`mt-2 w-full rounded py-3 font-semibold text-white ${
+                    className={`mt-2 w-full btn py-3 font-semibold btn-neutral  ${
                       isSubmitting
                         ? "bg-blue-300 cursor-not-allowed"
-                        : "bg-blue-600 hover:bg-blue-500"
+                        : ""
                     }`}
                   >
                     {isSubmitting ? "Saving..." : "Save Movie"}

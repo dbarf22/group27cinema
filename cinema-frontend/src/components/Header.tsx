@@ -15,7 +15,7 @@ export default function Header() {
     };
 
     return (
-        <div className={"navbar shadow-sm"}>
+        <div className={"navbar shadow-sm bg-base-100"}>
             <div className={"navbar-start"}>
                 <a onClick={() => go('/')}
                    className={"btn btn-ghost text-xl"}>Cinema E-Booking System</a>
@@ -29,21 +29,21 @@ export default function Header() {
                         <div>Welcome, {currentUser.username}!</div>
                         <button
                             onClick={() => go('/profile/edit')}
-                            className="btn"
+                            className="btn btn-neutral"
                             data-testid={"editProfile"}
                         >
                             Edit Profile
                         </button>
                         <button
                             onClick={() => go('/portal')}
-                            className="btn"
+                            className="btn btn-neutral"
                             id={"portal"}
                         >
                             Portal
                         </button>
                         <button
                             onClick={handleLogout}
-                            className="btn"
+                            className="btn btn-neutral"
                             id={"logout"}
                         >
                             Logout

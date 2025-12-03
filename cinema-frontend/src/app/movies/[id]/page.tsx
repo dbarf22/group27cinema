@@ -40,27 +40,37 @@ export default async function MovieDetails(
     return (
         <main className="max-w-4xl mx-auto px-6 py-10 space-y-8">
             {/* MOVIE POSTER */}
-            <div className="flex justify-center">
-                <div className="relative w-64 h-96 rounded-xl overflow-hidden shadow-lg">
-                    <Image
-                        src={movie.poster || "/placeholder.png"}
-                        alt={`${movie.title} poster`}
-                        fill
-                        className="object-cover"
-                    />
+            <div className={"flex justify-center"}>
+                <div className={"hover-3d "}>
+                    <figure className="relative w-64 h-96 rounded-xl overflow-hidden shadow-lg">
+                        <Image
+                            src={movie.poster || "/placeholder.png"}
+                            alt={`${movie.title} poster`}
+                            fill
+                            className="object-cover"
+                        />
+                    </figure>
+                    <div></div>
+                    <div></div>
+                    <div></div>
+                    <div></div>
+                    <div></div>
+                    <div></div>
+                    <div></div>
+                    <div></div>
                 </div>
             </div>
 
             {/* TITLE */}
             <div className="text-center space-y-2">
                 <h1 className="text-4xl font-bold">{movie.title}</h1>
-                <p className="text-gray-700">
+                <p>
                     {movie.genre} · Rating: {movie.rating}/5 · MPAA Rating: {movie.ratingCode.ratingCode}
                 </p>
-                <p className={"text-gray-700"}>
+                <p>
                     Cast: {movie.castList}
                 </p>
-                <p className={"text-gray-700"}>
+                <p>
                     Director: {movie.director} · Producer: {movie.producer}
                 </p>
 
@@ -82,7 +92,7 @@ export default async function MovieDetails(
                             <Link
                                 key={i}
                                 href={`/booking/${movie.id}?showtime=${encodeURIComponent(time)}`}
-                                className="px-4 py-2 rounded-full text-xs font-bold text-blue-700 bg-blue-50 border border-blue-200 hover:bg-blue-100 transition"
+                                className="px-4 py-2 rounded-full text-xs font-bold btn bg-base-100"
                             >
                                 {new Date(time).toLocaleTimeString([], {
                                     hour: "2-digit",
@@ -110,7 +120,7 @@ export default async function MovieDetails(
                     </div>
                 </div>
             ) : (
-                <p className="text-sm text-gray-500">No trailer available</p>
+                <p className="text-sm ">No trailer available</p>
             )}
         </main>
     );

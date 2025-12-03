@@ -6,13 +6,13 @@ import Link from "next/link";
 export default function SignupPage() {
   return (
     <div className="mx-auto mt-14 px-4 max-w-md">
-      <div className="rounded-2xl border border-gray-200 bg-white shadow-sm p-8">
+      <div className="card bg-base-100 p-8">
         <h1 className="text-3xl text-center tracking-wide">Verify Your Account</h1>
-        <p className="mt-1 text-center text-sm text-gray-600">
+        <p className="mt-1 text-center text-sm ">
           Check your email for a verification link.
         </p>
-          <p className="mt-1 text-center text-sm text-gray-600">
-              <Link href="/" className="underline text-blue-600 hover:text-blue-800">
+          <p className="mt-1 text-center text-sm ">
+              <Link href="/" className="underline text-info">
                 Go home
               </Link>
           </p>

@@ -11,7 +11,10 @@ export default async function HomePage() {
     const nowPlaying = allMovies.filter((m) => m.showtimes?.length > 0);
     const comingSoon = allMovies.filter((m) => !m.showtimes?.length);
 
+
+
     return (
+
         <HomePageClient nowPlaying={nowPlaying} comingSoon={comingSoon} />
     );
 }

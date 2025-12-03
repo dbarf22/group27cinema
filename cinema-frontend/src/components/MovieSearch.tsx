@@ -53,7 +53,7 @@ export default function MovieSearch() {
         <select
           value={mode}
           onChange={(e) => setMode(e.target.value as "title" | "genre")}
-          className="border rounded px-2 py-2"
+          className="btn px-2 py-2 bg-base-100"
         >
           <option value="title">Title</option>
           <option value="genre">Genre</option>
@@ -63,26 +63,26 @@ export default function MovieSearch() {
           value={q}
           onChange={(e) => setQ(e.target.value)}
           placeholder={`Search by ${mode}…`}
-          className="flex-1 border rounded px-3 py-2"
+          className="flex-1 input px-3 py-2"
         />
 
         <button
           type="submit"
-          className="px-4 py-2 rounded bg-blue-600 text-white"
+          className="px-4 py-2 btn btn-neutral"
         >
           Search
         </button>
       </form>
 
       {loading && <p>Loading…</p>}
-      {error && <p className="text-red-600">Error: {error}</p>}
+      {error && <p className="text-error">Error: {error}</p>}
       {!loading && !error && items.length === 0 && <p>No results.</p>}
 
       <ul className="space-y-2">
         {items.map((m, i) => {
           const key = (m.id ?? m._id ?? i) as React.Key;
           return (
-          <li key={key} className="border rounded p-3 hover:shadow transition">
+          <li key={key} className="card bg-base-100 border-base-300 border p-3 shadow-sm">
             <Link href={`/movies/${m.id ?? m._id}`} className="block space-y-1">
              <div className="font-semibold text-balck-700 hover:underline">
               {m.title}

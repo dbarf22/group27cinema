@@ -16,7 +16,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="en" data-theme={"cupcake"}>
 
-      <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
+      <body className={`${geistSans.variable} ${geistMono.variable} antialiased bg-base-200 min-h-screen` }>
       <SessionProvider>
           <Header/>
           <main className="mx-auto max-w-screen-xl px-4 py-8">

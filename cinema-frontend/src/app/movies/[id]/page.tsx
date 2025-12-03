@@ -4,9 +4,7 @@ import {notFound} from "next/navigation";
 import {Movie} from "@/types/movie";
 
 async function fetchMovie(id: string): Promise<Movie | null> {
-    const res = await fetch(`http://localhost:8080/api/movies/${id}`, {
-        next: {revalidate: 60},
-    });
+    const res = await fetch(`http://localhost:8080/api/movies/${id}`)
     if (!res.ok) return null;
     return res.json();
 }

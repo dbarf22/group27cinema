@@ -1,5 +1,6 @@
 package com.group27.cinema_backend.model;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.OnDelete;
@@ -18,6 +19,7 @@ public class Booking {
     @Column(name = "booking_id", nullable = false)
     private Integer id;
 
+    @JsonBackReference
     @ManyToOne(fetch = FetchType.LAZY)
     @OnDelete(action = OnDeleteAction.CASCADE)
     @JoinColumn(name = "user_id")

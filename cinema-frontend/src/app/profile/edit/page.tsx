@@ -4,7 +4,7 @@ import 'react-phone-number-input/style.css'
 import {useState, useEffect, FormEvent} from 'react';
 import {useRouter} from 'next/navigation';
 import {useSession} from '@/app/session/SessionContext';
-import { isPossiblePhoneNumber } from 'react-phone-number-input'
+import {isPossiblePhoneNumber} from 'react-phone-number-input'
 
 
 import PhoneInput from 'react-phone-number-input';
@@ -151,7 +151,7 @@ export default function EditProfilePage() {
         setError('');
         setOk('');
 
-         try {
+        try {
             if (!isPossiblePhoneNumber(phoneNumber)) {
                 throw new Error('Phone number is invalid.');
             }
@@ -199,7 +199,7 @@ export default function EditProfilePage() {
                 return;
             }
         }
-         try {
+        try {
             if (!isPossiblePhoneNumber(phoneNumber)) {
                 throw new Error('Phone number is invalid.');
             }
@@ -277,7 +277,120 @@ export default function EditProfilePage() {
 
     return (
         <div className="mx-auto max-w-3xl p-6">
-            <h1 className="text-2xl font-semibold text-center mb-4">Edit Profile</h1>
+            <div className="text-2xl font-semibold text-center mb-4">Edit Profile</div>
+
+            <div className={"collapse collapse-open bg-base-100 border-base-300 border mb-4 shadow-sm"}>
+                <input type={"checkbox"}/>
+                <div className={"collapse-title font-semibold"}>Profile</div>
+                <div className={"collapse-content text-sm"}>
+                    <form onSubmit={handleProfile} className="space-y-4 ">
+                        <div className="grid gap-3 sm:grid-cols-2">
+                            <input
+                                id="username"
+                                placeholder="Username"
+                                value={username}
+                                onChange={e => setUsername(e.target.value)}
+                                required
+                                className="input"
+                            />
+                            <input
+                                id="email"
+                                placeholder="Email"
+                                type="email"
+                                value={email}
+                                disabled
+                                className="input"
+                            />
+                            <input
+                                id="firstName"
+                                placeholder="First Name"
+                                value={first_name}
+                                onChange={e => setFirst(e.target.value)}
+                                required
+                                className="input"
+                            />
+                            <input
+                                id="lastName"
+                                placeholder="Last Name"
+                                value={last_name}
+                                onChange={e => setLast(e.target.value)}
+                                required
+                                className="input"
+                            />
+                            <div>
+                                <PhoneInput
+                                    id="phoneNumber"
+                                    name="phoneNumber"
+                                    value={phoneNumber}
+                                    onChange={(value: E164Number) => setPhone(value)}
+                                    defaultCountry="US"
+                                    className="input"
+                                />
+                            </div>
+                        </div>
+                        <label className="flex items-center gap-2 text-sm">
+                            <input
+                                type="checkbox"
+                                checked={wantsPromotions}
+                                onChange={e => setPromo(e.target.checked)}
+                                className="checkbox"
+                            />
+                            RECEIVE PROMOTIONS?
+                        </label>
+                        <button type="submit" disabled={busyProfile}
+                                className="w-full btn btn-neutral"
+                                id={"submitProfileChange"}>
+                            {busyProfile ? 'Updating…' : 'Update Profile'}
+                        </button>
+                    </form>
+                </div>
+            </div>
+
+            <div className={"collapse collapse-arrow bg-base-100 border-base-300 border mb-4 shadow-sm"}>
+                <input type={"checkbox"}/>
+                <div className={"collapse-title font-semibold"}>Address Information</div>
+                <div className={"collapse-content text-sm"}>
+                    <form onSubmit={handleAddress} className="space-y-3">
+                        <input
+                            id="street"
+                            placeholder="123 Example Rd"
+                            value={street}
+                            onChange={e => setStreet(e.target.value)}
+                            className="input w-full"
+                        />
+                        <div className="grid gap-3 sm:grid-cols-3">
+                            <input
+                                id="city"
+                                placeholder="Athens"
+                                value={city}
+                                onChange={e => setCity(e.target.value)}
+                                className="input"
+                            />
+                            <input
+                                id="state"
+                                placeholder="GA"
+                                value={state}
+                                onChange={e => setState(e.target.value)}
+                                maxLength={2}
+                                className="input"
+                            />
+                            <input
+                                id="zip"
+                                placeholder="30606"
+                                value={zip}
+                                onChange={e => setZip(e.target.value)}
+                                className="input"
+                            />
+                        </div>
+                        <button type="submit" disabled={busyAddress}
+                                className="w-full btn btn-neutral"
+                                id={"submitAddressChange"}>
+                            {busyAddress ? 'Updating…' : 'Update Address'}
+                        </button>
+                    </form>
+                </div>
+            </div>
+
 
             {msg.error ? (
                 <div className="mb-4 rounded border border-red-200 bg-red-50 p-3 text-sm text-red-700"
@@ -289,141 +402,21 @@ export default function EditProfilePage() {
                     id={"successMessage"}>{msg.ok}</div>
             ) : null}
 
-            <form onSubmit={handleProfile} className="space-y-4 border-b pb-6 mb-6">
-                <h2 className="text-lg font-medium">Profile</h2>
-                <div className="grid gap-3 sm:grid-cols-2">
-                    <input
-                        id="username"
-                        placeholder="Username"
-                        value={username}
-                        onChange={e => setUsername(e.target.value)}
-                        required
-                        className="rounded border px-3 py-2"
-                    />
-                    <input
-                        id="email"
-                        placeholder="Email"
-                        type="email"
-                        value={email}
-                        disabled
-                        className="rounded border px-3 py-2 bg-gray-100"
-                    />
-                    <input
-                        id="firstName"
-                        placeholder="First Name"
-                        value={first_name}
-                        onChange={e => setFirst(e.target.value)}
-                        required
-                        className="rounded border px-3 py-2"
-                    />
-                    <input
-                        id="lastName"
-                        placeholder="Last Name"
-                        value={last_name}
-                        onChange={e => setLast(e.target.value)}
-                        required
-                        className="rounded border px-3 py-2"
-                    />
-                    <div>
-                        <PhoneInput
-                            id="phoneNumber"
-                            name="phoneNumber"
-                            value={phoneNumber}
-                            onChange={(value: E164Number) => setPhone(value)}
-                            defaultCountry="US"
-                            className="rounded border px-3 py-2"
-                        />
-                    </div>
-                </div>
-                <label className="flex items-center gap-2 text-sm">
-                    <input
-                        type="checkbox"
-                        checked={wantsPromotions}
-                        onChange={e => setPromo(e.target.checked)}
-                        className="h-4 w-4"
-                    />
-                    RECEIVE PROMOTIONS?
-                </label>
-                <button type="submit" disabled={busyProfile}
-                        className="w-full rounded bg-black px-4 py-2 text-white disabled:opacity-50"
-                id={"submitProfileChange"}>
-                    {busyProfile ? 'Updating…' : 'Update Profile'}
-                </button>
-            </form>
 
-            <div className="border-b pb-6 mb-6">
-                <button
-                    type="button"
-                    onClick={() => setShowAddress(s => !s)}
-                    className="mb-4 flex w-full items-center justify-between text-left text-lg font-medium"
-                    data-testid={"expandHomeAddress"}
-                >
-                    Home Address <span>{showAddress ? '−' : '+'}</span>
-                </button>
-
-                {showAddress && (
-                    <form onSubmit={handleAddress} className="space-y-3">
-                        <input
-                            id="street"
-                            placeholder="123 Example Rd"
-                            value={street}
-                            onChange={e => setStreet(e.target.value)}
-                            className="w-full rounded border px-3 py-2"
-                        />
-                        <div className="grid gap-3 sm:grid-cols-3">
-                            <input
-                                id="city"
-                                placeholder="Athens"
-                                value={city}
-                                onChange={e => setCity(e.target.value)}
-                                className="rounded border px-3 py-2"
-                            />
-                            <input
-                                id="state"
-                                placeholder="GA"
-                                value={state}
-                                onChange={e => setState(e.target.value)}
-                                maxLength={2}
-                                className="rounded border px-3 py-2"
-                            />
-                            <input
-                                id="zip"
-                                placeholder="30606"
-                                value={zip}
-                                onChange={e => setZip(e.target.value)}
-                                className="rounded border px-3 py-2"
-                            />
-                        </div>
-                        <button type="submit" disabled={busyAddress}
-                                className="w-full rounded bg-black px-4 py-2 text-white disabled:opacity-50"
-                        id={"submitAddressChange"}>
-                            {busyAddress ? 'Updating…' : 'Update Address'}
-                        </button>
-                    </form>
-                )}
-            </div>
-
-            <div className="border-b pb-6 mb-6">
-                <button
-                    type="button"
-                    onClick={() => setShowPayments(s => !s)}
-                    className="mb-4 flex w-full items-center justify-between text-left text-lg font-medium"
-                    data-testid={"expandPaymentMethods"}
-                >
-                    Payment Methods <span>{showPayments ? '−' : '+'}</span>
-                </button>
-
-                {showPayments && (
+            <div className={"collapse collapse-arrow bg-base-100 border-base-300 border mb-4 shadow-sm"}>
+                <input type={"checkbox"}/>
+                <div className={"collapse-title font-semibold"}>Payment Information</div>
+                <div className={"collapse-content text-sm"}>
                     <form onSubmit={handlePayments} className="space-y-4">
                         {cards.length === 0 ? (
                             <p className="text-sm text-gray-600">No cards added.</p>
                         ) : (
                             cards.map((c, i) => (
-                                <div key={i} className="rounded border p-3">
+                                <div key={i} className="card bg-base-100 shadow-sm p-5">
                                     <div className="mb-2 flex items-center justify-between">
                                         <div className="font-medium">Card {i + 1}</div>
                                         <button type="button" onClick={() => removeCard(i)}
-                                                className="text-sm text-red-600">
+                                                className="btn btn-sm btn text-error-content">
                                             Remove
                                         </button>
                                     </div>
@@ -432,7 +425,7 @@ export default function EditProfilePage() {
                                             value={c.cardType}
                                             onChange={e => updateCard(i, 'cardType', e.target.value)}
                                             required
-                                            className="rounded border px-3 py-2 bg-white"
+                                            className="btn px-3 py-2 text-left"
                                         >
                                             <option value="">Type</option>
                                             <option value="Visa">Visa</option>
@@ -447,7 +440,7 @@ export default function EditProfilePage() {
                                             onChange={e => updateCard(i, 'cardNumber', e.target.value)}
                                             required
                                             maxLength={19}
-                                            className="rounded border px-3 py-2"
+                                            className="input"
                                         />
                                         <input
                                             placeholder="00"
@@ -456,7 +449,7 @@ export default function EditProfilePage() {
                                             onChange={e => updateCard(i, 'expMonth', e.target.value)}
                                             required
                                             maxLength={2}
-                                            className="rounded border px-3 py-2"
+                                            className="input"
                                         />
                                         <input
                                             placeholder="0000"
@@ -465,21 +458,21 @@ export default function EditProfilePage() {
                                             onChange={e => updateCard(i, 'expYear', e.target.value)}
                                             required
                                             maxLength={4}
-                                            className="rounded border px-3 py-2"
+                                            className="input"
                                         />
                                         <input
                                             placeholder="123 Example Rd"
                                             value={c.billingStreet}
                                             id={"cardBillingStreet"}
                                             onChange={e => updateCard(i, 'billingStreet', e.target.value)}
-                                            className="sm:col-span-2 rounded border px-3 py-2"
+                                            className="sm:col-span-2 input w-full"
                                         />
                                         <input
                                             placeholder="Athens"
                                             value={c.billingCity}
                                             id={"cardBillingCity"}
                                             onChange={e => updateCard(i, 'billingCity', e.target.value)}
-                                            className="rounded border px-3 py-2"
+                                            className="input"
                                         />
                                         <input
                                             placeholder="GA"
@@ -487,14 +480,14 @@ export default function EditProfilePage() {
                                             id={"cardBillingState"}
                                             onChange={e => updateCard(i, 'billingState', e.target.value)}
                                             maxLength={2}
-                                            className="rounded border px-3 py-2"
+                                            className="input"
                                         />
                                         <input
                                             placeholder="30606"
                                             value={c.billingZip}
                                             id={"cardBillingZip"}
                                             onChange={e => updateCard(i, 'billingZip', e.target.value)}
-                                            className="rounded border px-3 py-2"
+                                            className="input"
                                         />
                                     </div>
                                 </div>
@@ -506,7 +499,7 @@ export default function EditProfilePage() {
                                 type="button"
                                 onClick={addCard}
                                 disabled={cards.length >= maxCards}
-                                className="text-sm text-blue-600 disabled:opacity-50"
+                                className="btn btn-sm"
                             >
                                 + Add Card ({cards.length}/{maxCards})
                             </button>
@@ -516,25 +509,18 @@ export default function EditProfilePage() {
                             <button type="submit"
                                     disabled={busyPayments}
                                     id={"submitPaymentChange"}
-                                    className="w-full rounded bg-black px-4 py-2 text-white disabled:opacity-50">
+                                    className="w-full btn btn-neutral">
                                 {busyPayments ? 'Updating…' : 'Update Payment Methods'}
                             </button>
                         )}
                     </form>
-                )}
+                </div>
             </div>
 
-            <div>
-                <button
-                    type="button"
-                    onClick={() => setShowPassword(s => !s)}
-                    className="mb-4 flex w-full items-center justify-between text-left text-lg font-medium"
-                    data-testid={"expandChangePassword"}
-                >
-                    Change Password <span>{showPassword ? '−' : '+'}</span>
-                </button>
-
-                {showPassword && (
+            <div className={"collapse collapse-arrow bg-base-100 border-base-300 border mb-4 shadow-sm"}>
+                <input type={"checkbox"}/>
+                <div className={"collapse-title font-semibold"}>Change Password</div>
+                <div className={"collapse-content text-sm"}>
                     <form onSubmit={handlePassword} className="space-y-3">
                         <input
                             id="currentPassword"
@@ -542,7 +528,7 @@ export default function EditProfilePage() {
                             placeholder="Current password"
                             value={currentPassword}
                             onChange={e => setCurPw(e.target.value)}
-                            className="w-full rounded border px-3 py-2"
+                            className="w-full input"
                         />
                         <input
                             id="newPassword"
@@ -550,7 +536,7 @@ export default function EditProfilePage() {
                             placeholder="New password"
                             value={newPassword}
                             onChange={e => setNewPw(e.target.value)}
-                            className="w-full rounded border px-3 py-2"
+                            className="w-full input"
                         />
                         <input
                             id="confirmPassword"
@@ -558,18 +544,19 @@ export default function EditProfilePage() {
                             placeholder="Confirm new password"
                             value={confirmPassword}
                             onChange={e => setConfirmPw(e.target.value)}
-                            className="w-full rounded border px-3 py-2"
+                            className="w-full input"
                         />
                         <button
                             type="submit"
                             disabled={busyPassword || !currentPassword || !newPassword}
-                            className="w-full rounded bg-black px-4 py-2 text-white disabled:opacity-50"
+                            className="w-full btn btn-neutral"
                         >
                             {busyPassword ? 'Changing…' : 'Change Password'}
                         </button>
                     </form>
-                )}
+                </div>
             </div>
+
         </div>
     );
 }

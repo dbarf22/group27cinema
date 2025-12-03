@@ -4,8 +4,6 @@ import { useState } from "react";
 import { Movie } from "@/types/movie";
 import MovieSection from "@/components/MovieSection";
 import MovieSearch from "@/components/MovieSearch";
-import DatePicker from "@/components/DatePicker";
-
 type HomePageClientProps = {
   nowPlaying: Movie[];
   comingSoon: Movie[];
@@ -19,19 +17,12 @@ export default function HomePageClient({
 
   return (
     <main className="mx-auto max-w-6xl px-4 py-8 space-y-10">
-      {/* Calendar / date picker at the top */}
-      <div className="flex justify-center">
-        <DatePicker
-          selectedTime={selectedTime}
-          setSelectedTime={setSelectedTime}
-        />
-      </div>
-
       {/* Sections that depend on the selected date */}
       <MovieSection
-        title="Now Playing"
+        title="Now Playing on: "
         movies={nowPlaying}
         selectedTime={selectedTime}
+        setSelectedTime={setSelectedTime}
       />
       <MovieSection
         title="Coming Soon"

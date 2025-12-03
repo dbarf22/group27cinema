@@ -29,21 +29,21 @@ export default function Header() {
                         <div>Welcome, {currentUser.username}!</div>
                         <button
                             onClick={() => go('/profile/edit')}
-                            className="btn"
+                            className="btn btn-neutral"
                             data-testid={"editProfile"}
                         >
                             Edit Profile
                         </button>
                         <button
                             onClick={() => go('/portal')}
-                            className="btn"
+                            className="btn btn-neutral"
                             id={"portal"}
                         >
                             Portal
                         </button>
                         <button
                             onClick={handleLogout}
-                            className="btn"
+                            className="btn btn-neutral"
                             id={"logout"}
                         >
                             Logout

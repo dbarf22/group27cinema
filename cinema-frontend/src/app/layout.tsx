@@ -14,9 +14,9 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" data-theme={"cupcake"}>
+    <html lang="en" data-theme={"caramellatte"}>
 
-      <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
+      <body className={`${geistSans.variable} ${geistMono.variable} antialiased bg-base-100`}>
       <SessionProvider>
           <Header/>
           <main className="mx-auto max-w-screen-xl px-4 py-8">

@@ -10,6 +10,7 @@
     "start:all": "concurrently \"npm run backend\" \"npm run dev\""
   },
   "dependencies": {
+    "cally": "^0.8.0",
     "date-fns": "^4.1.0",
     "next": "15.5.4",
     "react": "19.1.0",

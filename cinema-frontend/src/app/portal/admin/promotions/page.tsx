@@ -47,25 +47,13 @@ export default function ManagePromotionsPage() {
     const validateCreate = () => {
         const next: CreateErrors = {};
 
-        if (!promo.code.trim()) next.code = "Promotion code is required.";
-
-        if (!promo.discount.trim()) {
-            next.discount = "Discount is required.";
-        } else {
-            const d = Number(promo.discount);
-            if (Number.isNaN(d) || d < 0 || d > 100) {
-                next.discount = "Discount must be between 0 and 100.";
-            }
-        }
-
-        if (!promo.start.trim()) next.start = "Start date is required.";
-        if (!promo.end.trim()) next.end = "End date is required.";
-        if (promo.start && promo.end && new Date(promo.start) > new Date(promo.end)) {
-            next.end = "End date must be on or after start date.";
-        }
-
-        if (!promo.description.trim())
-            next.description = "Description is required.";
+        if (!promo.code.trim()) next.code = "Code required.";
+        if (!promo.discount.trim()) next.discount = "Discount required.";
+        if (!promo.start) next.start = "Start date required.";
+        if (!promo.end) next.end = "End date required.";
+        if (new Date(promo.start) > new Date(promo.end))
+            next.end = "End date must be after start date.";
+        if (!promo.description.trim()) next.description = "Description required.";
 
         setErrs(next);
         return Object.keys(next).length === 0;
@@ -167,7 +155,6 @@ export default function ManagePromotionsPage() {
                                         code: e.target.value.toUpperCase(),
                                     }))
                                 }
-                                onBlur={validateCreate}
                                 placeholder="Promo Code"
                             />
                             {errs.code && (
@@ -187,7 +174,6 @@ export default function ManagePromotionsPage() {
                                 onChange={(e) =>
                                     setPromo((p) => ({...p, discount: e.target.value}))
                                 }
-                                onBlur={validateCreate}
                                 placeholder="Discount %"
                             />
                             {errs.discount && (
@@ -211,7 +197,6 @@ export default function ManagePromotionsPage() {
                                     onChange={(e) =>
                                         setPromo((p) => ({...p, start: e.target.value}))
                                     }
-                                    onBlur={validateCreate}
                                 />
                                 {errs.start && (
                                     <p className="mt-2 text-sm text-error">{errs.start}</p>
@@ -230,7 +215,6 @@ export default function ManagePromotionsPage() {
                                     onChange={(e) =>
                                         setPromo((p) => ({...p, end: e.target.value}))
                                     }
-                                    onBlur={validateCreate}
                                 />
                                 {errs.end && (
                                     <p className="mt-2 text-sm text-error">{errs.end}</p>
@@ -247,7 +231,6 @@ export default function ManagePromotionsPage() {
                         onChange={(e) =>
                             setPromo((p) => ({...p, description: e.target.value}))
                         }
-                        onBlur={validateCreate}
                         placeholder="Promo description"
                     />
                             {errs.description && (

@@ -10,36 +10,6 @@ public class CheckoutRequest {
     // which seats (by seat_id) are chosen
     private List<Integer> seatIds;
 
-    private int cardID;
-
-    private int userID;
-
-    private int promoID;
-
-    public int getPromoID() {
-        return promoID;
-    }
-
-    public void setPromoID() {
-        this.promoID = promoID;
-    }
-
-    public int getCardID() {
-        return cardID;
-    }
-
-    public void setCardID(int cardID) {
-        this.cardID = cardID;
-    }
-
-    public int getUserID() {
-        return userID;
-    }
-
-    public void setUserID(int userID) {
-        this.userID = userID;
-    }
-
     public Integer getScreeningId() {
         return screeningId;
     }

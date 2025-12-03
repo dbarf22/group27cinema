@@ -3,6 +3,7 @@ package com.group27.cinema_backend.model;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 
@@ -65,6 +66,7 @@ public class Card {
 
     @OneToMany
     @JoinColumn(name = "card_id")
+    @JsonManagedReference
     private Set<Booking> bookings = new LinkedHashSet<>();
 
     @Column(name = "last_four")

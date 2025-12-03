@@ -28,6 +28,7 @@ public class User {
     private Instant tokenCreatedAt;
 
     @OneToMany(mappedBy = "user")
+    @JsonManagedReference
     private Set<Booking> bookings = new LinkedHashSet<>();
 
     public String getUserKey() {

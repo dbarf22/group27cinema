@@ -2,6 +2,7 @@ package com.group27.cinema_backend.model;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.OnDelete;
@@ -41,7 +42,7 @@ public class Showtime {
     @Column(name = "created_at")
     private Instant createdAt;
 
-    @JsonBackReference
+    @JsonManagedReference
     @OneToMany(mappedBy = "screening")
     private Set<Booking> bookings = new LinkedHashSet<>();
 

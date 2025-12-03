@@ -18,6 +18,7 @@ public class UserProfileDto {
     private String zipCode;
     private List<Card> cards;
     private String userKey;
+    private int id;
 
 
     public UserProfileDto(User user) {
@@ -33,10 +34,16 @@ public class UserProfileDto {
         this.zipCode = user.getZipCode();
         this.cards = user.getCards();
         this.userKey = user.getUserKey();
+        this.id = user.getId();
+
     }
 
     public String getEmail() {
         return email;
+    }
+
+    public int getId() {
+        return id;
     }
 
     public String getUserKey() {return userKey;}

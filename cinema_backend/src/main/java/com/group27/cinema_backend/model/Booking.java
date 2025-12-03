@@ -1,6 +1,8 @@
 package com.group27.cinema_backend.model;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.OnDelete;
@@ -28,11 +30,13 @@ public class Booking {
     @ManyToOne(fetch = FetchType.LAZY)
     @OnDelete(action = OnDeleteAction.CASCADE)
     @JoinColumn(name = "screening_id")
+    @JsonBackReference
     private Showtime screening;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @OnDelete(action = OnDeleteAction.SET_NULL)
     @JoinColumn(name = "card_id")
+    @JsonBackReference
     private Card card;
 
     @Column(name = "number_of_tickets")
@@ -52,6 +56,7 @@ public class Booking {
 
     @OneToMany
     @JoinColumn(name = "booking_id")
+    @JsonIgnore
     private Set<Ticket> tickets = new LinkedHashSet<>();
 
     public Integer getId() {

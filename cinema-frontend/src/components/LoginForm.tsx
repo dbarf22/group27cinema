@@ -47,7 +47,7 @@ export default function LoginForm() {
     }
 
     return (
-        <div className="card card-border card-xl">
+        <div className="card bg-base-100 card-border card-xl">
             <div className="card-body">
                 <h2 className="card-title justify-center text-center">Log In</h2>
                 <p className={"text-sm justify-center text-center"}>Enter your credentials to manage your bookings</p>
@@ -114,7 +114,7 @@ export default function LoginForm() {
                         </label>
                     </div>
 
-                    <div className="flex items-center justify-between text-sm text-gray-700">
+                    <div className="flex items-center justify-between text-sm ">
                         <label className="flex items-center gap-2">
                             <input
                                 id="rememberMe"

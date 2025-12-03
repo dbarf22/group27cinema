@@ -92,7 +92,7 @@ export default async function MovieDetails(
                             <Link
                                 key={i}
                                 href={`/booking/${movie.id}?showtime=${encodeURIComponent(time)}`}
-                                className="px-4 py-2 rounded-full text-xs font-bold btn"
+                                className="px-4 py-2 rounded-full text-xs font-bold btn bg-base-100"
                             >
                                 {new Date(time).toLocaleTimeString([], {
                                     hour: "2-digit",

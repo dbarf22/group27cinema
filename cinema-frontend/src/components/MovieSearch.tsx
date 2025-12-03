@@ -53,7 +53,7 @@ export default function MovieSearch() {
         <select
           value={mode}
           onChange={(e) => setMode(e.target.value as "title" | "genre")}
-          className="btn px-2 py-2"
+          className="btn px-2 py-2 bg-base-100"
         >
           <option value="title">Title</option>
           <option value="genre">Genre</option>
@@ -82,7 +82,7 @@ export default function MovieSearch() {
         {items.map((m, i) => {
           const key = (m.id ?? m._id ?? i) as React.Key;
           return (
-          <li key={key} className="card border-base-300 border p-3 shadow-sm">
+          <li key={key} className="card bg-base-100 border-base-300 border p-3 shadow-sm">
             <Link href={`/movies/${m.id ?? m._id}`} className="block space-y-1">
              <div className="font-semibold text-balck-700 hover:underline">
               {m.title}

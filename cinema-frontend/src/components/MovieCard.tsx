@@ -33,7 +33,7 @@ export default function MovieCard({ movie, selectedTime }: MovieCardProps) {
 
   return (
       <div>
-          <div className="card card-border overflow-hidden ">
+          <div className="card bg-base-100 card-border overflow-hidden ">
               {/* Poster + Title */}
               <Link href={`/movies/${movie.id}`} className="group">
                   <figure className={"aspect-2/3"}>

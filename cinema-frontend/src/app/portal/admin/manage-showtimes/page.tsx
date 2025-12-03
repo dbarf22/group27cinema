@@ -239,7 +239,7 @@ export default function ManageShowtimesPage() {
           </div>
           <a
             href="/portal"
-            className="inline-flex items-center gap-2  px-4 py-2 font-semibold btn"
+            className="inline-flex items-center gap-2  px-4 py-2 font-semibold btn btn-neutral"
           >
             ← Back to Admin
           </a>
@@ -257,7 +257,7 @@ export default function ManageShowtimesPage() {
           </div>
         )}
 
-        <section className="collapse collapse-open border border-base-300 p-6 shadow-sm">
+        <section className="collapse collapse-open bg-base-100 border border-base-300 p-6 shadow-sm">
           <h2 className="text-lg font-semibold ">Add Showtime</h2>
           <p className="text-sm  mb-4">
             Pick a movie, showroom, and date/time, then add the showtime.
@@ -269,7 +269,7 @@ export default function ManageShowtimesPage() {
                 Movie
               </label>
               <select
-                className="mt-1 w-full  p-2 btn text-left"
+                className="mt-1 w-full p-2 btn btn-neutral text-left"
                 value={selectedMovieId ?? ""}
                 onChange={(e) => handleMovieSelect(e.target.value)}
               >
@@ -287,7 +287,7 @@ export default function ManageShowtimesPage() {
                 Showroom
               </label>
               <select
-                className="mt-1 w-full p-2 btn text-left"
+                className="mt-1 w-full p-2 btn btn-neutral text-left"
                 value={selectedShowroomId ?? ""}
                 onChange={(e) =>
                   setSelectedShowroomId(
@@ -311,7 +311,7 @@ export default function ManageShowtimesPage() {
               </label>
               <input
                 type="datetime-local"
-                className="mt-1 w-full btn p-2 text-left"
+                className="mt-1 w-full btn btn-neutral p-2 text-left"
                 value={when}
                 onChange={(e) => setWhen(e.target.value)}
                 disabled={!selectedMovieId}
@@ -327,7 +327,7 @@ export default function ManageShowtimesPage() {
           </button>
         </section>
 
-        <section className="collapse collapse-open border border-base-300 p-6 shadow-sm">
+        <section className="collapse collapse-open bg-base-100 border border-base-300 p-6 shadow-sm">
           <h2 className="text-lg font-semibold ">
             Showtimes for Selected Movie
           </h2>
@@ -372,7 +372,7 @@ export default function ManageShowtimesPage() {
                       <td className="border-b px-3 py-2">
                         <button
                           onClick={() => handleRemoveShowtime(s.id)}
-                          className="px-3 py-1 text-xs font-semibold btn"
+                          className="px-3 btn-error text-error-content py-1 text-xs font-semibold btn"
                         >
                           Remove
                         </button>

@@ -416,7 +416,7 @@ export default function EditProfilePage() {
                                     <div className="mb-2 flex items-center justify-between">
                                         <div className="font-medium">Card {i + 1}</div>
                                         <button type="button" onClick={() => removeCard(i)}
-                                                className="btn btn-sm btn text-error-content">
+                                                className="btn btn-sm btn btn-error text-error-content">
                                             Remove
                                         </button>
                                     </div>
@@ -425,7 +425,7 @@ export default function EditProfilePage() {
                                             value={c.cardType}
                                             onChange={e => updateCard(i, 'cardType', e.target.value)}
                                             required
-                                            className="btn px-3 py-2 text-left"
+                                            className="btn btn-neutral px-3 py-2 text-left"
                                         >
                                             <option value="">Type</option>
                                             <option value="Visa">Visa</option>
@@ -499,7 +499,7 @@ export default function EditProfilePage() {
                                 type="button"
                                 onClick={addCard}
                                 disabled={cards.length >= maxCards}
-                                className="btn btn-sm"
+                                className="btn btn-neutral btn-sm"
                             >
                                 + Add Card ({cards.length}/{maxCards})
                             </button>

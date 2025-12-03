@@ -15,7 +15,7 @@ export default function Header() {
     };
 
     return (
-        <div className={"navbar shadow-sm"}>
+        <div className={"navbar shadow-sm bg-base-100"}>
             <div className={"navbar-start"}>
                 <a onClick={() => go('/')}
                    className={"btn btn-ghost text-xl"}>Cinema E-Booking System</a>

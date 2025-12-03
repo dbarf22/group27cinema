@@ -210,14 +210,14 @@ export default function ManageMoviesPage() {
       <div className="mx-auto max-w-3xl space-y-8">
         <div className="flex items-center justify-between">
           <header>
-            <h1 className="text-3xl font-bold text-gray-800">Manage Movies</h1>
-            <p className="text-gray-600">
+            <h1 className="text-3xl font-bold ">Manage Movies</h1>
+            <p >
               Add new titles and manage showtimes, genres, and more.
             </p>
           </header>
           <a
             href="/portal"
-            className="inline-flex items-center gap-2 btn px-4 py-2 font-semibold "
+            className="inline-flex items-center gap-2 btn btn-neutral px-4 py-2 font-semibold "
           >
             ← Back to Admin
           </a>
@@ -346,7 +346,7 @@ export default function ManageMoviesPage() {
 
                   <div>
                     <select
-                      className="btn mt-1 w-full p-2 text-left"
+                      className="btn btn-neutral mt-1 w-full p-2 text-left"
                       id={"ratingCode"}
                       value={ratingCode}
                       onChange={(e) => {
@@ -453,7 +453,7 @@ export default function ManageMoviesPage() {
                         type="button"
                         id={"addGenre"}
                         onClick={addGenre}
-                        className="btn"
+                        className="btn btn-neutral"
                       >
                         Add
                       </button>

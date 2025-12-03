@@ -34,8 +34,7 @@ const PortalPage = () => {
 
   if (accountType !== "Admin") {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50">
-        <h1 className="text-3xl font-bold text-gray-700">Welcome to the User Portal</h1>
+      <div className="min-h-screen flex items-center justify-center">
       </div>
     );
   }
@@ -51,7 +50,7 @@ const PortalPage = () => {
         <div className="grid gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-2">
           <div
             onClick={() => go("portal/admin/movies")}
-            className="card cursor-pointer bg-base-200 border-base-300 border shadow-md p-6 hover:shadow-lg
+            className="card cursor-pointer bg-base-100 border-base-300 border shadow-md p-6 hover:shadow-lg
             hover:bg-base-300 transition"
           >
             <h2 className="text-xl font-semibold mb-2">Manage Movies</h2>
@@ -62,7 +61,7 @@ const PortalPage = () => {
 
           <div
             onClick={() => go("portal/admin/promotions")}
-            className="card cursor-pointer bg-base-200 border-base-300 border shadow-md p-6
+            className="card cursor-pointer bg-base-100 border-base-300 border shadow-md p-6
             hover:shadow-lg hover:bg-base-300 transition"
           >
             <h2 className="text-xl font-semibold  mb-2">Manage Promotions</h2>
@@ -73,7 +72,7 @@ const PortalPage = () => {
 
           <div
             onClick={() => go("portal/admin/manage-showtimes")}
-            className="card cursor-pointer bg-base-200 border-base-300 border shadow-md p-6 hover:shadow-lg
+            className="card cursor-pointer bg-base-100 border-base-300 border shadow-md p-6 hover:shadow-lg
             hover:bg-base-300 transition"
           >
             <h2 className="text-xl font-semibold  mb-2">Manage Showtimes</h2>

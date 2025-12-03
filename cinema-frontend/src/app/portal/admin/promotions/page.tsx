@@ -146,14 +146,14 @@ export default function ManagePromotionsPage() {
 
                     <a
                         href="/portal"
-                        className="inline-flex items-center gap-2 px-4 py-2 font-semibold btn"
+                        className="inline-flex items-center gap-2 px-4 py-2 btn-neutral font-semibold btn"
                     >
                         ← Back to Admin
                     </a>
                 </div>
 
                 {/* CREATE PROMOTION */}
-                <div className="collapse collapse-open border border-base-300 p-6 shadow-sm">
+                <div className="collapse collapse-open border border-base-300 bg-base-100 p-6 shadow-sm">
                     <form onSubmit={handlePromoSubmit} className="grid gap-6">
                         <div>
                             <input
@@ -278,7 +278,7 @@ export default function ManagePromotionsPage() {
                 </div>
 
                 {/* EMAIL PROMOTION SECTION (still frontend-only) */}
-                <div className="collapse collapse-open border border-base-300 p-6 shadow-sm">
+                <div className="collapse collapse-open border border-base-300 bg-base-100 p-6 shadow-sm">
                     <div
                         id="email-panel"
                         className="grid-rows-[1fr]">

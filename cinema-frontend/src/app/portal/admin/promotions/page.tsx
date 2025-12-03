@@ -1,5 +1,5 @@
 "use client";
-import {useMemo, useState, FormEvent} from "react";
+import {useEffect, useMemo, useState, FormEvent} from "react";
 
 type CreateErrors = {
     code?: string;
@@ -7,6 +7,15 @@ type CreateErrors = {
     start?: string;
     end?: string;
     description?: string;
+};
+
+type PromotionOption = {
+  id: number;
+  promoCode: string;
+  discount: number;
+  startDate: string;
+  endDate: string;
+  description: string;
 };
 
 export default function ManagePromotionsPage() {
@@ -29,6 +38,30 @@ export default function ManagePromotionsPage() {
         message: "",
         promoCode: "",
     });
+
+    const [promotions, setPromotions] = useState<PromotionOption[]>([]);
+    const [promosLoading, setPromosLoading] = useState(false);
+
+    useEffect(() => {
+    const fetchPromos = async () => {
+      try {
+        setPromosLoading(true);
+        const res = await fetch("/api/admin/promotions");
+        if (!res.ok) {
+          console.error("Failed to fetch promotions");
+          return;
+        }
+        const data = await res.json();
+        setPromotions(data);
+      } catch (err) {
+        console.error("Error fetching promotions", err);
+      } finally {
+        setPromosLoading(false);
+      }
+    };
+
+    fetchPromos();
+  }, []);
 
     // Simple enable/disable check for the button
     const isCreateValid = useMemo(() => {
@@ -107,19 +140,45 @@ export default function ManagePromotionsPage() {
         }
     }
 
-    const submitEmail = () => {
+    const submitEmail = async () => {
         if (!emailForm.subject.trim() || !emailForm.message.trim()) {
             alert("Please fill in Subject and Message.");
             return;
         }
-        console.log("Email Promotion (frontend only):", {
-            subject: emailForm.subject,
-            message: emailForm.message,
-            promoCode: emailForm.promoCode || null,
-            onlySubscribedUsers: true,
-        });
-        alert("frontend only (email not set up yet)");
-    };
+         if (
+          emailForm.promoCode &&
+          !promotions.some((p) => p.promoCode === emailForm.promoCode)
+        ) {
+          alert("Selected promo code is not valid.");
+          return;
+        }
+
+        try {
+          const res = await fetch("/api/admin/promotions/send", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              subject: emailForm.subject,
+              message: emailForm.message,
+              promoCode: emailForm.promoCode || null,
+            }),
+          });
+
+          const text = await res.text();
+
+          if (!res.ok) {
+          alert(`Failed to send promotion emails: ${text || "Unknown error"}`);
+          return;
+          }
+
+          alert(text || "Promotion emails sent successfully.");
+
+          setEmailForm({ subject: "", message: "", promoCode: "" });
+        } catch (err) {
+          console.error("Error sending promotion emails", err);
+         alert("An error occurred while sending promotion emails.");
+        }
+      };
 
     return (
         <div>
@@ -260,24 +319,23 @@ export default function ManagePromotionsPage() {
                     </form>
                 </div>
 
-                {/* EMAIL PROMOTION SECTION (still frontend-only) */}
+                {/* EMAIL PROMOTION SECTION */}
                 <div className="collapse collapse-open border border-base-300 bg-base-100 p-6 shadow-sm">
-                    <div
-                        id="email-panel"
-                        className="grid-rows-[1fr]">
-                        <div className="min-h-0">
-                            <div className="  grid gap-6">
-                                <div>
-                                    <input
-                                        className="mt-1 w-full input p-2"
-                                        value={emailForm.subject}
-                                        onChange={(e) =>
-                                            setEmailForm((f) => ({...f, subject: e.target.value}))
-                                        }
-                                        placeholder="Subject line"
-                                    />
-                                </div>
-                                <div>
+                  <div id="email-panel" className="grid-rows-[1fr]">
+                    <div className="min-h-0">
+                      <div className="  grid gap-6">
+                         <div>
+                           <input
+                             className="mt-1 w-full input p-2"
+                              value={emailForm.subject}
+                              onChange={(e) =>
+                                setEmailForm((f) => ({...f, subject: e.target.value}))
+                              }
+                              placeholder="Subject line"
+                            />
+                          </div>
+                                
+                <div>
                   <textarea
                       className="mt-1 w-full input p-2 min-h-28"
                       value={emailForm.message}
@@ -286,51 +344,62 @@ export default function ManagePromotionsPage() {
                       }
                       placeholder="Write your promotional email message here…"
                   />
-                                </div>
-
-                                <div className="max-w-sm">
-
-                                    <input
-                                        className="mt-1 w-full input p-2"
-                                        value={emailForm.promoCode}
-                                        onChange={(e) =>
-                                            setEmailForm((f) => ({
-                                                ...f,
-                                                promoCode: e.target.value.toUpperCase(),
-                                            }))
-                                        }
-                                        placeholder="Enter Promo Code"
-                                    />
-                                </div>
-
-                                <div className="flex flex-col sm:flex-row gap-3">
-                                    <button
-                                        type="button"
-                                        onClick={submitEmail}
-                                        className="btn px-4 py-2 font-semibold "
-                                    >
-                                        Send Email
-                                    </button>
-                                    <button
-                                        type="button"
-                                        className="px-4 py-2 font-semibold btn"
-                                        onClick={() =>
-                                            alert(
-                                                `Preview (frontend only):\n\nSubject: ${emailForm.subject}\nPromo Code: ${
-                                                    emailForm.promoCode || "(none)"
-                                                }\n\n${emailForm.message}`
-                                            )
-                                        }
-                                    >
-                                        Preview
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
                 </div>
+
+                <div className="max-w-sm">
+                  <label className="block text-sm mb-1">
+                    Promo Code (optional)
+                  </label>
+                  <select
+                    className="mt-1 w-full select select-bordered"
+                    value={emailForm.promoCode}
+                    onChange={(e) =>
+                      setEmailForm((f) => ({
+                        ...f,
+                        promoCode: e.target.value,
+                      }))
+                    }
+                  >
+                    <option value="">
+                      {promosLoading
+                        ? "Loading promo codes…"
+                        : "No promo code"}
+                    </option>
+                    {promotions.map((p) => (
+                      <option key={p.id} value={p.promoCode}>
+                        {p.promoCode} – {p.description}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                <div className="flex flex-col sm:flex-row gap-3">
+                  <button
+                    type="button"
+                    onClick={submitEmail}
+                    className="btn px-4 py-2 font-semibold "
+                  >
+                    Send Email
+                    </button>
+                    <button
+                      type="button"
+                      className="px-4 py-2 font-semibold btn"
+                      onClick={() =>
+                        alert(
+                        `Preview:\n\nSubject: ${emailForm.subject}\nPromo Code: ${
+                          emailForm.promoCode || "(none)"
+                        }\n\n${emailForm.message}`
+                      )
+                    }
+                  >
+                    Preview
+                  </button>
+                </div>
+              </div>
             </div>
+          </div>
         </div>
-    );
+      </div>
+    </div>
+  );
 }

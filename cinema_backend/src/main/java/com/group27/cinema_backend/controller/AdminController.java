@@ -51,5 +51,10 @@ public class AdminController {
     public ResponseEntity<String> sendPromotionEmail(@RequestBody SendPromotionEmailRequest request) {
         int sent = adminService.sendPromotionEmail(request);
         return ResponseEntity.ok("Promotion email sent to " + sent + " users!");
-    }
+        }
+
+    @GetMapping("/promotions")
+    public ResponseEntity<?> getAllPromotions() {
+        return ResponseEntity.ok(adminService.getAllPromotions());
+    }       
 }

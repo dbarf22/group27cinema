@@ -10,6 +10,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.group27.cinema_backend.dto.BookingHistoryDto;
+import com.group27.cinema_backend.model.User;
+import com.group27.cinema_backend.repository.UserRepository;
 import com.group27.cinema_backend.service.BookingService;
 
 @RestController
@@ -18,14 +20,20 @@ import com.group27.cinema_backend.service.BookingService;
 public class UserController {
 
     private final BookingService bookingService;
+    private final UserRepository userRepository;
 
-    public UserController(BookingService bookingService) {
+    public UserController(BookingService bookingService, UserRepository userRepository) {
         this.bookingService = bookingService;
+        this.userRepository = userRepository;
     }
 
     @GetMapping("/bookings")
-    public ResponseEntity<List<BookingHistoryDto>> getUserBookings(@RequestParam Integer userId) {
-        // For testing pass as /api/user/bookings?userId=??)
+    public ResponseEntity<List<BookingHistoryDto>> getUserBookings(@RequestParam String userKey) {
+        User user = userRepository.findByUserKey(userKey)
+                .orElseThrow(() -> new RuntimeException("User not found for userKey: " + userKey));
+
+        Integer userId = user.getId();
+
         List<BookingHistoryDto> bookings = bookingService.getUserBookings(userId);
         return ResponseEntity.ok(bookings);
     }

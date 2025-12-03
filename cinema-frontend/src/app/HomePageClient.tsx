@@ -5,6 +5,7 @@ import { Movie } from "@/types/movie";
 import MovieSection from "@/components/MovieSection";
 import MovieSearch from "@/components/MovieSearch";
 import DatePicker from "@/components/DatePicker";
+import SlideShow from "@/components/HomeSlideshow";
 
 type HomePageClientProps = {
   nowPlaying: Movie[];
@@ -19,6 +20,7 @@ export default function HomePageClient({
 
   return (
     <main className="mx-auto max-w-6xl px-4 py-8 space-y-10">
+      <SlideShow />
       {/* Calendar / date picker at the top */}
       <div className="flex justify-center">
         <DatePicker

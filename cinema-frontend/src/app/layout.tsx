@@ -14,7 +14,7 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" data-theme={"sunset"}>
+    <html lang="en" data-theme={"cupcake"}>
 
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased bg-base-200 min-h-screen` }>
       <SessionProvider>

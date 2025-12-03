@@ -1,12 +1,23 @@
 package com.group27.cinema_backend.model;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
-import jakarta.persistence.*;
+import java.util.LinkedHashSet;
+import java.util.Set;
+
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 
-import java.util.LinkedHashSet;
-import java.util.Set;
+import com.fasterxml.jackson.annotation.JsonBackReference;
+
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.Table;
 
 @Entity
 @Table(name = "cards")
@@ -27,6 +38,9 @@ public class Card {
 
     @Column(name = "card_number", nullable = false)
     private String cardNumber;
+
+    @Column(name = "cvv", length = 4)
+    private String cvv;
 
     @Column(name = "exp_month", length = 2)
     private String expMonth;
@@ -91,6 +105,14 @@ public class Card {
 
     public void setCardNumber(String cardNumber) {
         this.cardNumber = cardNumber;
+    }
+
+    public String getCvv() {
+        return cvv;
+    }
+
+    public void setCvv(String cvv) {
+        this.cvv = cvv;
     }
 
     public String getExpMonth() {

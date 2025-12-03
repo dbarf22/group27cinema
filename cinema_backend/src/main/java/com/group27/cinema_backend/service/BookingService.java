@@ -18,14 +18,10 @@ import com.group27.cinema_backend.repository.UserRepository;
 public class BookingService {
 
     private final BookingRepository bookingRepository;
-    private final MovieRepository movieRepository;
-    private final AuditoriumRepository auditoriumRepository;
     private final UserRepository userRepository;
 
     public BookingService(BookingRepository bookingRepository, MovieRepository movieRepository, AuditoriumRepository auditoriumRepository, UserRepository userRepository) {
         this.bookingRepository = bookingRepository;
-        this.movieRepository = movieRepository;
-        this.auditoriumRepository = auditoriumRepository;
         this.userRepository = userRepository;
     }
 

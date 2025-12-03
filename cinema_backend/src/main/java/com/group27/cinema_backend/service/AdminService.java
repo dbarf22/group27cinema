@@ -60,6 +60,11 @@ public class AdminService {
     }
 
     public int sendPromotionEmail(SendPromotionEmailRequest req) {
+        if (req.promoCode() != null && !req.promoCode().isBlank()) {
+            promotionRepository.findByPromoCode(req.promoCode())
+                .orElseThrow(() -> new IllegalArgumentException("Invalid promo code."));
+        }
+       
         List<User> recipients = userRepository.findByWantsPromotionsTrue();
 
         String finalMessage = req.message();
@@ -71,5 +76,9 @@ public class AdminService {
             EmailService.INSTANCE.sendEmail(user.getEmail(), req.subject(), finalMessage);
         }
         return recipients.size();
+    }
+
+    public List<Promotion> getAllPromotions() {
+        return promotionRepository.findAll();
     }
 }

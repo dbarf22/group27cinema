@@ -57,7 +57,7 @@ public class BookingService {
                 theaterName,
                 promotionCode,
                 promotionDiscount,
-                booking.getCreatedAt(),
+                booking.getPurchasedAt(),
                 ticketDtos
             );
         }).collect(Collectors.toList());

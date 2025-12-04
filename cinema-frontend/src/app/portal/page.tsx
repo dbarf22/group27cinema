@@ -78,7 +78,7 @@ const PortalPage = () => {
 
     if (accountType !== "Admin") {
         return (
-            <div className="overflow-x-auto rounded-box border border-base-300 bg-base-100">
+            <div className="rounded-box border border-base-300 bg-base-100">
                 <h1 className={"card-title text-3xl py-7 justify-center"}>Your Order History</h1>
                 <div className={"card-body text-xl"}>
                     <table className="table">

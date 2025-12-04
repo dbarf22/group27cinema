@@ -19,7 +19,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased bg-base-200 min-h-screen` }>
       <SessionProvider>
           <Header/>
-          <main className="mx-auto max-w-screen-xl px-4 py-8">
+          <main className="mx-auto max-w-screen px-4 py-8">
               {children}
           </main>
       </SessionProvider>

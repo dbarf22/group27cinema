@@ -12,6 +12,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.math.BigDecimal;
+import java.time.Instant;      
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -32,7 +33,8 @@ public class CheckoutController {
             BookingRepository bookingRepo,
             SeatRepository seatRepo,
             TicketRepository ticketRepo,
-            ShowtimeRepository showtimeRepo, CardRepository cardRepo,
+            ShowtimeRepository showtimeRepo,
+            CardRepository cardRepo,
             UserRepository userRepo
     ) {
         this.bookingRepo = bookingRepo;
@@ -79,11 +81,24 @@ public class CheckoutController {
         Booking booking = new Booking();
         booking.setScreening(screening);
         booking.setNumberOfTickets(request.getSeatIds().size());
-        booking.setCard(cardRepo.findCardById(request.getCardID()).orElseThrow(() ->
-                new RuntimeException("Card not found")));
 
-        booking.setUser(userRepo.findById(request.getUserID()).orElseThrow(() ->
-                new RuntimeException("User not found.")));
+        // validate card
+        var cardOpt = cardRepo.findCardById(request.getCardID());
+        if (cardOpt.isEmpty()) {
+            resp.setSuccess(false);
+            resp.setMessage("Invalid card ID");
+            return ResponseEntity.badRequest().body(resp);
+        }
+        booking.setCard(cardOpt.get());
+
+        // validate user
+        var userOpt = userRepo.findById(request.getUserID());
+        if (userOpt.isEmpty()) {
+            resp.setSuccess(false);
+            resp.setMessage("Invalid user ID");
+            return ResponseEntity.badRequest().body(resp);
+        }
+        booking.setUser(userOpt.get());
 
         float adultPrice = request.getAdultTickets() * 12;
         float childPrice = request.getChildTickets() * 8;
@@ -91,6 +106,8 @@ public class CheckoutController {
 
         float finalPrice = adultPrice + childPrice + seniorPrice;
 
+        booking.setTotalPrice(BigDecimal.valueOf(finalPrice));
+        booking.setPurchasedAt(Instant.now());
         booking = bookingRepo.save(booking);
 
         // 5) create Ticket rows (one per seat)
@@ -106,14 +123,22 @@ public class CheckoutController {
             Ticket t = new Ticket();
             t.setBooking(booking);
             t.setSeat(seat);
-            t.setPrice(BigDecimal.valueOf(finalPrice));
+            if (request.getAdultTickets() > 0) {
+                t.setPrice(BigDecimal.valueOf(12));
+                request.setAdultTickets(request.getAdultTickets() - 1);
+            } else if (request.getChildTickets() > 0) {
+                t.setPrice(BigDecimal.valueOf(8));
+                request.setChildTickets(request.getChildTickets() - 1);
+            } else if (request.getSeniorTickets() > 0) {
+                t.setPrice(BigDecimal.valueOf(8));
+                request.setSeniorTickets(request.getSeniorTickets() - 1);
+            } else {
+                t.setPrice(BigDecimal.valueOf(0)); // fallback, should not happen
+            }
             t.setTicketType("STANDARD");
-
             ticketsToSave.add(t);
         }
         ticketRepo.saveAll(ticketsToSave);
-
-
 
         // 6) build response
         resp.setSuccess(true);

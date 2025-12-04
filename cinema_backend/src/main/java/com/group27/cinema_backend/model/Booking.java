@@ -61,9 +61,8 @@ public class Booking {
     @JsonIgnore
     private Promotion promotion;
 
-    @ColumnDefault("CURRENT_TIMESTAMP")
     @Column(name = "purchased_at")
-    private Instant purchased_at;
+    private Instant purchasedAt;
 
     @OneToMany
     @JoinColumn(name = "booking_id")
@@ -127,11 +126,11 @@ public class Booking {
     }
 
     public Instant getPurchasedAt() {
-        return purchased_at;
+        return purchasedAt;
     }
 
-    public void setPurchasedAt(Instant purchased_at) {
-        this.purchased_at = purchased_at;
+    public void setPurchasedAt(Instant purchasedAt) {
+        this.purchasedAt = purchasedAt;
     }
 
     public Set<Ticket> getTickets() {
@@ -141,5 +140,4 @@ public class Booking {
     public void setTickets(Set<Ticket> tickets) {
         this.tickets = tickets;
     }
-
 }

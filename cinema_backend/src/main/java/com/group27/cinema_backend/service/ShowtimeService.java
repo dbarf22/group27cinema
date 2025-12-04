@@ -3,6 +3,7 @@ package com.group27.cinema_backend.service;
 import java.time.Instant;
 import java.util.List;
 
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -87,6 +88,17 @@ public class ShowtimeService {
             st.setAuditorium(auditorium);
             st.setShowtime(inst);
             st.setAvailableSeats(availableSeats);
+            showtimeRepository.save(st);
+        }
+    }
+
+    @Scheduled(fixedRate = 3600000)  // Every hour
+    @Transactional
+    public void updateAllScreeningStatuses() {
+        List<Showtime> showtimes = showtimeRepository.findAll();
+        for (Showtime st : showtimes) {
+            // Trigger the update to re-evaluate status
+            st.setShowtime(st.getShowtime());
             showtimeRepository.save(st);
         }
     }

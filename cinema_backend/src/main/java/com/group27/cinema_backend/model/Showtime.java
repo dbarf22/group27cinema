@@ -1,16 +1,26 @@
 package com.group27.cinema_backend.model;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonManagedReference;
-import jakarta.persistence.*;
+import java.time.Instant;
+import java.util.LinkedHashSet;
+import java.util.Set;
+
 import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 
-import java.time.Instant;
-import java.util.LinkedHashSet;
-import java.util.Set;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.Table;
 
 @Entity
 @Table(name = "showtimes")
@@ -33,6 +43,9 @@ public class Showtime {
 
     @Column(name = "showtime")
     private Instant showtime;
+
+    @Column(name = "screening_status", insertable = false, updatable = false)
+    private String screeningStatus;
 
     @Column(name = "available_seats")
     private Integer availableSeats;
@@ -76,6 +89,11 @@ public class Showtime {
     public void setShowtime(Instant showtime) {
         this.showtime = showtime;
     }
+
+    public String getScreeningStatus() {
+        return screeningStatus;
+    }
+
 
     public Integer getAvailableSeats() {
         return availableSeats;

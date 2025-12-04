@@ -25,3 +25,4 @@ Thumbs.db
 
 cinema_backend/src/main/resources/application.properties
 .vscode/
+cinema-frontend/package-lock.json

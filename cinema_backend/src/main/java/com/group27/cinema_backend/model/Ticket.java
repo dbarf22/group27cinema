@@ -37,7 +37,6 @@ public class Ticket {
     @Column(name = "price", precision = 10, scale = 2)
     private BigDecimal price;
 
-    @Lob
     @Column(name = "ticket_type")
     private String ticketType;
 

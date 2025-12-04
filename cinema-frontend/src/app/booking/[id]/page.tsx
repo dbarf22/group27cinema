@@ -163,26 +163,39 @@ function SeatSelection({
 
   // Fetch occupied seats for this screening
   useEffect(() => {
-    if (!screeningId) return;
+  if (!screeningId) return;
 
-    const fetchOccupiedSeats = async () => {
-      try {
-        const res = await fetch(
-          `http://localhost:8080/api/checkout/screening/${screeningId}/seats`
+  const fetchOccupiedSeats = async () => {
+    try {
+      console.log("Fetching occupied seats for screening:", screeningId);
+
+      const res = await fetch(
+        `http://localhost:8080/api/checkout/screening/${screeningId}/seats`
+      );
+
+      console.log("Occupied seats response status:", res.status);
+
+      if (!res.ok) {
+        const text = await res.text().catch(() => "");
+        console.error(
+          "Failed to fetch occupied seats:",
+          res.status,
+          text
         );
-        if (!res.ok) {
-          console.error('Failed to fetch occupied seats');
-          return;
-        }
-        const data: string[] = await res.json();
-        setOccupiedSeats(data);
-      } catch (err) {
-        console.error('Error fetching occupied seats:', err);
+        return;
       }
-    };
 
-    fetchOccupiedSeats();
-  }, [screeningId]);
+      const data: string[] = await res.json();
+      console.log("Occupied seats payload:", data);
+      setOccupiedSeats(data);
+    } catch (err) {
+      console.error("Error fetching occupied seats:", err);
+    }
+  };
+
+  fetchOccupiedSeats();
+}, [screeningId]);
+
 
   const toggleSeat = (seatId: string) => {
     if (occupiedSeats.includes(seatId)) return;
@@ -354,22 +367,23 @@ function BookingConfirmation({
 
   // Convert labels like "A3" -> seat_id using your auditorium layout rule
   function labelToSeatId(label: string): number | null {
-    if (!label || label.length < 2) return null;
+  if (!label || label.length < 2) return null;
 
-    const rowChar = label[0];
-    const seatNum = parseInt(label.slice(1), 10);
-    if (Number.isNaN(seatNum)) return null;
+  const rowChar = label[0];                 // e.g. 'A'
+  const seatNum = parseInt(label.slice(1), 10); // e.g. "6" -> 6
+  if (Number.isNaN(seatNum)) return null;
 
-    const rowIndex = rowChar.charCodeAt(0) - 'A'.charCodeAt(0); // 0-based
-    const seatsPerAud = rows.length * seatsPerRow;
+  const rowIndex = rowChar.charCodeAt(0) - 'A'.charCodeAt(0); // 0-based
 
-    // auditorium 1: 1..seatsPerAud
-    // auditorium 2: seatsPerAud+1..2*seatsPerAud, etc.
-    const baseId = (auditoriumId - 1) * seatsPerAud + 1;
-    const indexWithinAud = rowIndex * seatsPerRow + (seatNum - 1);
+  // Total seats for the layout (15 rows * 10 seats = 150)
+  const indexWithinAud = rowIndex * seatsPerRow + (seatNum - 1);
 
-    return baseId + indexWithinAud;
-  }
+  // If your seats table has seat_id 1..150 mapped exactly this way:
+  // A1 -> 1, A2 -> 2, ..., A10 -> 10,
+  // B1 -> 11, ..., O10 -> 150
+  return indexWithinAud + 1;
+}
+
 
   const handlePayment = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -616,74 +630,95 @@ export default function BookingPage({
   const [auditoriumId, setAuditoriumId] = useState<number | null>(null);
 
   useEffect(() => {
-    if (!currentUser) {
-      router.push('/login');
+  if (!currentUser) {
+    router.push('/login');
+    return;
+  }
+
+  const fetchData = async () => {
+    const resolvedParams = await params;
+    const resolvedSearchParams = await searchParams;
+
+    // 1) Fetch the movie
+    const res = await fetch(`/api/movies/${resolvedParams.id}`);
+    if (!res.ok) {
+      notFound();
+    }
+    const movieData = await res.json();
+    setMovie(movieData);
+
+    // 2) Decide which showtime string we are using
+    const selectedShowtime: string =
+      resolvedSearchParams.showtime ||
+      movieData.showtimes?.[0]?.showtime ||
+      '';
+
+    setCurrentShowtime(selectedShowtime);
+
+    // 3) Find the screening for this showtime
+    const matchingScreening = movieData.showtimes?.find(
+      (st: any) => st.showtime === selectedShowtime
+    );
+
+    if (!matchingScreening) {
+      console.warn('No matching screening for showtime', selectedShowtime);
       return;
     }
 
-    const fetchData = async () => {
-      const resolvedParams = await params;
-      const resolvedSearchParams = await searchParams;
+    // use screening id for occupied seats (what you already do)
+    const screeningIdLocal: number = matchingScreening.id;
+    setScreeningId(screeningIdLocal);
 
-      // 1) Fetch the movie
-      const res = await fetch(`/api/movies/${resolvedParams.id}`);
-      if (!res.ok) {
-        notFound();
-      }
-      const movieData = await res.json();
-      setMovie(movieData);
+    // 4) Get the auditorium id from the screening
+    // Adjust these two lines depending on your actual JSON shape:
+    const screeningAuditoriumId: number | undefined =
+      matchingScreening.auditorium?.id ?? matchingScreening.auditoriumId;
 
-      // 2) Decide which showtime string we are using
-      const selectedShowtime: string =
-        resolvedSearchParams.showtime ||
-        movieData.showtimes?.[0]?.showtime ||
-        '';
+    if (!screeningAuditoriumId) {
+      console.warn('Screening has no auditorium id:', matchingScreening);
+      return;
+    }
 
-      setCurrentShowtime(selectedShowtime);
+    // 5) Fetch auditoriums
+    const audRes = await fetch('/api/showrooms');
+    if (!audRes.ok) {
+      console.error('Failed to fetch showrooms');
+      return;
+    }
+    const auditoriums = await audRes.json();
 
-      // Find screening that matches this showtime
-      const matchingScreening = movieData.showtimes?.find(
-        (st: any) => st.showtime === selectedShowtime
+    // 6) Find the auditorium by its id (NOT by showtime anymore)
+    const matchingAuditorium = auditoriums.find(
+      (aud: any) => aud.id === screeningAuditoriumId
+    );
+
+    if (!matchingAuditorium) {
+      console.warn(
+        'No matching auditorium for id',
+        screeningAuditoriumId,
+        'available auditoriums:',
+        auditoriums
       );
-      if (matchingScreening) {
-        setScreeningId(matchingScreening.id); // adjust if field name differs
-      }
+      return;
+    }
 
-      if (!selectedShowtime) return;
+    setAuditoriumId(matchingAuditorium.id);
 
-      // 3) Fetch auditoriums
-      const audRes = await fetch('/api/showrooms');
-      if (!audRes.ok) {
-        console.error('Failed to fetch showrooms');
-        return;
-      }
-      const auditoriums = await audRes.json();
+    // 7) Use its rows/columns to size the seat map
+    const rowCount: number = matchingAuditorium.rows ?? 10;
+    const colCount: number = matchingAuditorium.columns ?? 10;
 
-      // 4) Find the auditorium whose showtimes contain this showtime
-      const matchingAuditorium = auditoriums.find((aud: any) =>
-        aud.showtimes?.some((st: any) => st.showtime === selectedShowtime)
-      );
+    const rowLabels = Array.from({ length: rowCount }, (_, i) =>
+      String.fromCharCode('A'.charCodeAt(0) + i)
+    );
 
-      if (!matchingAuditorium) {
-        console.warn('No matching auditorium for showtime', selectedShowtime);
-        return;
-      }
-      setAuditoriumId(matchingAuditorium.id);
+    setRows(rowLabels);
+    setSeatsPerRow(colCount);
+  };
 
-      // 5) Use its rows/columns to size the seat map
-      const rowCount: number = matchingAuditorium.rows ?? 10;
-      const colCount: number = matchingAuditorium.columns ?? 10;
+  fetchData();
+}, [params, searchParams, currentUser, router]);
 
-      const rowLabels = Array.from({ length: rowCount }, (_, i) =>
-        String.fromCharCode('A'.charCodeAt(0) + i)
-      );
-
-      setRows(rowLabels);
-      setSeatsPerRow(colCount);
-    };
-
-    fetchData();
-  }, [params, searchParams, currentUser, router]);
 
   // While redirecting / not logged in, don't show booking UI
   if (!currentUser) {

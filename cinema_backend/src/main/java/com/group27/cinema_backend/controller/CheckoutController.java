@@ -99,16 +99,23 @@ public class CheckoutController {
             return ResponseEntity.badRequest().body(resp);
         }
         booking.setUser(userOpt.get());
+        int adultCount = request.getAdultTickets();
+        int childCount = request.getChildTickets();
+        int seniorCount = request.getSeniorTickets();
 
         float adultPrice = request.getAdultTickets() * 12;
         float childPrice = request.getChildTickets() * 8;
-        float seniorPrice = request.getSeniorTickets() * 8;
+        float seniorPrice = request.getSeniorTickets() * 9;
 
         float finalPrice = adultPrice + childPrice + seniorPrice;
 
         booking.setTotalPrice(BigDecimal.valueOf(finalPrice));
         booking.setPurchasedAt(Instant.now());
         booking = bookingRepo.save(booking);
+
+        int remainingAdult = adultCount;
+        int remainingChild = childCount;
+        int remainingSenior = seniorCount;
 
         // 5) create Ticket rows (one per seat)
         List<Ticket> ticketsToSave = new ArrayList<>();
@@ -123,19 +130,23 @@ public class CheckoutController {
             Ticket t = new Ticket();
             t.setBooking(booking);
             t.setSeat(seat);
-            if (request.getAdultTickets() > 0) {
+            if (remainingAdult > 0) {
                 t.setPrice(BigDecimal.valueOf(12));
-                request.setAdultTickets(request.getAdultTickets() - 1);
-            } else if (request.getChildTickets() > 0) {
+                t.setTicketType("adult");
+                remainingAdult--;
+            } else if (remainingChild > 0) {
                 t.setPrice(BigDecimal.valueOf(8));
-                request.setChildTickets(request.getChildTickets() - 1);
-            } else if (request.getSeniorTickets() > 0) {
-                t.setPrice(BigDecimal.valueOf(8));
-                request.setSeniorTickets(request.getSeniorTickets() - 1);
+                t.setTicketType("child");
+                remainingChild--;
+            } else if (remainingSenior > 0) {
+                t.setPrice(BigDecimal.valueOf(9)); 
+                t.setTicketType("senior");
+                remainingSenior--;
             } else {
-                t.setPrice(BigDecimal.valueOf(0)); // fallback, should not happen
+                // Fallback – should not happen if counts match seatIds length
+                t.setPrice(BigDecimal.ZERO);
+                t.setTicketType("unknown");
             }
-            t.setTicketType("STANDARD");
             ticketsToSave.add(t);
         }
         ticketRepo.saveAll(ticketsToSave);

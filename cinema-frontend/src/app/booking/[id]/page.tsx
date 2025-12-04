@@ -3,7 +3,6 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { notFound } from 'next/navigation';
-import Image from 'next/image';
 import { Movie } from '@/types/movie';
 import { useSession } from '@/app/session/SessionContext';
 
@@ -23,22 +22,26 @@ type Card = {
   billingState: string;
   billingZip: string;
   lastFour: string;
+  // backend card has an id
+  id?: number;
 };
 
 const ageCategories = [
   { id: 'child', label: 'Child (Under 12)', price: 8 },
   { id: 'adult', label: 'Adult', price: 12 },
-  { id: 'senior', label: 'Senior (65+)', price: 9 }
+  { id: 'senior', label: 'Senior (65+)', price: 9 },
 ];
 
+// ----------------------------------------------------
 // Ticket Selection Component
-function TicketSelection({ 
-  movie, 
-  showtime, 
-  onContinue 
-}: { 
-  movie: Movie; 
-  showtime: string; 
+// ----------------------------------------------------
+function TicketSelection({
+  movie,
+  showtime,
+  onContinue,
+}: {
+  movie: Movie;
+  showtime: string;
   onContinue: (tickets: Ticket[]) => void;
 }) {
   const [tickets, setTickets] = useState<Ticket[]>([]);
@@ -48,13 +51,17 @@ function TicketSelection({
   };
 
   const removeTicket = (id: number) => {
-    setTickets(tickets.filter(t => t.id !== id));
+    setTickets(tickets.filter((t) => t.id !== id));
   };
 
   const updateTicket = (id: number, category: 'child' | 'adult' | 'senior') => {
-    const cat = ageCategories.find(c => c.id === category);
+    const cat = ageCategories.find((c) => c.id === category);
     if (cat) {
-      setTickets(tickets.map(t => t.id === id ? { ...t, category, price: cat.price } : t));
+      setTickets(
+        tickets.map((t) =>
+          t.id === id ? { ...t, category, price: cat.price } : t
+        )
+      );
     }
   };
 
@@ -64,7 +71,7 @@ function TicketSelection({
     <div className="space-y-6">
       <div className="bg-white rounded-lg border p-6">
         <h2 className="text-2xl font-bold mb-4">Select Tickets</h2>
-        
+
         <div className="mb-6 bg-gray-50 rounded-lg p-4">
           <div className="font-semibold">{movie.title}</div>
           <div className="text-sm text-gray-600">
@@ -74,14 +81,19 @@ function TicketSelection({
 
         <div className="space-y-3 mb-6">
           {tickets.map((ticket, index) => (
-            <div key={ticket.id} className="flex items-center gap-3 bg-gray-50 p-3 rounded">
+            <div
+              key={ticket.id}
+              className="flex items-center gap-3 bg-gray-50 p-3 rounded"
+            >
               <span className="font-semibold">Ticket {index + 1}</span>
               <select
                 value={ticket.category}
-                onChange={(e) => updateTicket(ticket.id, e.target.value as any)}
+                onChange={(e) =>
+                  updateTicket(ticket.id, e.target.value as any)
+                }
                 className="flex-1 border rounded px-3 py-2"
               >
-                {ageCategories.map(cat => (
+                {ageCategories.map((cat) => (
                   <option key={cat.id} value={cat.id}>
                     {cat.label} - ${cat.price}
                   </option>
@@ -116,45 +128,69 @@ function TicketSelection({
           disabled={tickets.length === 0}
           className="w-full bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700 transition font-semibold disabled:opacity-50 disabled:cursor-not-allowed"
         >
-          Continue to Seat Selection ({tickets.length} ticket{tickets.length !== 1 ? 's' : ''})
+          Continue to Seat Selection ({tickets.length} ticket
+          {tickets.length !== 1 ? 's' : ''})
         </button>
       </div>
     </div>
   );
 }
 
+// ----------------------------------------------------
 // Seat Selection Component
-function SeatSelection({ 
-  movie, 
-  showtime, 
-  tickets, 
+// ----------------------------------------------------
+function SeatSelection({
+  movie,
+  showtime,
+  tickets,
   rows,
   seatsPerRow,
-  onBack, 
-  onConfirm 
-}: { 
-  movie: Movie; 
-  showtime: string; 
-  tickets: Ticket[]; 
+  screeningId,
+  onBack,
+  onConfirm,
+}: {
+  movie: Movie;
+  showtime: string;
+  tickets: Ticket[];
   rows: string[];
   seatsPerRow: number;
+  screeningId: number;
   onBack: () => void;
   onConfirm: (seats: string[]) => void;
 }) {
   const [selectedSeats, setSelectedSeats] = useState<string[]>([]);
+  const [occupiedSeats, setOccupiedSeats] = useState<string[]>([]);
 
-  // Mock occupied seats - in real app, fetch from backend
-  const occupiedSeats = ['A3', 'A4', 'B5', 'C6', 'C7', 'D8'];
+  // Fetch occupied seats for this screening
+  useEffect(() => {
+    if (!screeningId) return;
+
+    const fetchOccupiedSeats = async () => {
+      try {
+        const res = await fetch(
+          `http://localhost:8080/api/checkout/screening/${screeningId}/seats`
+        );
+        if (!res.ok) {
+          console.error('Failed to fetch occupied seats');
+          return;
+        }
+        const data: string[] = await res.json();
+        setOccupiedSeats(data);
+      } catch (err) {
+        console.error('Error fetching occupied seats:', err);
+      }
+    };
+
+    fetchOccupiedSeats();
+  }, [screeningId]);
 
   const toggleSeat = (seatId: string) => {
     if (occupiedSeats.includes(seatId)) return;
-    
+
     if (selectedSeats.includes(seatId)) {
-      setSelectedSeats(selectedSeats.filter(s => s !== seatId));
-    } else {
-      if (selectedSeats.length < tickets.length) {
-        setSelectedSeats([...selectedSeats, seatId]);
-      }
+      setSelectedSeats(selectedSeats.filter((s) => s !== seatId));
+    } else if (selectedSeats.length < tickets.length) {
+      setSelectedSeats([...selectedSeats, seatId]);
     }
   };
 
@@ -170,20 +206,24 @@ function SeatSelection({
 
   return (
     <div className="space-y-6">
-      <button onClick={onBack} className="text-blue-600 hover:underline flex items-center gap-2">
+      <button
+        onClick={onBack}
+        className="text-blue-600 hover:underline flex items-center gap-2"
+      >
         ← Back to Tickets
       </button>
 
       <div className="bg-white rounded-lg border p-6">
         <h2 className="text-2xl font-bold mb-4">Select Seats</h2>
-        
+
         <div className="mb-6 bg-gray-50 rounded-lg p-4">
           <div className="font-semibold">{movie.title}</div>
           <div className="text-sm text-gray-600">
             Showtime: {new Date(showtime).toLocaleString()}
           </div>
           <div className="text-sm text-gray-600">
-            Please select {tickets.length} seat{tickets.length !== 1 ? 's' : ''}
+            Please select {tickets.length} seat
+            {tickets.length !== 1 ? 's' : ''}
           </div>
         </div>
 
@@ -197,7 +237,7 @@ function SeatSelection({
         {/* Seat Grid */}
         <div className="mb-6 overflow-x-auto">
           <div className="inline-block min-w-full">
-            {rows.map(row => (
+            {rows.map((row) => (
               <div key={row} className="flex items-center gap-2 mb-2">
                 <span className="w-6 font-semibold">{row}</span>
                 {Array.from({ length: seatsPerRow }).map((_, i) => {
@@ -207,7 +247,9 @@ function SeatSelection({
                     <button
                       key={seatId}
                       onClick={() => toggleSeat(seatId)}
-                      className={`w-10 h-10 rounded-t-lg font-semibold text-sm transition ${getSeatClass(seatId)}`}
+                      className={`w-10 h-10 rounded-t-lg font-semibold text-sm transition ${getSeatClass(
+                        seatId
+                      )}`}
                       disabled={occupiedSeats.includes(seatId)}
                     >
                       {seatNum}
@@ -239,8 +281,11 @@ function SeatSelection({
           <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-4">
             <div className="font-semibold mb-2">Selected Seats:</div>
             <div className="flex flex-wrap gap-2">
-              {selectedSeats.map(seat => (
-                <span key={seat} className="bg-blue-600 text-white px-3 py-1 rounded-full text-sm">
+              {selectedSeats.map((seat) => (
+                <span
+                  key={seat}
+                  className="bg-blue-600 text-white px-3 py-1 rounded-full text-sm"
+                >
                   {seat}
                 </span>
               ))}
@@ -253,63 +298,162 @@ function SeatSelection({
           disabled={selectedSeats.length !== tickets.length}
           className="w-full bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700 transition font-semibold disabled:opacity-50 disabled:cursor-not-allowed"
         >
-          {selectedSeats.length === tickets.length 
-            ? 'Confirm Booking' 
-            : `Select ${tickets.length - selectedSeats.length} more seat${tickets.length - selectedSeats.length !== 1 ? 's' : ''}`
-          }
+          {selectedSeats.length === tickets.length
+            ? 'Confirm Booking'
+            : `Select ${
+                tickets.length - selectedSeats.length
+              } more seat${
+                tickets.length - selectedSeats.length !== 1 ? 's' : ''
+              }`}
         </button>
       </div>
     </div>
   );
 }
 
-function BookingConfirmation({ 
-  movie, 
-  showtime, 
-  tickets, 
-  seats, 
+// ----------------------------------------------------
+// Booking Confirmation Component
+// ----------------------------------------------------
+function BookingConfirmation({
+  movie,
+  showtime,
+  tickets,
+  seats,
   savedCard,
-  onNewBooking 
-}: { 
-  movie: Movie; 
-  showtime: string; 
-  tickets: Ticket[]; 
+  onNewBooking,
+  screeningId,
+  auditoriumId,
+  rows,
+  seatsPerRow,
+  userId,
+}: {
+  movie: Movie;
+  showtime: string;
+  tickets: Ticket[];
   seats: string[];
   savedCard: Card | null;
   onNewBooking: () => void;
+  screeningId: number;
+  auditoriumId: number;
+  rows: string[];
+  seatsPerRow: number;
+  userId: number;
 }) {
   const total = tickets.reduce((sum, t) => sum + t.price, 0);
 
-  // Pre-fill fields if there's a saved card, otherwise blank
-  const [cardholderName, setCardholderName] = useState<string>("");
+  const [cardholderName, setCardholderName] = useState<string>('');
   const [cardNumber, setCardNumber] = useState<string>(
-    savedCard ? `**** **** **** ${savedCard.lastFour}` : ""
+    savedCard ? `**** **** **** ${savedCard.lastFour}` : ''
   );
-  const [expMonth, setExpMonth] = useState<string>(savedCard?.expMonth ?? "");
+  const [expMonth, setExpMonth] = useState<string>(savedCard?.expMonth ?? '');
   const [expYear, setExpYear] = useState<string>(
-    savedCard?.expYear ? savedCard.expYear.slice(-2) : ""
+    savedCard?.expYear ? savedCard.expYear.slice(-2) : ''
   );
-  const [cvc, setCvc] = useState<string>("");
-
+  const [cvc, setCvc] = useState<string>('');
   const [isPaying, setIsPaying] = useState(false);
+
+  // Convert labels like "A3" -> seat_id using your auditorium layout rule
+  function labelToSeatId(label: string): number | null {
+    if (!label || label.length < 2) return null;
+
+    const rowChar = label[0];
+    const seatNum = parseInt(label.slice(1), 10);
+    if (Number.isNaN(seatNum)) return null;
+
+    const rowIndex = rowChar.charCodeAt(0) - 'A'.charCodeAt(0); // 0-based
+    const seatsPerAud = rows.length * seatsPerRow;
+
+    // auditorium 1: 1..seatsPerAud
+    // auditorium 2: seatsPerAud+1..2*seatsPerAud, etc.
+    const baseId = (auditoriumId - 1) * seatsPerAud + 1;
+    const indexWithinAud = rowIndex * seatsPerRow + (seatNum - 1);
+
+    return baseId + indexWithinAud;
+  }
 
   const handlePayment = async (e: React.FormEvent) => {
     e.preventDefault();
 
     if (!cardNumber || !expMonth || !expYear || !cvc) {
-      alert("Please fill in your card details to complete payment.");
+      alert('Please fill in your card details to complete payment.');
+      return;
+    }
+
+    if (!screeningId || !userId) {
+      alert('Missing screening or user info.');
       return;
     }
 
     setIsPaying(true);
+    console.log('handlePayment called');
 
     try {
-      // TODO: replace with real payment later
-      await new Promise((resolve) => setTimeout(resolve, 600));
+      // Convert seat labels to numeric seat IDs:
+      const seatIds = seats
+        .map(labelToSeatId)
+        .filter((id): id is number => id !== null);
+
+      if (seatIds.length !== seats.length) {
+        alert('Error converting seat labels to seat IDs.');
+        setIsPaying(false);
+        return;
+      }
+
+      const adultCount = tickets.filter(
+        (t) => t.category === 'adult'
+      ).length;
+      const childCount = tickets.filter(
+        (t) => t.category === 'child'
+      ).length;
+      const seniorCount = tickets.filter(
+        (t) => t.category === 'senior'
+      ).length;
+
+      const body = {
+        screeningId,
+        seatIds,
+        cardID: savedCard && savedCard.id ? savedCard.id : 1, // fallback test card
+        userID: userId,
+        promoID: 0,
+        adultTickets: adultCount,
+        childTickets: childCount,
+        seniorTickets: seniorCount,
+      };
+
+      console.log('Sending checkout body:', body);
+
+      const resp = await fetch('http://localhost:8080/api/checkout', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(body),
+      });
+
+      console.log('Checkout response status:', resp.status);
+
+      if (!resp.ok) {
+        const text = await resp.text();
+        console.error('Checkout failed:', text);
+        alert('Payment / booking failed. Check console/backend logs.');
+        setIsPaying(false);
+        return;
+      }
+
+      const data = await resp.json();
+      console.log('Checkout response JSON:', data);
+
+      if (!data.success) {
+        alert(data.message || 'Booking failed.');
+        setIsPaying(false);
+        return;
+      }
+
+      // Success – go home
       onNewBooking();
     } catch (err) {
       console.error(err);
-      alert("Payment failed. Please try again.");
+      alert('Payment failed. Please try again.');
     } finally {
       setIsPaying(false);
     }
@@ -318,9 +462,7 @@ function BookingConfirmation({
   return (
     <div className="max-w-3xl mx-auto space-y-6">
       <div className="bg-white rounded-lg border p-8">
-        <h2 className="text-3xl font-bold mb-4 text-center">
-          Review & Pay
-        </h2>
+        <h2 className="text-3xl font-bold mb-4 text-center">Review & Pay</h2>
 
         {/* Booking summary */}
         <div className="bg-gray-50 rounded-lg p-6 mb-6 space-y-3">
@@ -328,19 +470,18 @@ function BookingConfirmation({
             <span className="font-semibold">Movie:</span> {movie.title}
           </div>
           <div>
-            <span className="font-semibold">Showtime:</span>{" "}
+            <span className="font-semibold">Showtime:</span>{' '}
             {new Date(showtime).toLocaleString()}
           </div>
           <div>
-            <span className="font-semibold">Tickets:</span>{" "}
-            {tickets.length}
+            <span className="font-semibold">Tickets:</span> {tickets.length}
           </div>
           <div>
-            <span className="font-semibold">Seats:</span>{" "}
-            {seats.join(", ")}
+            <span className="font-semibold">Seats:</span>{' '}
+            {seats.join(', ')}
           </div>
           <div className="border-t pt-3 text-xl">
-            <span className="font-semibold">Total:</span>{" "}
+            <span className="font-semibold">Total:</span>{' '}
             ${total.toFixed(2)}
           </div>
         </div>
@@ -349,7 +490,7 @@ function BookingConfirmation({
         <form onSubmit={handlePayment} className="space-y-4">
           <h3 className="text-xl font-semibold mb-2">Payment Method</h3>
 
-          {/* Saved card display if exist */}
+          {/* Saved card display if exists */}
           {savedCard && (
             <div className="mb-4 rounded-lg border border-blue-200 bg-blue-50 p-4 text-sm">
               <div className="font-semibold mb-1">Saved Card</div>
@@ -357,7 +498,8 @@ function BookingConfirmation({
                 {savedCard.cardType} ending in {savedCard.lastFour}
               </div>
               <div>
-                Expires {savedCard.expMonth}/{savedCard.expYear.slice(-2)}
+                Expires {savedCard.expMonth}/
+                {savedCard.expYear.slice(-2)}
               </div>
               <div className="mt-2 text-xs text-gray-600">
                 You can use this saved card or update the fields below.
@@ -392,7 +534,7 @@ function BookingConfirmation({
               placeholder={
                 savedCard
                   ? `**** **** **** ${savedCard.lastFour}`
-                  : "1234 5678 9012 3456"
+                  : '1234 5678 9012 3456'
               }
             />
           </div>
@@ -440,7 +582,7 @@ function BookingConfirmation({
             disabled={isPaying}
             className="mt-4 w-full bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700 transition font-semibold disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            {isPaying ? "Processing..." : "Complete Payment"}
+            {isPaying ? 'Processing...' : 'Complete Payment'}
           </button>
         </form>
       </div>
@@ -448,9 +590,9 @@ function BookingConfirmation({
   );
 }
 
-
-
+// ----------------------------------------------------
 // Main Booking Page
+// ----------------------------------------------------
 export default function BookingPage({
   params,
   searchParams,
@@ -463,72 +605,84 @@ export default function BookingPage({
 
   const [movie, setMovie] = useState<Movie | null>(null);
   const [currentShowtime, setCurrentShowtime] = useState<string>('');
-  const [step, setStep] = useState<'tickets' | 'seats' | 'confirmation'>('tickets');
+  const [step, setStep] = useState<'tickets' | 'seats' | 'confirmation'>(
+    'tickets'
+  );
   const [tickets, setTickets] = useState<Ticket[]>([]);
   const [seats, setSeats] = useState<string[]>([]);
   const [rows, setRows] = useState<string[]>(['A', 'B', 'C', 'D']);
   const [seatsPerRow, setSeatsPerRow] = useState<number>(10);
+  const [screeningId, setScreeningId] = useState<number | null>(null);
+  const [auditoriumId, setAuditoriumId] = useState<number | null>(null);
 
   useEffect(() => {
-    // If not logged in, send them to login page
     if (!currentUser) {
       router.push('/login');
       return;
     }
 
     const fetchData = async () => {
-    const resolvedParams = await params;
-    const resolvedSearchParams = await searchParams;
+      const resolvedParams = await params;
+      const resolvedSearchParams = await searchParams;
 
-    // 1) Fetch the movie
-    const res = await fetch(`/api/movies/${resolvedParams.id}`);
-    if (!res.ok) {
-      notFound();
-    }
-    const movieData = await res.json();
-    setMovie(movieData);
+      // 1) Fetch the movie
+      const res = await fetch(`/api/movies/${resolvedParams.id}`);
+      if (!res.ok) {
+        notFound();
+      }
+      const movieData = await res.json();
+      setMovie(movieData);
 
-    // 2) Decide which showtime string we are using
-    const selectedShowtime: string =
-      resolvedSearchParams.showtime ||
-      movieData.showtimes?.[0]?.showtime ||
-      "";
+      // 2) Decide which showtime string we are using
+      const selectedShowtime: string =
+        resolvedSearchParams.showtime ||
+        movieData.showtimes?.[0]?.showtime ||
+        '';
 
-    setCurrentShowtime(selectedShowtime);
+      setCurrentShowtime(selectedShowtime);
 
-    // If we still don't have a showtime, we can't size the auditorium
-    if (!selectedShowtime) return;
+      // Find screening that matches this showtime
+      const matchingScreening = movieData.showtimes?.find(
+        (st: any) => st.showtime === selectedShowtime
+      );
+      if (matchingScreening) {
+        setScreeningId(matchingScreening.id); // adjust if field name differs
+      }
 
-    // 3) Fetch auditoriums (showrooms)
-    const audRes = await fetch("/api/showrooms");
-    if (!audRes.ok) {
-      return;
-    }
-    const auditoriums = await audRes.json();
+      if (!selectedShowtime) return;
 
-    // 4) Find the auditorium whose showtimes contain this showtime
-    const matchingAuditorium = auditoriums.find((aud: any) =>
-      aud.showtimes?.some((st: any) => st.showtime === selectedShowtime)
-    );
+      // 3) Fetch auditoriums
+      const audRes = await fetch('/api/showrooms');
+      if (!audRes.ok) {
+        console.error('Failed to fetch showrooms');
+        return;
+      }
+      const auditoriums = await audRes.json();
 
-    if (!matchingAuditorium) {
-      return;
-    }
+      // 4) Find the auditorium whose showtimes contain this showtime
+      const matchingAuditorium = auditoriums.find((aud: any) =>
+        aud.showtimes?.some((st: any) => st.showtime === selectedShowtime)
+      );
 
-    // 5) Use its rows/columns to size the seat map
-    const rowCount: number = matchingAuditorium.rows ?? 10;
-    const colCount: number = matchingAuditorium.columns ?? 10;
+      if (!matchingAuditorium) {
+        console.warn('No matching auditorium for showtime', selectedShowtime);
+        return;
+      }
+      setAuditoriumId(matchingAuditorium.id);
 
-    // Generate labels: A, B, C, ... up to rowCount
-    const rowLabels = Array.from({ length: rowCount }, (_, i) =>
-      String.fromCharCode("A".charCodeAt(0) + i)
-    );
+      // 5) Use its rows/columns to size the seat map
+      const rowCount: number = matchingAuditorium.rows ?? 10;
+      const colCount: number = matchingAuditorium.columns ?? 10;
 
-    setRows(rowLabels);
-    setSeatsPerRow(colCount);
-  };
-  fetchData();
+      const rowLabels = Array.from({ length: rowCount }, (_, i) =>
+        String.fromCharCode('A'.charCodeAt(0) + i)
+      );
 
+      setRows(rowLabels);
+      setSeatsPerRow(colCount);
+    };
+
+    fetchData();
   }, [params, searchParams, currentUser, router]);
 
   // While redirecting / not logged in, don't show booking UI
@@ -574,19 +728,20 @@ export default function BookingPage({
         />
       )}
 
-      {step === 'seats' && (
+      {step === 'seats' && screeningId !== null && (
         <SeatSelection
           movie={movie}
           showtime={currentShowtime}
           tickets={tickets}
           rows={rows}
           seatsPerRow={seatsPerRow}
+          screeningId={screeningId}
           onBack={() => setStep('tickets')}
           onConfirm={handleSeatsConfirm}
         />
       )}
 
-      {step === 'confirmation' && (
+      {step === 'confirmation' && screeningId !== null && (
         <BookingConfirmation
           movie={movie}
           showtime={currentShowtime}
@@ -594,6 +749,11 @@ export default function BookingPage({
           seats={seats}
           savedCard={(currentUser as any)?.cards?.[0] ?? null}
           onNewBooking={handleNewBooking}
+          screeningId={screeningId}
+          auditoriumId={auditoriumId ?? 1} // fallback to 1 if somehow null
+          rows={rows}
+          seatsPerRow={seatsPerRow}
+          userId={(currentUser as any)?.id}
         />
       )}
     </main>

@@ -65,6 +65,10 @@ public class Booking {
     @Column(name = "purchased_at")
     private Instant purchased_at;
 
+    // 🔹 NEW FIELD
+    @Column(name = "purchased_at")
+    private Instant purchasedAt;
+
     @OneToMany
     @JoinColumn(name = "booking_id")
     @JsonIgnore
@@ -134,6 +138,15 @@ public class Booking {
         this.purchased_at = purchased_at;
     }
 
+    // 🔹 NEW GETTER/SETTER
+    public Instant getPurchasedAt() {
+        return purchasedAt;
+    }
+
+    public void setPurchasedAt(Instant purchasedAt) {
+        this.purchasedAt = purchasedAt;
+    }
+
     public Set<Ticket> getTickets() {
         return tickets;
     }
@@ -141,5 +154,4 @@ public class Booking {
     public void setTickets(Set<Ticket> tickets) {
         this.tickets = tickets;
     }
-
 }

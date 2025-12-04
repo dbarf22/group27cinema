@@ -194,7 +194,7 @@ function SeatSelection({
   };
 
   fetchOccupiedSeats();
-}, [screeningId]);
+}, [screeningId]); 
 
 
   const toggleSeat = (seatId: string) => {
@@ -339,6 +339,7 @@ function BookingConfirmation({
   rows,
   seatsPerRow,
   userId,
+  seatIdOffset,
 }: {
   movie: Movie;
   showtime: string;
@@ -351,6 +352,7 @@ function BookingConfirmation({
   rows: string[];
   seatsPerRow: number;
   userId: number;
+  seatIdOffset: number;
 }) {
   const total = tickets.reduce((sum, t) => sum + t.price, 0);
 
@@ -375,14 +377,16 @@ function BookingConfirmation({
 
   const rowIndex = rowChar.charCodeAt(0) - 'A'.charCodeAt(0); // 0-based
 
-  // Total seats for the layout (15 rows * 10 seats = 150)
+  // Index within THIS auditorium's seating layout
   const indexWithinAud = rowIndex * seatsPerRow + (seatNum - 1);
 
-  // If your seats table has seat_id 1..150 mapped exactly this way:
-  // A1 -> 1, A2 -> 2, ..., A10 -> 10,
-  // B1 -> 11, ..., O10 -> 150
-  return indexWithinAud + 1;
+  // Global seat_id = offset for earlier auditoriums + indexWithinAud + 1
+  // auditorium1: offset 0  -> 1..150
+  // auditorium2: offset 150 -> 151..250
+  // auditorium3: offset 250 -> 251..300
+  return seatIdOffset + indexWithinAud + 1;
 }
+
 
 
   const handlePayment = async (e: React.FormEvent) => {
@@ -628,6 +632,7 @@ export default function BookingPage({
   const [seatsPerRow, setSeatsPerRow] = useState<number>(10);
   const [screeningId, setScreeningId] = useState<number | null>(null);
   const [auditoriumId, setAuditoriumId] = useState<number | null>(null);
+  const [seatIdOffset, setSeatIdOffset] = useState<number>(0);
 
   useEffect(() => {
   if (!currentUser) {
@@ -704,9 +709,24 @@ export default function BookingPage({
 
     setAuditoriumId(matchingAuditorium.id);
 
-    // 7) Use its rows/columns to size the seat map
-    const rowCount: number = matchingAuditorium.rows ?? 10;
-    const colCount: number = matchingAuditorium.columns ?? 10;
+// 7) Use its rows/columns to size the seat map
+const rowCount: number = matchingAuditorium.rows ?? 10;
+const colCount: number = matchingAuditorium.columns ?? 10;
+
+// --- NEW: compute offset based on auditoriums before this one ---
+let offset = 0;
+for (const aud of auditoriums) {
+  if (aud.id === matchingAuditorium.id) break;
+  const r = aud.rows ?? 10;
+  const c = aud.columns ?? 10;
+  offset += r * c;
+}
+setSeatIdOffset(offset);
+// For your example:
+// - aud1: offset = 0          -> seat IDs 1..150
+// - aud2: offset = 150        -> seat IDs 151..250
+// - aud3: offset = 150+100=250 -> seat IDs 251..300
+// ---------------------------------------------------------------
 
     const rowLabels = Array.from({ length: rowCount }, (_, i) =>
       String.fromCharCode('A'.charCodeAt(0) + i)
@@ -789,6 +809,7 @@ export default function BookingPage({
           rows={rows}
           seatsPerRow={seatsPerRow}
           userId={(currentUser as any)?.id}
+          seatIdOffset={seatIdOffset}
         />
       )}
     </main>

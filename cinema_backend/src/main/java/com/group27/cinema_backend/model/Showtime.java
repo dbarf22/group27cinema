@@ -47,6 +47,9 @@ public class Showtime {
     @Column(name = "screening_status", insertable = false, updatable = false)
     private String screeningStatus;
 
+    @Column(name = "last_status_check")
+    private Instant lastStatusCheck;
+
     @Column(name = "available_seats")
     private Integer availableSeats;
 
@@ -94,6 +97,13 @@ public class Showtime {
         return screeningStatus;
     }
 
+    public Instant getLastStatusCheck() {
+        return lastStatusCheck;
+    }
+
+    public void setLastStatusCheck(Instant lastStatusCheck) {  // ← Added setter
+        this.lastStatusCheck = lastStatusCheck;
+    }
 
     public Integer getAvailableSeats() {
         return availableSeats;

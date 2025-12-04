@@ -92,13 +92,12 @@ public class ShowtimeService {
         }
     }
 
-    @Scheduled(fixedRate = 3600000)  // Every hour
+    @Scheduled(fixedRate = 3600000) // updates every hour
     @Transactional
     public void updateAllScreeningStatuses() {
         List<Showtime> showtimes = showtimeRepository.findAll();
         for (Showtime st : showtimes) {
-            // Trigger the update to re-evaluate status
-            st.setShowtime(st.getShowtime());
+            st.setLastStatusCheck(Instant.now());  // update last_status_check to force trigger
             showtimeRepository.save(st);
         }
     }

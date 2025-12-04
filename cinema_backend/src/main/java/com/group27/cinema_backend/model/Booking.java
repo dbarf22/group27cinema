@@ -61,11 +61,6 @@ public class Booking {
     @JsonIgnore
     private Promotion promotion;
 
-    @ColumnDefault("CURRENT_TIMESTAMP")
-    @Column(name = "purchased_at")
-    private Instant purchased_at;
-
-    // 🔹 NEW FIELD
     @Column(name = "purchased_at")
     private Instant purchasedAt;
 
@@ -130,15 +125,6 @@ public class Booking {
         this.promotion = promotion;
     }
 
-    public Instant getPurchasedAt() {
-        return purchased_at;
-    }
-
-    public void setPurchasedAt(Instant purchased_at) {
-        this.purchased_at = purchased_at;
-    }
-
-    // 🔹 NEW GETTER/SETTER
     public Instant getPurchasedAt() {
         return purchasedAt;
     }

@@ -33,10 +33,6 @@ public class Ticket {
     @Column(name = "ticket_type")
     private String ticketType;
 
-    @ColumnDefault("CURRENT_TIMESTAMP")
-    @Column(name = "purchased_at")
-    private Instant purchasedAt;
-
     public Integer getId() {
         return id;
     }
@@ -75,14 +71,6 @@ public class Ticket {
 
     public void setTicketType(String ticketType) {
         this.ticketType = ticketType;
-    }
-
-    public Instant getPurchasedAt() {
-        return purchasedAt;
-    }
-
-    public void setPurchasedAt(Instant purchasedAt) {
-        this.purchasedAt = purchasedAt;
     }
 
 }

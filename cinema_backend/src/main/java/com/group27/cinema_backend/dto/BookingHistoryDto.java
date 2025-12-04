@@ -11,15 +11,14 @@ public class BookingHistoryDto {
     private BigDecimal totalPrice;
     private String movieTitle;
     private String screeningTime;
-    private String auditoriumName;  // ← Auditorium name
-    private String theaterName;     // ← Theater name
+    private String auditoriumName;
+    private String theaterName;
     private String promotionCode;
     private Integer promotionDiscount;
-    private Instant bookingTime;    // ← booking time (created_at)
-    private Set<TicketDto> tickets;  // ← Tickets with seats
+    private Instant purchasedAt;
+    private Set<TicketDto> tickets;
 
-    // Constructor (12 parameters — all your fields)
-    public BookingHistoryDto(Integer bookingId, String cardLastFour, Integer numberOfTickets, BigDecimal totalPrice, String movieTitle, String screeningTime, String auditoriumName, String theaterName, String promotionCode, Integer promotionDiscount, Instant bookingTime, Set<TicketDto> tickets) {
+    public BookingHistoryDto(Integer bookingId, String cardLastFour, Integer numberOfTickets, BigDecimal totalPrice, String movieTitle, String screeningTime, String auditoriumName, String theaterName, String promotionCode, Integer promotionDiscount, Instant purchasedAt, Set<TicketDto> tickets) {
         this.bookingId = bookingId;
         this.cardLastFour = cardLastFour;
         this.numberOfTickets = numberOfTickets;
@@ -30,11 +29,10 @@ public class BookingHistoryDto {
         this.theaterName = theaterName;
         this.promotionCode = promotionCode;
         this.promotionDiscount = promotionDiscount;
-        this.bookingTime = bookingTime;
+        this.purchasedAt = purchasedAt;
         this.tickets = tickets;
     }
 
-    // Getters and Setters
     public Integer getBookingId() { return bookingId; }
     public void setBookingId(Integer bookingId) { this.bookingId = bookingId; }
 
@@ -65,8 +63,8 @@ public class BookingHistoryDto {
     public Integer getPromotionDiscount() { return promotionDiscount; }
     public void setPromotionDiscount(Integer promotionDiscount) { this.promotionDiscount = promotionDiscount; }
 
-    public Instant getBookingTime() { return bookingTime; }
-    public void setBookingTime(Instant bookingTime) { this.bookingTime = bookingTime; }
+    public Instant getPurchasedAt() { return purchasedAt; }
+    public void setPurchasedAt(Instant purchasedAt) { this.purchasedAt = purchasedAt; }
 
     public Set<TicketDto> getTickets() { return tickets; }
     public void setTickets(Set<TicketDto> tickets) { this.tickets = tickets; }

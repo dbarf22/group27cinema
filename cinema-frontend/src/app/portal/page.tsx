@@ -15,7 +15,7 @@ type Order = {
     promotionCode: string;
     promotionDiscount: number;
     tickets: Ticket[];
-    bookingTime: string;
+    purchasedAt: string;
 }
 
 type Ticket = {
@@ -108,7 +108,7 @@ const PortalPage = () => {
                                     <td>{order.promotionCode}</td>
                                     <td>{order.promotionDiscount}%</td>
                                     <td>${order.totalPrice}</td>
-                                    <td>{formatLocal(order.bookingTime)}</td>
+                                    <td>{formatLocal(order.purchasedAt)}</td>
                                     <td>{order.auditoriumName}</td>
                                     <td>{order.theaterName}</td>
                                     <td>
@@ -134,7 +134,7 @@ const PortalPage = () => {
                                                                 <td>{ticket.ticketType}</td>
                                                                 <td>{ticket.price}</td>
                                                             </tr>
-                                                    ))}
+                                                        ))}
                                                     </tbody>
                                                 </table>
                                                 <div className="modal-action">

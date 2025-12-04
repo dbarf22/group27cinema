@@ -1,12 +1,20 @@
 package com.group27.cinema_backend.model;
 
-import jakarta.persistence.*;
-import org.hibernate.annotations.ColumnDefault;
+import java.math.BigDecimal;
+
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 
-import java.math.BigDecimal;
-import java.time.Instant;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.Lob;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Table;
 
 @Entity
 @Table(name = "tickets")
@@ -32,10 +40,6 @@ public class Ticket {
     @Lob
     @Column(name = "ticket_type")
     private String ticketType;
-
-    @ColumnDefault("CURRENT_TIMESTAMP")
-    @Column(name = "purchased_at")
-    private Instant purchasedAt;
 
     public Integer getId() {
         return id;
@@ -75,14 +79,6 @@ public class Ticket {
 
     public void setTicketType(String ticketType) {
         this.ticketType = ticketType;
-    }
-
-    public Instant getPurchasedAt() {
-        return purchasedAt;
-    }
-
-    public void setPurchasedAt(Instant purchasedAt) {
-        this.purchasedAt = purchasedAt;
     }
 
 }

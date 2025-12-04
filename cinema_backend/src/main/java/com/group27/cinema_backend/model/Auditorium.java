@@ -55,6 +55,7 @@ public class Auditorium {
 
     @OneToMany
     @JoinColumn(name = "auditorium_id")
+    @JsonIgnore
     private Set<Showtime> showtimes = new LinkedHashSet<>();
 
     public Integer getId() {

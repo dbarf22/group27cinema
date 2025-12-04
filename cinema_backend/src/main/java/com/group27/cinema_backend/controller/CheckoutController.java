@@ -125,14 +125,17 @@ public class CheckoutController {
         return ResponseEntity.ok(resp);
     }
 
-    // GET /api/checkout/screening/{screeningId}/seats  → all booked seat IDs
+    // GET /api/checkout/screening/{screeningId}/seats
     @GetMapping("/screening/{screeningId}/seats")
-    public ResponseEntity<List<Integer>> getBookedSeats(@PathVariable Integer screeningId) {
-        List<Integer> seatIds = ticketRepo.findByBooking_Screening_Id(screeningId)
-                .stream()
-                .map(t -> t.getSeat().getId())
-                .toList();
+    public ResponseEntity<List<String>> getBookedSeats(@PathVariable Integer screeningId) {
+        List<Ticket> tickets = ticketRepo.findByBooking_Screening_Id(screeningId);
+        List<String> bookedSeats = new ArrayList<>();
 
-        return ResponseEntity.ok(seatIds);
+        for (Ticket t : tickets) {
+            Seat seat = t.getSeat();
+            bookedSeats.add(seat.getRowLabel() + seat.getSeatNumber().toString());
+        }
+
+        return ResponseEntity.ok(bookedSeats);
     }
 }

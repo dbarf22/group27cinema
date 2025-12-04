@@ -1,11 +1,10 @@
 package com.group27.cinema_backend.controller;
 
 import java.util.List;
+import java.util.Set;
 
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import com.group27.cinema_backend.model.Seat;
+import org.springframework.web.bind.annotation.*;
 
 import com.group27.cinema_backend.model.Auditorium;
 import com.group27.cinema_backend.repository.AuditoriumRepository;
@@ -25,5 +24,11 @@ public class ShowroomController {
     @GetMapping
     public List<Auditorium> getAllShowrooms() {
         return auditoriumRepository.findAll();
+    }
+
+    @GetMapping("/{id}/seats")
+    public Set<Seat> getSeats(@PathVariable Integer id) {
+        Auditorium a = auditoriumRepository.findAuditoriumById(id);
+        return a.getSeats();
     }
 }

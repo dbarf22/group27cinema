@@ -13,4 +13,6 @@ public interface TicketRepository extends JpaRepository<Ticket, Integer> {
 
     // all tickets for a screening (to know which seats are taken)
     List<Ticket> findByBooking_Screening_Id(Integer screeningId);
+
+
 }

@@ -26,10 +26,9 @@ public class Showtime {
     @JoinColumn(name = "movie_id")
     private Movie movie;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @OnDelete(action = OnDeleteAction.CASCADE)
     @JoinColumn(name = "auditorium_id")
-    @JsonIgnore
     private Auditorium auditorium;
 
     @Column(name = "showtime")

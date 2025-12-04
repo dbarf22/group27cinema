@@ -2,10 +2,7 @@ package com.group27.cinema_backend.controller;
 
 import java.util.List;
 
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import com.group27.cinema_backend.model.Showtime;
 import com.group27.cinema_backend.repository.ShowtimeRepository;
@@ -26,4 +23,10 @@ public class ShowtimeController {
     public List<Showtime> getAllShowtimes() {
         return showtimeRepository.findAll();
     }
+
+    @GetMapping("/{id}")
+    public Showtime getShowtimeByID(@PathVariable Integer id) {
+        return showtimeRepository.getShowtimeById(id);
+    }
+
 }

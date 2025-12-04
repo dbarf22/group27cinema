@@ -1,26 +1,26 @@
 package com.group27.cinema_backend.service;
 
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
 
 import com.group27.cinema_backend.dto.BookingHistoryDto;
+import com.group27.cinema_backend.dto.TicketDto;
 import com.group27.cinema_backend.model.Booking;
 import com.group27.cinema_backend.model.Showtime;
-import com.group27.cinema_backend.model.User;
+import com.group27.cinema_backend.repository.AuditoriumRepository;
 import com.group27.cinema_backend.repository.BookingRepository;
-import com.group27.cinema_backend.repository.UserRepository;
+import com.group27.cinema_backend.repository.MovieRepository;
 
 @Service
 public class BookingService {
 
     private final BookingRepository bookingRepository;
-    private final UserRepository userRepository;
 
-    public BookingService(BookingRepository bookingRepository, UserRepository userRepository) {
+    public BookingService(BookingRepository bookingRepository, MovieRepository movieRepository, AuditoriumRepository auditoriumRepository) {
         this.bookingRepository = bookingRepository;
-        this.userRepository = userRepository;
     }
 
     public List<BookingHistoryDto> getUserBookings(Integer userId) {
@@ -41,9 +41,11 @@ public class BookingService {
                 promotionDiscount = booking.getPromotion().getDiscount();
             }
 
-            String userEmail = userRepository.findById(booking.getUser().getId())
-                    .map(User::getEmail)
-                    .orElse("Unknown Email");
+            Set<TicketDto> ticketDtos = booking.getTickets().stream().map(ticket -> {
+                String rowLabel = String.valueOf(ticket.getSeat().getRowLabel());
+                Integer seatNumber = ticket.getSeat().getSeatNumber();
+                return new TicketDto(ticket.getId(), rowLabel, seatNumber, ticket.getPrice(), ticket.getTicketType());
+            }).collect(Collectors.toSet());
 
             return new BookingHistoryDto(
                 booking.getId(),
@@ -55,7 +57,8 @@ public class BookingService {
                 theaterName,
                 promotionCode,
                 promotionDiscount,
-                userEmail
+                booking.getCreatedAt(),
+                ticketDtos
             );
         }).collect(Collectors.toList());
     }

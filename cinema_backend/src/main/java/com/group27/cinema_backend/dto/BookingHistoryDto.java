@@ -1,6 +1,8 @@
 package com.group27.cinema_backend.dto;
 
 import java.math.BigDecimal;
+import java.time.Instant;
+import java.util.Set;
 
 public class BookingHistoryDto {
     private Integer bookingId;
@@ -12,9 +14,10 @@ public class BookingHistoryDto {
     private String theaterName;
     private String promotionCode;
     private Integer promotionDiscount;
-    private String userEmail;
+    private Instant bookingTime;
+    private Set<TicketDto> tickets;
 
-    public BookingHistoryDto(Integer bookingId, String cardLastFour, Integer numberOfTickets, BigDecimal totalPrice, String movieTitle, String screeningTime, String theaterName, String promotionCode, Integer promotionDiscount, String userEmail) {
+    public BookingHistoryDto(Integer bookingId, String cardLastFour, Integer numberOfTickets, BigDecimal totalPrice, String movieTitle, String screeningTime, String theaterName, String promotionCode, Integer promotionDiscount, Instant bookingTime, Set<TicketDto> tickets) {
         this.bookingId = bookingId;
         this.cardLastFour = cardLastFour;
         this.numberOfTickets = numberOfTickets;
@@ -24,7 +27,8 @@ public class BookingHistoryDto {
         this.theaterName = theaterName;
         this.promotionCode = promotionCode;
         this.promotionDiscount = promotionDiscount;
-        this.userEmail = userEmail;
+        this.bookingTime = bookingTime;
+        this.tickets = tickets;
     }
 
     public Integer getBookingId() { return bookingId; }
@@ -54,6 +58,9 @@ public class BookingHistoryDto {
     public Integer getPromotionDiscount() { return promotionDiscount; }
     public void setPromotionDiscount(Integer promotionDiscount) { this.promotionDiscount = promotionDiscount; }
 
-    public String getUserEmail() { return userEmail; }
-    public void setUserEmail(String userEmail) { this.userEmail = userEmail; }
+    public Instant getBookingTime() { return bookingTime; }
+    public void setBookingTime(Instant bookingTime) { this.bookingTime = bookingTime; }
+
+    public Set<TicketDto> getTickets() { return tickets; }
+    public void setTickets(Set<TicketDto> tickets) { this.tickets = tickets; }
 }

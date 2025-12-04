@@ -102,7 +102,7 @@ const PortalPage = () => {
                                     <td>{order.movieTitle}</td>
                                     <td>{order.cardLastFour}</td>
                                     <td>{order.numberOfTickets}</td>
-                                    <td>{formatLocal(order.bookingTime)}</td>
+                                    <td>{formatLocal(order.screeningTime)}</td>
                                     <td>{order.promotionCode}</td>
                                     <td>{order.promotionDiscount}%</td>
                                     <td>${order.totalPrice}</td>

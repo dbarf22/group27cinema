@@ -10,7 +10,8 @@ type Order = {
     totalPrice: number;
     movieTitle: string;
     screeningTime: string;
-    theatreName: string;
+    auditoriumName: string;
+    theaterName: string;
     promotionCode: string;
     promotionDiscount: number;
     tickets: Ticket[];
@@ -91,7 +92,8 @@ const PortalPage = () => {
                             <th>Promotion Discount</th>
                             <th>Price</th>
                             <th>Date of Purchase</th>
-                            <th></th>
+                            <th>Auditorium</th>
+                            <th>Theater</th>
                         </tr>
                         </thead>
                         <tbody>
@@ -107,6 +109,8 @@ const PortalPage = () => {
                                     <td>{order.promotionDiscount}%</td>
                                     <td>${order.totalPrice}</td>
                                     <td>{formatLocal(order.bookingTime)}</td>
+                                    <td>{order.auditoriumName}</td>
+                                    <td>{order.theaterName}</td>
                                     <td>
                                         <button className="btn"
                                                 onClick={() =>

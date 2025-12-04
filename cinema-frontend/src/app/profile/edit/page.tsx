@@ -19,6 +19,8 @@ type Card = {
     billingCity: string;
     billingState: string;
     billingZip: string;
+    cvv: string;
+    cardholder: string;
 };
 
 const emptyCard: Card = {
@@ -30,6 +32,8 @@ const emptyCard: Card = {
     billingCity: '',
     billingState: '',
     billingZip: '',
+    cvv: '',
+    cardholder: '',
 };
 
 export default function EditProfilePage() {
@@ -194,7 +198,7 @@ export default function EditProfilePage() {
         setMsg({error: '', ok: ''});
         for (let i = 0; i < cards.length; i++) {
             const c = cards[i];
-            if (!c.cardType || !c.cardNumber || !c.expMonth || !c.expYear) {
+            if (!c.cardType || !c.cardNumber || !c.expMonth || !c.expYear || !c.cvv || !c.cardholder) {
                 setError(`Card ${i + 1}: fill required fields`);
                 return;
             }
@@ -436,14 +440,22 @@ export default function EditProfilePage() {
                                         <input
                                             placeholder="Card number"
                                             id={"cardNumber"}
-
+                                            value={c.cardNumber}
                                             onChange={e => updateCard(i, 'cardNumber', e.target.value)}
                                             required
                                             maxLength={19}
                                             className="input"
                                         />
                                         <input
-                                            placeholder="00"
+                                            placeholder="Cardholder Name"
+                                            id={"cardholderName"}
+                                            value={c.cardholder}
+                                            onChange={e => updateCard(i, 'cardholder', e.target.value)}
+                                            required
+                                            className="input"
+                                        />
+                                        <input
+                                            placeholder="MM"
                                             id={"cardExpMonth"}
                                             value={c.expMonth}
                                             onChange={e => updateCard(i, 'expMonth', e.target.value)}
@@ -452,10 +464,19 @@ export default function EditProfilePage() {
                                             className="input"
                                         />
                                         <input
-                                            placeholder="0000"
+                                            placeholder="YYYY"
                                             value={c.expYear}
                                             id={"cardExpYear"}
                                             onChange={e => updateCard(i, 'expYear', e.target.value)}
+                                            required
+                                            maxLength={4}
+                                            className="input"
+                                        />
+                                        <input
+                                            placeholder="CVV"
+                                            value={c.cvv}
+                                            id={"cardCVV"} 
+                                            onChange={e => updateCard(i, 'cvv', e.target.value)}
                                             required
                                             maxLength={4}
                                             className="input"

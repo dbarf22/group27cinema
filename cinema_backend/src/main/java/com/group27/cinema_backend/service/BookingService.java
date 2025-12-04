@@ -28,7 +28,8 @@ public class BookingService {
             Showtime screening = booking.getScreening();
             String movieTitle = screening.getMovie().getTitle();
             String screeningTime = screening.getShowtime().toString();
-            String theaterName = screening.getAuditorium().getAuditoriumName();
+            String auditoriumName = screening.getAuditorium().getAuditoriumName();
+            String theaterName = screening.getAuditorium().getTheater().getTheaterName();
 
             String cardLastFour = booking.getCard() != null ? booking.getCard().getLastFour() : "N/A";
 
@@ -52,6 +53,7 @@ public class BookingService {
                 booking.getTotalPrice(),
                 movieTitle,
                 screeningTime,
+                auditoriumName,
                 theaterName,
                 promotionCode,
                 promotionDiscount,

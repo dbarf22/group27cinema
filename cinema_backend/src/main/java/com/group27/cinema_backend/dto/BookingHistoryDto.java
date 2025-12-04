@@ -11,19 +11,22 @@ public class BookingHistoryDto {
     private BigDecimal totalPrice;
     private String movieTitle;
     private String screeningTime;
-    private String theaterName;
+    private String auditoriumName;  // ← Auditorium name
+    private String theaterName;     // ← Theater name
     private String promotionCode;
     private Integer promotionDiscount;
-    private Instant bookingTime;
-    private Set<TicketDto> tickets;
+    private Instant bookingTime;    // ← booking time (created_at)
+    private Set<TicketDto> tickets;  // ← Tickets with seats
 
-    public BookingHistoryDto(Integer bookingId, String cardLastFour, Integer numberOfTickets, BigDecimal totalPrice, String movieTitle, String screeningTime, String theaterName, String promotionCode, Integer promotionDiscount, Instant bookingTime, Set<TicketDto> tickets) {
+    // Constructor (12 parameters — all your fields)
+    public BookingHistoryDto(Integer bookingId, String cardLastFour, Integer numberOfTickets, BigDecimal totalPrice, String movieTitle, String screeningTime, String auditoriumName, String theaterName, String promotionCode, Integer promotionDiscount, Instant bookingTime, Set<TicketDto> tickets) {
         this.bookingId = bookingId;
         this.cardLastFour = cardLastFour;
         this.numberOfTickets = numberOfTickets;
         this.totalPrice = totalPrice;
         this.movieTitle = movieTitle;
         this.screeningTime = screeningTime;
+        this.auditoriumName = auditoriumName;
         this.theaterName = theaterName;
         this.promotionCode = promotionCode;
         this.promotionDiscount = promotionDiscount;
@@ -31,6 +34,7 @@ public class BookingHistoryDto {
         this.tickets = tickets;
     }
 
+    // Getters and Setters
     public Integer getBookingId() { return bookingId; }
     public void setBookingId(Integer bookingId) { this.bookingId = bookingId; }
 
@@ -48,6 +52,9 @@ public class BookingHistoryDto {
 
     public String getScreeningTime() { return screeningTime; }
     public void setScreeningTime(String screeningTime) { this.screeningTime = screeningTime; }
+
+    public String getAuditoriumName() { return auditoriumName; }
+    public void setAuditoriumName(String auditoriumName) { this.auditoriumName = auditoriumName; }
 
     public String getTheaterName() { return theaterName; }
     public void setTheaterName(String theaterName) { this.theaterName = theaterName; }

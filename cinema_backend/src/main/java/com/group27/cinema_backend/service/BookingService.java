@@ -10,16 +10,14 @@ import com.group27.cinema_backend.dto.BookingHistoryDto;
 import com.group27.cinema_backend.dto.TicketDto;
 import com.group27.cinema_backend.model.Booking;
 import com.group27.cinema_backend.model.Showtime;
-import com.group27.cinema_backend.repository.AuditoriumRepository;
 import com.group27.cinema_backend.repository.BookingRepository;
-import com.group27.cinema_backend.repository.MovieRepository;
 
 @Service
 public class BookingService {
 
     private final BookingRepository bookingRepository;
 
-    public BookingService(BookingRepository bookingRepository, MovieRepository movieRepository, AuditoriumRepository auditoriumRepository) {
+    public BookingService(BookingRepository bookingRepository) {
         this.bookingRepository = bookingRepository;
     }
 

@@ -42,7 +42,7 @@ const PortalPage = () => {
         const fetchData = async () => {
             try {
                 let key = currentUser?.userKey;
-                const response = await fetch(`/api/user/bookings?userKey=aca65a8c-f39a-4955-8e79-132203fa1987`);
+                const response = await fetch(`/api/user/bookings?userKey=${key}`);
                 const data = await response.json();
                 setOrders(data);
             } catch (err) {

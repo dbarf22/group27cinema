@@ -26,6 +26,13 @@ type Card = {
   id?: number;
 };
 
+type Promo = {
+  id: number;
+  promoCode: string;
+  discount: number; // percentage discount
+  description: string;
+};
+
 const ageCategories = [
   { id: 'child', label: 'Child (Under 12)', price: 8 },
   { id: 'adult', label: 'Adult', price: 12 },
@@ -339,13 +346,13 @@ function BookingConfirmation({
   rows,
   seatsPerRow,
   userId,
-  seatIdOffset = 0,   // if you added offsets earlier; default 0 so it's safe
+  seatIdOffset = 0,
 }: {
   movie: Movie;
   showtime: string;
   tickets: Ticket[];
   seats: string[];
-  savedCards: Card[];     // ⬅️ now we take ALL cards, not just one
+  savedCards: Card[];
   onNewBooking: () => void;
   screeningId: number;
   auditoriumId: number;
@@ -355,13 +362,20 @@ function BookingConfirmation({
   seatIdOffset?: number;
 }) {
   const router = useRouter();
-  const total = tickets.reduce((sum, t) => sum + t.price, 0);
 
-  // pick first card by default if any exist
+  const subtotal = tickets.reduce((sum, t) => sum + t.price, 0);
+
+  // cards
   const [selectedCardId, setSelectedCardId] = useState<number | null>(
     savedCards[0]?.id ?? null
   );
   const [isPaying, setIsPaying] = useState(false);
+
+  // promotions
+  const [promoCode, setPromoCode] = useState('');
+  const [appliedPromo, setAppliedPromo] = useState<Promo | null>(null);
+  const [promoChecking, setPromoChecking] = useState(false);
+  const [promoError, setPromoError] = useState('');
 
   // Convert labels like "A3" -> seat_id using your layout rule
   function labelToSeatId(label: string): number | null {
@@ -374,11 +388,68 @@ function BookingConfirmation({
     const rowIndex = rowChar.charCodeAt(0) - 'A'.charCodeAt(0); // 0-based
     const indexWithinAud = rowIndex * seatsPerRow + (seatNum - 1);
 
-    // If you’re using global seat IDs with offsets:
-    // auditorium1 offset 0 -> 1..N
-    // auditorium2 offset K -> K+1.. etc
     return seatIdOffset + indexWithinAud + 1;
   }
+
+  const handleApplyPromo = async () => {
+    setPromoError('');
+    setAppliedPromo(null);
+
+    const trimmed = promoCode.trim();
+    if (!trimmed) {
+      setPromoError('Please enter a promo code.');
+      return;
+    }
+
+    setPromoChecking(true);
+    try {
+      // adjust URL/path to your actual promo validation endpoint
+      const resp = await fetch(
+        `http://localhost:8080/api/promotions/validate?code=${encodeURIComponent(
+          trimmed
+        )}`
+      );
+
+      if (!resp.ok) {
+        const text = await resp.text();
+        console.error('Promo validate failed:', text);
+        setPromoError('Promo code is invalid or expired.');
+        setAppliedPromo(null);
+        return;
+      }
+
+      const data = await resp.json();
+      // assuming backend returns { id, promoCode, discount, description }
+      const promo: Promo = {
+        id: data.id,
+        promoCode: data.promoCode,
+        discount: data.discount,
+        description: data.description,
+      };
+
+      setAppliedPromo(promo);
+      setPromoError('');
+    } catch (err) {
+      console.error('Error validating promo:', err);
+      setPromoError('Could not validate promo code. Try again.');
+      setAppliedPromo(null);
+    } finally {
+      setPromoChecking(false);
+    }
+  };
+
+  const handleClearPromo = () => {
+    setAppliedPromo(null);
+    setPromoError('');
+  };
+
+  // compute discount & final total
+  const discountAmount =
+    appliedPromo && appliedPromo.discount
+      ? (subtotal * appliedPromo.discount) / 100
+      : 0;
+
+  const finalTotal = Math.max(0, subtotal - discountAmount);
 
   const handlePayment = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -414,9 +485,9 @@ function BookingConfirmation({
       const body = {
         screeningId,
         seatIds,
-        cardID: selectedCardId,   // ⬅️ use selected saved card
+        cardID: selectedCardId,
         userID: userId,
-        promoID: 0,
+        promoID: appliedPromo ? appliedPromo.id : 0, // ⬅️ send promo id if any
         adultTickets: adultCount,
         childTickets: childCount,
         seniorTickets: seniorCount,
@@ -484,9 +555,73 @@ function BookingConfirmation({
           <div>
             <span className="font-semibold">Seats:</span> {seats.join(', ')}
           </div>
-          <div className="border-t pt-3 text-xl">
-            <span className="font-semibold">Total:</span> ${total.toFixed(2)}
+
+          {/* totals with promo */}
+          <div className="border-t pt-3 space-y-1">
+            <div className="flex justify-between text-sm">
+              <span>Subtotal:</span>
+              <span>${subtotal.toFixed(2)}</span>
+            </div>
+            {appliedPromo && (
+              <>
+                <div className="flex justify-between text-sm text-green-700">
+                  <span>
+                    Promo ({appliedPromo.promoCode} - {appliedPromo.discount}% off):
+                  </span>
+                  <span>- ${discountAmount.toFixed(2)}</span>
+                </div>
+                <div className="flex justify-between text-xs text-gray-500">
+                  <span>{appliedPromo.description}</span>
+                </div>
+              </>
+            )}
+            <div className="flex justify-between text-xl font-semibold pt-2">
+              <span>Total:</span>
+              <span>${finalTotal.toFixed(2)}</span>
+            </div>
           </div>
+        </div>
+
+        {/* Promo code section */}
+        <div className="mb-6 border rounded-lg p-4 bg-gray-50 space-y-3">
+          <div className="flex justify-between items-center">
+            <h3 className="text-sm font-semibold">Have a promo code?</h3>
+            {appliedPromo && (
+              <button
+                type="button"
+                className="text-xs text-red-600 hover:underline"
+                onClick={handleClearPromo}
+              >
+                Remove promo
+              </button>
+            )}
+          </div>
+          <div className="flex gap-2">
+            <input
+              type="text"
+              value={promoCode}
+              onChange={(e) => setPromoCode(e.target.value)}
+              className="flex-1 border rounded px-3 py-2 text-sm"
+              placeholder="Enter promo code"
+            />
+            <button
+              type="button"
+              onClick={handleApplyPromo}
+              disabled={promoChecking}
+              className="px-4 py-2 rounded bg-gray-800 text-white text-sm font-semibold disabled:opacity-50"
+            >
+              {promoChecking ? 'Checking...' : 'Apply'}
+            </button>
+          </div>
+          {promoError && (
+            <div className="text-xs text-red-600 mt-1">{promoError}</div>
+          )}
+          {appliedPromo && !promoError && (
+            <div className="text-xs text-green-700 mt-1">
+              Promo <span className="font-semibold">{appliedPromo.promoCode}</span> applied: {appliedPromo.discount}
+              % off.
+            </div>
+          )}
         </div>
 
         {/* Payment section */}
@@ -568,6 +703,7 @@ function BookingConfirmation({
     </div>
   );
 }
+
 
 // ----------------------------------------------------
 // Main Booking Page

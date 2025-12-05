@@ -45,7 +45,7 @@ export default function ManageShowtimesPage() {
     fetch("/api/movies")
       .then((res) => res.json())
       .then(setMovies)
-      .catch(() => {});
+      .catch(() => { });
   }, []);
 
   useEffect(() => {
@@ -99,7 +99,7 @@ export default function ManageShowtimesPage() {
       const data = await res.json();
       const roomsToUse = roomsOverride ?? showrooms;
       const rows: ShowtimeRow[] = data.map((s: any) => {
-          const auditoriumId = s.auditorium?.id ?? null;
+        const auditoriumId = s.auditorium?.id ?? null;
         return {
           id: s.id,
           showtime: s.showtime ?? s.when,
@@ -247,11 +247,10 @@ export default function ManageShowtimesPage() {
 
         {message && (
           <div
-            className={`rounded-lg border px-4 py-3 text-sm ${
-              message.type === "error"
-                ? "border-red-300 bg-red-50 text-red-800"
-                : "border-green-300 bg-green-50 text-green-800"
-            }`}
+            className={`rounded-lg border px-4 py-3 text-sm ${message.type === "error"
+              ? "border-red-300 bg-red-50 text-red-800"
+              : "border-green-300 bg-green-50 text-green-800"
+              }`}
           >
             {message.text}
           </div>

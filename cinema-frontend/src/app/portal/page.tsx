@@ -1,7 +1,7 @@
 "use client";
-import {useEffect, useState} from "react";
-import {useRouter} from "next/navigation";
-import {useSession} from '@/app/session/SessionContext';
+import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
+import { useSession } from '@/app/session/SessionContext';
 
 type Order = {
     bookingId: number;
@@ -29,7 +29,7 @@ type Ticket = {
 const PortalPage = () => {
     const [accountType, setAccountType] = useState("");
     const router = useRouter();
-    const {currentUser} = useSession();
+    const { currentUser } = useSession();
     const [orders, setOrders] = useState<Order[]>([]);
     const [tickets, setTickets] = useState<Ticket[]>([]);
 
@@ -83,71 +83,71 @@ const PortalPage = () => {
                 <div className={"card-body text-xl"}>
                     <table className="table flex">
                         <thead>
-                        <tr className="">
-                            <th>Movie Title</th>
-                            <th>Last 4 Digits of Payment</th>
-                            <th>Number of Tickets</th>
-                            <th>Screening Time</th>
-                            <th>Promo Used</th>
-                            <th>Promotion Discount</th>
-                            <th>Price</th>
-                            <th>Date of Purchase</th>
-                            <th>Auditorium</th>
-                            <th>Theater</th>
-                        </tr>
+                            <tr className="">
+                                <th>Movie Title</th>
+                                <th>Last 4 Digits of Payment</th>
+                                <th>Number of Tickets</th>
+                                <th>Screening Time</th>
+                                <th>Promo Used</th>
+                                <th>Promotion Discount</th>
+                                <th>Price</th>
+                                <th>Date of Purchase</th>
+                                <th>Auditorium</th>
+                                <th>Theater</th>
+                            </tr>
                         </thead>
                         <tbody>
-                        {orders.map((order) => {
-                            const modalID = `modal-${order.bookingId}`;
-                            return (
-                                <tr key={order.bookingId}>
-                                    <td>{order.movieTitle}</td>
-                                    <td>{order.cardLastFour}</td>
-                                    <td>{order.numberOfTickets}</td>
-                                    <td>{formatLocal(order.screeningTime)}</td>
-                                    <td>{order.promotionCode || "N/A"}</td>
-                                    <td>{order.promotionDiscount ? `${order.promotionDiscount}%` : "N/A"}</td>
-                                    <td>${order.totalPrice}</td>
-                                    <td>{formatLocal(order.purchasedAt)}</td>
-                                    <td>{order.auditoriumName}</td>
-                                    <td>{order.theaterName}</td>
-                                    <td>
-                                        <button className="btn btn-neutral"
+                            {orders.map((order) => {
+                                const modalID = `modal-${order.bookingId}`;
+                                return (
+                                    <tr key={order.bookingId}>
+                                        <td>{order.movieTitle}</td>
+                                        <td>{order.cardLastFour}</td>
+                                        <td>{order.numberOfTickets}</td>
+                                        <td>{formatLocal(order.screeningTime)}</td>
+                                        <td>{order.promotionCode || "N/A"}</td>
+                                        <td>{order.promotionDiscount ? `${order.promotionDiscount}%` : "N/A"}</td>
+                                        <td>${order.totalPrice}</td>
+                                        <td>{formatLocal(order.purchasedAt)}</td>
+                                        <td>{order.auditoriumName}</td>
+                                        <td>{order.theaterName}</td>
+                                        <td>
+                                            <button className="btn btn-neutral"
                                                 onClick={() =>
                                                     (document.getElementById(modalID) as HTMLDialogElement).showModal()}>Details
-                                        </button>
-                                        <dialog id={modalID} className="modal">
-                                            <div className="modal-box text-center ">
-                                                <h3 className="font-bold text-lg ">Order Details</h3>
-                                                <table className="table text-center">
-                                                    <thead>
-                                                    <tr>
-                                                        <td>Seat</td>
-                                                        <td>Ticket Type</td>
-                                                        <td>Price</td>
-                                                    </tr>
-                                                    </thead>
-                                                    <tbody>
-                                                        {order.tickets?.map(ticket => (
-                                                            <tr key={ticket.id}>
-                                                                <td>{ticket.rowLabel}{ticket.seatNumber}</td>
-                                                                <td>{ticket.ticketType}</td>
-                                                                <td>{ticket.price}</td>
+                                            </button>
+                                            <dialog id={modalID} className="modal">
+                                                <div className="modal-box text-center ">
+                                                    <h3 className="font-bold text-lg ">Order Details</h3>
+                                                    <table className="table text-center">
+                                                        <thead>
+                                                            <tr>
+                                                                <td>Seat</td>
+                                                                <td>Ticket Type</td>
+                                                                <td>Price</td>
                                                             </tr>
-                                                        ))}
-                                                    </tbody>
-                                                </table>
-                                                <div className="modal-action">
-                                                    <form method="dialog">
-                                                        <button className="btn">Close</button>
-                                                    </form>
+                                                        </thead>
+                                                        <tbody>
+                                                            {order.tickets?.map(ticket => (
+                                                                <tr key={ticket.id}>
+                                                                    <td>{ticket.rowLabel}{ticket.seatNumber}</td>
+                                                                    <td>{ticket.ticketType}</td>
+                                                                    <td>{ticket.price}</td>
+                                                                </tr>
+                                                            ))}
+                                                        </tbody>
+                                                    </table>
+                                                    <div className="modal-action">
+                                                        <form method="dialog">
+                                                            <button className="btn">Close</button>
+                                                        </form>
+                                                    </div>
                                                 </div>
-                                            </div>
-                                        </dialog>
-                                    </td>
-                                </tr>
-                            )
-                        })}
+                                            </dialog>
+                                        </td>
+                                    </tr>
+                                )
+                            })}
                         </tbody>
                     </table>
                 </div>

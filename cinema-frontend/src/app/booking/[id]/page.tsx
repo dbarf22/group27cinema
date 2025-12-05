@@ -170,38 +170,38 @@ function SeatSelection({
 
   // Fetch occupied seats for this screening
   useEffect(() => {
-  if (!screeningId) return;
+    if (!screeningId) return;
 
-  const fetchOccupiedSeats = async () => {
-    try {
-      console.log("Fetching occupied seats for screening:", screeningId);
+    const fetchOccupiedSeats = async () => {
+      try {
+        console.log("Fetching occupied seats for screening:", screeningId);
 
-      const res = await fetch(
-        `http://localhost:8080/api/checkout/screening/${screeningId}/seats`
-      );
-
-      console.log("Occupied seats response status:", res.status);
-
-      if (!res.ok) {
-        const text = await res.text().catch(() => "");
-        console.error(
-          "Failed to fetch occupied seats:",
-          res.status,
-          text
+        const res = await fetch(
+          `http://localhost:8080/api/checkout/screening/${screeningId}/seats`
         );
-        return;
+
+        console.log("Occupied seats response status:", res.status);
+
+        if (!res.ok) {
+          const text = await res.text().catch(() => "");
+          console.error(
+            "Failed to fetch occupied seats:",
+            res.status,
+            text
+          );
+          return;
+        }
+
+        const data: string[] = await res.json();
+        console.log("Occupied seats payload:", data);
+        setOccupiedSeats(data);
+      } catch (err) {
+        console.error("Error fetching occupied seats:", err);
       }
+    };
 
-      const data: string[] = await res.json();
-      console.log("Occupied seats payload:", data);
-      setOccupiedSeats(data);
-    } catch (err) {
-      console.error("Error fetching occupied seats:", err);
-    }
-  };
-
-  fetchOccupiedSeats();
-}, [screeningId]); 
+    fetchOccupiedSeats();
+  }, [screeningId]);
 
 
   const toggleSeat = (seatId: string) => {
@@ -320,11 +320,9 @@ function SeatSelection({
         >
           {selectedSeats.length === tickets.length
             ? 'Confirm Booking'
-            : `Select ${
-                tickets.length - selectedSeats.length
-              } more seat${
-                tickets.length - selectedSeats.length !== 1 ? 's' : ''
-              }`}
+            : `Select ${tickets.length - selectedSeats.length
+            } more seat${tickets.length - selectedSeats.length !== 1 ? 's' : ''
+            }`}
         </button>
       </div>
     </div>
@@ -563,51 +561,51 @@ function BookingConfirmation({
           </div>
 
           <div className="border-t pt-3 space-y-1">
-  {/* Ticket subtotal before promo */}
-  <div className="flex justify-between text-sm">
-    <span>Ticket Subtotal:</span>
-    <span>${subtotal.toFixed(2)}</span>
-  </div>
+            {/* Ticket subtotal before promo */}
+            <div className="flex justify-between text-sm">
+              <span>Ticket Subtotal:</span>
+              <span>${subtotal.toFixed(2)}</span>
+            </div>
 
-  {/* Promo discount (if any) */}
-  {appliedPromo && (
-    <>
-      <div className="flex justify-between text-sm text-success">
-        <span>
-          Promo ({appliedPromo.promoCode} - {appliedPromo.discount}% off):
-        </span>
-        <span>- ${discountAmount.toFixed(2)}</span>
-      </div>
-      <div className="flex justify-between text-xs">
-        <span>{appliedPromo.description}</span>
-      </div>
-    </>
-  )}
+            {/* Promo discount (if any) */}
+            {appliedPromo && (
+              <>
+                <div className="flex justify-between text-sm text-success">
+                  <span>
+                    Promo ({appliedPromo.promoCode} - {appliedPromo.discount}% off):
+                  </span>
+                  <span>- ${discountAmount.toFixed(2)}</span>
+                </div>
+                <div className="flex justify-between text-xs">
+                  <span>{appliedPromo.description}</span>
+                </div>
+              </>
+            )}
 
-  {/* Subtotal after promo */}
-  <div className="flex justify-between text-sm">
-    <span>Subtotal after promo:</span>
-    <span>${subtotalAfterPromo.toFixed(2)}</span>
-  </div>
+            {/* Subtotal after promo */}
+            <div className="flex justify-between text-sm">
+              <span>Subtotal after promo:</span>
+              <span>${subtotalAfterPromo.toFixed(2)}</span>
+            </div>
 
-  {/* 8% tax */}
-  <div className="flex justify-between text-sm">
-    <span>Sales tax (8%):</span>
-    <span>${taxAmount.toFixed(2)}</span>
-  </div>
+            {/* 8% tax */}
+            <div className="flex justify-between text-sm">
+              <span>Sales tax (8%):</span>
+              <span>${taxAmount.toFixed(2)}</span>
+            </div>
 
-  {/* $2 fee */}
-  <div className="flex justify-between text-sm">
-    <span>Online booking fee:</span>
-    <span>${ONLINE_FEE.toFixed(2)}</span>
-  </div>
+            {/* $2 fee */}
+            <div className="flex justify-between text-sm">
+              <span>Online booking fee:</span>
+              <span>${ONLINE_FEE.toFixed(2)}</span>
+            </div>
 
-  {/* Final total */}
-  <div className="flex justify-between text-xl font-semibold pt-2">
-    <span>Total:</span>
-    <span>${finalTotal.toFixed(2)}</span>
-  </div>
-</div>
+            {/* Final total */}
+            <div className="flex justify-between text-xl font-semibold pt-2">
+              <span>Total:</span>
+              <span>${finalTotal.toFixed(2)}</span>
+            </div>
+          </div>
 
         </div>
 
@@ -693,8 +691,8 @@ function BookingConfirmation({
                         {card.lastFour
                           ? `ending in ${card.lastFour}`
                           : card.cardNumber
-                          ? `ending in ${card.cardNumber.slice(-4)}`
-                          : ''}
+                            ? `ending in ${card.cardNumber.slice(-4)}`
+                            : ''}
                       </div>
                       <div className="">
                         Expires {card.expMonth}/{card.expYear}
@@ -763,109 +761,109 @@ export default function BookingPage({
   const [seatIdOffset, setSeatIdOffset] = useState<number>(0);
 
   useEffect(() => {
-  if (!currentUser) {
-    router.push('/login');
-    return;
-  }
-
-  const fetchData = async () => {
-    const resolvedParams = await params;
-    const resolvedSearchParams = await searchParams;
-
-    // 1) Fetch the movie
-    const res = await fetch(`/api/movies/${resolvedParams.id}`);
-    if (!res.ok) {
-      notFound();
-    }
-    const movieData = await res.json();
-    setMovie(movieData);
-
-    // 2) Decide which showtime string we are using
-    const selectedShowtime: string =
-      resolvedSearchParams.showtime ||
-      movieData.showtimes?.[0]?.showtime ||
-      '';
-
-    setCurrentShowtime(selectedShowtime);
-
-    // 3) Find the screening for this showtime
-    const matchingScreening = movieData.showtimes?.find(
-      (st: any) => st.showtime === selectedShowtime
-    );
-
-    if (!matchingScreening) {
-      console.warn('No matching screening for showtime', selectedShowtime);
+    if (!currentUser) {
+      router.push('/login');
       return;
     }
 
-    // use screening id for occupied seats (what you already do)
-    const screeningIdLocal: number = matchingScreening.id;
-    setScreeningId(screeningIdLocal);
+    const fetchData = async () => {
+      const resolvedParams = await params;
+      const resolvedSearchParams = await searchParams;
 
-    // 4) Get the auditorium id from the screening
-    // Adjust these two lines depending on your actual JSON shape:
-    const screeningAuditoriumId: number | undefined =
-      matchingScreening.auditorium?.id ?? matchingScreening.auditoriumId;
+      // 1) Fetch the movie
+      const res = await fetch(`/api/movies/${resolvedParams.id}`);
+      if (!res.ok) {
+        notFound();
+      }
+      const movieData = await res.json();
+      setMovie(movieData);
 
-    if (!screeningAuditoriumId) {
-      console.warn('Screening has no auditorium id:', matchingScreening);
-      return;
-    }
+      // 2) Decide which showtime string we are using
+      const selectedShowtime: string =
+        resolvedSearchParams.showtime ||
+        movieData.showtimes?.[0]?.showtime ||
+        '';
 
-    // 5) Fetch auditoriums
-    const audRes = await fetch('/api/showrooms');
-    if (!audRes.ok) {
-      console.error('Failed to fetch showrooms');
-      return;
-    }
-    const auditoriums = await audRes.json();
+      setCurrentShowtime(selectedShowtime);
 
-    // 6) Find the auditorium by its id (NOT by showtime anymore)
-    const matchingAuditorium = auditoriums.find(
-      (aud: any) => aud.id === screeningAuditoriumId
-    );
-
-    if (!matchingAuditorium) {
-      console.warn(
-        'No matching auditorium for id',
-        screeningAuditoriumId,
-        'available auditoriums:',
-        auditoriums
+      // 3) Find the screening for this showtime
+      const matchingScreening = movieData.showtimes?.find(
+        (st: any) => st.showtime === selectedShowtime
       );
-      return;
-    }
 
-    setAuditoriumId(matchingAuditorium.id);
+      if (!matchingScreening) {
+        console.warn('No matching screening for showtime', selectedShowtime);
+        return;
+      }
 
-// 7) Use its rows/columns to size the seat map
-const rowCount: number = matchingAuditorium.rows ?? 10;
-const colCount: number = matchingAuditorium.columns ?? 10;
+      // use screening id for occupied seats (what you already do)
+      const screeningIdLocal: number = matchingScreening.id;
+      setScreeningId(screeningIdLocal);
 
-// --- NEW: compute offset based on auditoriums before this one ---
-let offset = 0;
-for (const aud of auditoriums) {
-  if (aud.id === matchingAuditorium.id) break;
-  const r = aud.rows ?? 10;
-  const c = aud.columns ?? 10;
-  offset += r * c;
-}
-setSeatIdOffset(offset);
-// For your example:
-// - aud1: offset = 0          -> seat IDs 1..150
-// - aud2: offset = 150        -> seat IDs 151..250
-// - aud3: offset = 150+100=250 -> seat IDs 251..300
-// ---------------------------------------------------------------
+      // 4) Get the auditorium id from the screening
+      // Adjust these two lines depending on your actual JSON shape:
+      const screeningAuditoriumId: number | undefined =
+        matchingScreening.auditorium?.id ?? matchingScreening.auditoriumId;
 
-    const rowLabels = Array.from({ length: rowCount }, (_, i) =>
-      String.fromCharCode('A'.charCodeAt(0) + i)
-    );
+      if (!screeningAuditoriumId) {
+        console.warn('Screening has no auditorium id:', matchingScreening);
+        return;
+      }
 
-    setRows(rowLabels);
-    setSeatsPerRow(colCount);
-  };
+      // 5) Fetch auditoriums
+      const audRes = await fetch('/api/showrooms');
+      if (!audRes.ok) {
+        console.error('Failed to fetch showrooms');
+        return;
+      }
+      const auditoriums = await audRes.json();
 
-  fetchData();
-}, [params, searchParams, currentUser, router]);
+      // 6) Find the auditorium by its id (NOT by showtime anymore)
+      const matchingAuditorium = auditoriums.find(
+        (aud: any) => aud.id === screeningAuditoriumId
+      );
+
+      if (!matchingAuditorium) {
+        console.warn(
+          'No matching auditorium for id',
+          screeningAuditoriumId,
+          'available auditoriums:',
+          auditoriums
+        );
+        return;
+      }
+
+      setAuditoriumId(matchingAuditorium.id);
+
+      // 7) Use its rows/columns to size the seat map
+      const rowCount: number = matchingAuditorium.rows ?? 10;
+      const colCount: number = matchingAuditorium.columns ?? 10;
+
+      // --- NEW: compute offset based on auditoriums before this one ---
+      let offset = 0;
+      for (const aud of auditoriums) {
+        if (aud.id === matchingAuditorium.id) break;
+        const r = aud.rows ?? 10;
+        const c = aud.columns ?? 10;
+        offset += r * c;
+      }
+      setSeatIdOffset(offset);
+      // For your example:
+      // - aud1: offset = 0          -> seat IDs 1..150
+      // - aud2: offset = 150        -> seat IDs 151..250
+      // - aud3: offset = 150+100=250 -> seat IDs 251..300
+      // ---------------------------------------------------------------
+
+      const rowLabels = Array.from({ length: rowCount }, (_, i) =>
+        String.fromCharCode('A'.charCodeAt(0) + i)
+      );
+
+      setRows(rowLabels);
+      setSeatsPerRow(colCount);
+    };
+
+    fetchData();
+  }, [params, searchParams, currentUser, router]);
 
 
   // While redirecting / not logged in, don't show booking UI

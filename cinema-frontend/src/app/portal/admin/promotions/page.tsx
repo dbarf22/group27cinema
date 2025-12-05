@@ -1,12 +1,12 @@
 "use client";
-import {useEffect, useMemo, useState, FormEvent} from "react";
+import { useEffect, useMemo, useState, FormEvent } from "react";
 
 type CreateErrors = {
-    code?: string;
-    discount?: string;
-    start?: string;
-    end?: string;
-    description?: string;
+  code?: string;
+  discount?: string;
+  start?: string;
+  end?: string;
+  description?: string;
 };
 
 type PromotionOption = {
@@ -19,30 +19,30 @@ type PromotionOption = {
 };
 
 export default function ManagePromotionsPage() {
-    const [createOpen, setCreateOpen] = useState(true);
-    const [emailOpen, setEmailOpen] = useState(false);
+  const [createOpen, setCreateOpen] = useState(true);
+  const [emailOpen, setEmailOpen] = useState(false);
 
-    const [promo, setPromo] = useState({
-        code: "",
-        discount: "",
-        start: "",
-        end: "",
-        description: "",
-    });
-    const [errs, setErrs] = useState<CreateErrors>({});
-    const [promoIsSubmitting, setPromoIsSubmitting] = useState(false);
-    const [promoSuccessMessage, setPromoSuccessMessage] = useState("");
+  const [promo, setPromo] = useState({
+    code: "",
+    discount: "",
+    start: "",
+    end: "",
+    description: "",
+  });
+  const [errs, setErrs] = useState<CreateErrors>({});
+  const [promoIsSubmitting, setPromoIsSubmitting] = useState(false);
+  const [promoSuccessMessage, setPromoSuccessMessage] = useState("");
 
-    const [emailForm, setEmailForm] = useState({
-        subject: "",
-        message: "",
-        promoCode: "",
-    });
+  const [emailForm, setEmailForm] = useState({
+    subject: "",
+    message: "",
+    promoCode: "",
+  });
 
-    const [promotions, setPromotions] = useState<PromotionOption[]>([]);
-    const [promosLoading, setPromosLoading] = useState(false);
+  const [promotions, setPromotions] = useState<PromotionOption[]>([]);
+  const [promosLoading, setPromosLoading] = useState(false);
 
-    useEffect(() => {
+  useEffect(() => {
     const fetchPromos = async () => {
       try {
         setPromosLoading(true);
@@ -63,286 +63,280 @@ export default function ManagePromotionsPage() {
     fetchPromos();
   }, []);
 
-    // Simple enable/disable check for the button
-    const isCreateValid = useMemo(() => {
-        const d = Number(promo.discount);
-        if (!promo.code.trim()) return false;
-        if (promo.discount.trim() === "" || Number.isNaN(d) || d < 0 || d > 100)
-            return false;
-        if (!promo.start || !promo.end) return false;
-        if (promo.start && promo.end && new Date(promo.start) > new Date(promo.end))
-            return false;
-        if (!promo.description.trim()) return false;
-        return true;
-    }, [promo]);
+  // Simple enable/disable check for the button
+  const isCreateValid = useMemo(() => {
+    const d = Number(promo.discount);
+    if (!promo.code.trim()) return false;
+    if (promo.discount.trim() === "" || Number.isNaN(d) || d < 0 || d > 100)
+      return false;
+    if (!promo.start || !promo.end) return false;
+    if (promo.start && promo.end && new Date(promo.start) > new Date(promo.end))
+      return false;
+    if (!promo.description.trim()) return false;
+    return true;
+  }, [promo]);
 
-    // --- PROMOTIONS VALIDATION ---
-    const validateCreate = () => {
-        const next: CreateErrors = {};
+  // --- PROMOTIONS VALIDATION ---
+  const validateCreate = () => {
+    const next: CreateErrors = {};
 
-        if (!promo.code.trim()) next.code = "Code required.";
-        if (!promo.discount.trim()) next.discount = "Discount required.";
-        if (!promo.start) next.start = "Start date required.";
-        if (!promo.end) next.end = "End date required.";
-        if (new Date(promo.start) > new Date(promo.end))
-            next.end = "End date must be after start date.";
-        if (!promo.description.trim()) next.description = "Description required.";
+    if (!promo.code.trim()) next.code = "Code required.";
+    if (!promo.discount.trim()) next.discount = "Discount required.";
+    if (!promo.start) next.start = "Start date required.";
+    if (!promo.end) next.end = "End date required.";
+    if (new Date(promo.start) > new Date(promo.end))
+      next.end = "End date must be after start date.";
+    if (!promo.description.trim()) next.description = "Description required.";
 
-        setErrs(next);
-        return Object.keys(next).length === 0;
-    };
+    setErrs(next);
+    return Object.keys(next).length === 0;
+  };
 
-    async function handlePromoSubmit(e: FormEvent<HTMLFormElement>) {
-        e.preventDefault();
+  async function handlePromoSubmit(e: FormEvent<HTMLFormElement>) {
+    e.preventDefault();
 
-        if (!validateCreate()) return;
-        if (promoIsSubmitting) return;
+    if (!validateCreate()) return;
+    if (promoIsSubmitting) return;
 
-        setPromoIsSubmitting(true);
-        setPromoSuccessMessage("");
+    setPromoIsSubmitting(true);
+    setPromoSuccessMessage("");
 
-        try {
-            const res = await fetch("/api/admin/promotions/create", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                },
-                body: JSON.stringify({
-                    promoCode: promo.code,
-                    discount: Number(promo.discount),
-                    startDate: promo.start,
-                    endDate: promo.end,
-                    description: promo.description,
-                }),
-            });
+    try {
+      const res = await fetch("/api/admin/promotions/create", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          promoCode: promo.code,
+          discount: Number(promo.discount),
+          startDate: promo.start,
+          endDate: promo.end,
+          description: promo.description,
+        }),
+      });
 
-            if (!res.ok) throw new Error("Failed to add promotion");
+      if (!res.ok) throw new Error("Failed to add promotion");
 
-            setPromoSuccessMessage("Promotion saved successfully!");
+      setPromoSuccessMessage("Promotion saved successfully!");
 
-            // Reset promo form
-            setPromo({
-                code: "",
-                discount: "",
-                start: "",
-                end: "",
-                description: "",
-            });
-            setErrs({});
+      // Reset promo form
+      setPromo({
+        code: "",
+        discount: "",
+        start: "",
+        end: "",
+        description: "",
+      });
+      setErrs({});
 
-            setTimeout(() => setPromoSuccessMessage(""), 3000);
-        } catch (err) {
-            console.error("Error saving promotion", err);
-            setPromoSuccessMessage("Something went wrong saving the promotion.");
-            setTimeout(() => setPromoSuccessMessage(""), 3000);
-        } finally {
-            setPromoIsSubmitting(false);
-        }
+      setTimeout(() => setPromoSuccessMessage(""), 3000);
+    } catch (err) {
+      console.error("Error saving promotion", err);
+      setPromoSuccessMessage("Something went wrong saving the promotion.");
+      setTimeout(() => setPromoSuccessMessage(""), 3000);
+    } finally {
+      setPromoIsSubmitting(false);
+    }
+  }
+
+  const submitEmail = async () => {
+    if (!emailForm.subject.trim() || !emailForm.message.trim()) {
+      alert("Please fill in Subject and Message.");
+      return;
+    }
+    if (
+      emailForm.promoCode &&
+      !promotions.some((p) => p.promoCode === emailForm.promoCode)
+    ) {
+      alert("Selected promo code is not valid.");
+      return;
     }
 
-    const submitEmail = async () => {
-        if (!emailForm.subject.trim() || !emailForm.message.trim()) {
-            alert("Please fill in Subject and Message.");
-            return;
-        }
-         if (
-          emailForm.promoCode &&
-          !promotions.some((p) => p.promoCode === emailForm.promoCode)
-        ) {
-          alert("Selected promo code is not valid.");
-          return;
-        }
+    try {
+      const res = await fetch("/api/admin/promotions/send", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          subject: emailForm.subject,
+          message: emailForm.message,
+          promoCode: emailForm.promoCode || null,
+        }),
+      });
 
-        try {
-          const res = await fetch("/api/admin/promotions/send", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-              subject: emailForm.subject,
-              message: emailForm.message,
-              promoCode: emailForm.promoCode || null,
-            }),
-          });
+      const text = await res.text();
 
-          const text = await res.text();
+      if (!res.ok) {
+        alert(`Failed to send promotion emails: ${text || "Unknown error"}`);
+        return;
+      }
 
-          if (!res.ok) {
-          alert(`Failed to send promotion emails: ${text || "Unknown error"}`);
-          return;
-          }
+      alert(text || "Promotion emails sent successfully.");
 
-          alert(text || "Promotion emails sent successfully.");
+      setEmailForm({ subject: "", message: "", promoCode: "" });
+    } catch (err) {
+      console.error("Error sending promotion emails", err);
+      alert("An error occurred while sending promotion emails.");
+    }
+  };
 
-          setEmailForm({ subject: "", message: "", promoCode: "" });
-        } catch (err) {
-          console.error("Error sending promotion emails", err);
-         alert("An error occurred while sending promotion emails.");
-        }
-      };
+  return (
+    <div>
+      <div className="mx-auto max-w-4xl space-y-6">
+        <div className="flex items-center justify-between">
+          <div className="space-y-1">
+            <h1 className="text-3xl font-bold ">Manage Promotions</h1>
+            <p>
+              Create promotions and email them to subscribed users.
+            </p>
+          </div>
 
-    return (
-        <div>
-            <div className="mx-auto max-w-4xl space-y-6">
-                <div className="flex items-center justify-between">
-                    <div className="space-y-1">
-                        <h1 className="text-3xl font-bold ">Manage Promotions</h1>
-                        <p>
-                            Create promotions and email them to subscribed users.
-                        </p>
-                    </div>
+          <a
+            href="/portal"
+            className="inline-flex items-center gap-2 px-4 py-2 btn-neutral font-semibold btn"
+          >
+            ← Back to Admin
+          </a>
+        </div>
 
-                    <a
-                        href="/portal"
-                        className="inline-flex items-center gap-2 px-4 py-2 btn-neutral font-semibold btn"
-                    >
-                        ← Back to Admin
-                    </a>
+        {/* CREATE PROMOTION */}
+        <div className="collapse collapse-open border border-base-300 bg-base-100 p-6 shadow-sm">
+          <form onSubmit={handlePromoSubmit} className="grid gap-6">
+            <div>
+              <input
+                className={`mt-1 w-full input p-2 ${errs.code ? "border-error" : ""
+                  }`}
+                value={promo.code}
+                onChange={(e) =>
+                  setPromo((p) => ({
+                    ...p,
+                    code: e.target.value.toUpperCase(),
+                  }))
+                }
+                placeholder="Promo Code"
+              />
+              {errs.code && (
+                <p className="mt-2 text-sm text-error">{errs.code}</p>
+              )}
+            </div>
+
+            <div className="max-w-xs">
+              <input
+                type="number"
+                min={0}
+                max={100}
+                className={`mt-1 w-full input p-2 ${errs.discount ? "border-error" : ""
+                  }`}
+                value={promo.discount}
+                onChange={(e) =>
+                  setPromo((p) => ({ ...p, discount: e.target.value }))
+                }
+                placeholder="Discount %"
+              />
+              {errs.discount && (
+                <p className="mt-2 text-sm text-error">
+                  {errs.discount}
+                </p>
+              )}
+            </div>
+
+            <div className="grid gap-4 md:grid-cols-2">
+              <div>
+                <label className="block text-sm">
+                  Start Date
+                </label>
+                <input
+                  type="date"
+                  className={`mt-1 w-full input p-2 ${errs.start ? "border-red-500" : ""
+                    }`}
+                  value={promo.start}
+                  onChange={(e) =>
+                    setPromo((p) => ({ ...p, start: e.target.value }))
+                  }
+                />
+                {errs.start && (
+                  <p className="mt-2 text-sm text-error">{errs.start}</p>
+                )}
+              </div>
+              <div>
+                <label className="block text-sm ">
+                  End Date
+                </label>
+                <input
+                  type="date"
+                  className={`mt-1 w-full input p-2 ${errs.end ? "border-error" : ""
+                    }`}
+                  value={promo.end}
+                  onChange={(e) =>
+                    setPromo((p) => ({ ...p, end: e.target.value }))
+                  }
+                />
+                {errs.end && (
+                  <p className="mt-2 text-sm text-error">{errs.end}</p>
+                )}
+              </div>
+            </div>
+
+            <div>
+              <textarea
+                className={`mt-1 w-full input p-2 min-h-24 ${errs.description ? "border-error" : ""
+                  }`}
+                value={promo.description}
+                onChange={(e) =>
+                  setPromo((p) => ({ ...p, description: e.target.value }))
+                }
+                placeholder="Promo description"
+              />
+              {errs.description && (
+                <p className="mt-2 text-sm text-error">
+                  {errs.description}
+                </p>
+              )}
+            </div>
+
+            {promoSuccessMessage && (
+              <div className="rounded bg-success bg-success-content px-4 py-2 text-sm">
+                {promoSuccessMessage}
+              </div>
+            )}
+
+            <button
+              type="submit"
+              disabled={!isCreateValid || promoIsSubmitting}
+              className={` px-4 py-2 font-semibold btn btn-neutral ${!isCreateValid || promoIsSubmitting
+                  ? "cursor-not-allowed"
+                  : ""
+                }`}
+            >
+              {promoIsSubmitting ? "Saving Promotion..." : "Create Promotion"}
+            </button>
+          </form>
+        </div>
+
+        {/* EMAIL PROMOTION SECTION */}
+        <div className="collapse collapse-open border border-base-300 bg-base-100 p-6 shadow-sm">
+          <div id="email-panel" className="grid-rows-[1fr]">
+            <div className="min-h-0">
+              <div className="  grid gap-6">
+                <div>
+                  <input
+                    className="mt-1 w-full input p-2"
+                    value={emailForm.subject}
+                    onChange={(e) =>
+                      setEmailForm((f) => ({ ...f, subject: e.target.value }))
+                    }
+                    placeholder="Subject line"
+                  />
                 </div>
 
-                {/* CREATE PROMOTION */}
-                <div className="collapse collapse-open border border-base-300 bg-base-100 p-6 shadow-sm">
-                    <form onSubmit={handlePromoSubmit} className="grid gap-6">
-                        <div>
-                            <input
-                                className={`mt-1 w-full input p-2 ${
-                                    errs.code ? "border-error" : ""
-                                }`}
-                                value={promo.code}
-                                onChange={(e) =>
-                                    setPromo((p) => ({
-                                        ...p,
-                                        code: e.target.value.toUpperCase(),
-                                    }))
-                                }
-                                placeholder="Promo Code"
-                            />
-                            {errs.code && (
-                                <p className="mt-2 text-sm text-error">{errs.code}</p>
-                            )}
-                        </div>
-
-                        <div className="max-w-xs">
-                            <input
-                                type="number"
-                                min={0}
-                                max={100}
-                                className={`mt-1 w-full input p-2 ${
-                                    errs.discount ? "border-error" : ""
-                                }`}
-                                value={promo.discount}
-                                onChange={(e) =>
-                                    setPromo((p) => ({...p, discount: e.target.value}))
-                                }
-                                placeholder="Discount %"
-                            />
-                            {errs.discount && (
-                                <p className="mt-2 text-sm text-error">
-                                    {errs.discount}
-                                </p>
-                            )}
-                        </div>
-
-                        <div className="grid gap-4 md:grid-cols-2">
-                            <div>
-                                <label className="block text-sm">
-                                    Start Date
-                                </label>
-                                <input
-                                    type="date"
-                                    className={`mt-1 w-full input p-2 ${
-                                        errs.start ? "border-red-500" : ""
-                                    }`}
-                                    value={promo.start}
-                                    onChange={(e) =>
-                                        setPromo((p) => ({...p, start: e.target.value}))
-                                    }
-                                />
-                                {errs.start && (
-                                    <p className="mt-2 text-sm text-error">{errs.start}</p>
-                                )}
-                            </div>
-                            <div>
-                                <label className="block text-sm ">
-                                    End Date
-                                </label>
-                                <input
-                                    type="date"
-                                    className={`mt-1 w-full input p-2 ${
-                                        errs.end ? "border-error" : ""
-                                    }`}
-                                    value={promo.end}
-                                    onChange={(e) =>
-                                        setPromo((p) => ({...p, end: e.target.value}))
-                                    }
-                                />
-                                {errs.end && (
-                                    <p className="mt-2 text-sm text-error">{errs.end}</p>
-                                )}
-                            </div>
-                        </div>
-
-                        <div>
-                    <textarea
-                        className={`mt-1 w-full input p-2 min-h-24 ${
-                            errs.description ? "border-error" : ""
-                        }`}
-                        value={promo.description}
-                        onChange={(e) =>
-                            setPromo((p) => ({...p, description: e.target.value}))
-                        }
-                        placeholder="Promo description"
-                    />
-                            {errs.description && (
-                                <p className="mt-2 text-sm text-error">
-                                    {errs.description}
-                                </p>
-                            )}
-                        </div>
-
-                        {promoSuccessMessage && (
-                            <div className="rounded bg-success bg-success-content px-4 py-2 text-sm">
-                                {promoSuccessMessage}
-                            </div>
-                        )}
-
-                        <button
-                            type="submit"
-                            disabled={!isCreateValid || promoIsSubmitting}
-                            className={` px-4 py-2 font-semibold btn btn-neutral ${
-                                !isCreateValid || promoIsSubmitting
-                                    ? "cursor-not-allowed"
-                                    : ""
-                            }`}
-                        >
-                            {promoIsSubmitting ? "Saving Promotion..." : "Create Promotion"}
-                        </button>
-                    </form>
-                </div>
-
-                {/* EMAIL PROMOTION SECTION */}
-                <div className="collapse collapse-open border border-base-300 bg-base-100 p-6 shadow-sm">
-                  <div id="email-panel" className="grid-rows-[1fr]">
-                    <div className="min-h-0">
-                      <div className="  grid gap-6">
-                         <div>
-                           <input
-                             className="mt-1 w-full input p-2"
-                              value={emailForm.subject}
-                              onChange={(e) =>
-                                setEmailForm((f) => ({...f, subject: e.target.value}))
-                              }
-                              placeholder="Subject line"
-                            />
-                          </div>
-                                
                 <div>
                   <textarea
-                      className="mt-1 w-full input p-2 min-h-28"
-                      value={emailForm.message}
-                      onChange={(e) =>
-                          setEmailForm((f) => ({...f, message: e.target.value}))
-                      }
-                      placeholder="Write your promotional email message here…"
+                    className="mt-1 w-full input p-2 min-h-28"
+                    value={emailForm.message}
+                    onChange={(e) =>
+                      setEmailForm((f) => ({ ...f, message: e.target.value }))
+                    }
+                    placeholder="Write your promotional email message here…"
                   />
                 </div>
 
@@ -380,14 +374,13 @@ export default function ManagePromotionsPage() {
                     className="btn px-4 py-2 font-semibold "
                   >
                     Send Email
-                    </button>
-                    <button
-                      type="button"
-                      className="px-4 py-2 font-semibold btn"
-                      onClick={() =>
-                        alert(
-                        `Preview:\n\nSubject: ${emailForm.subject}\nPromo Code: ${
-                          emailForm.promoCode || "(none)"
+                  </button>
+                  <button
+                    type="button"
+                    className="px-4 py-2 font-semibold btn"
+                    onClick={() =>
+                      alert(
+                        `Preview:\n\nSubject: ${emailForm.subject}\nPromo Code: ${emailForm.promoCode || "(none)"
                         }\n\n${emailForm.message}`
                       )
                     }

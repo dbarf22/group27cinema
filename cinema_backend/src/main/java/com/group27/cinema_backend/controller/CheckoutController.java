@@ -52,7 +52,7 @@ public class CheckoutController {
         this.promotionRepository = promotionRepository;
     }
 
-    // POST /api/checkout  → create a booking + tickets
+    // POST /api/checkout
     @PostMapping
     public ResponseEntity<CheckoutResponse> checkout(@RequestBody CheckoutRequest request) {
         CheckoutResponse resp = new CheckoutResponse();
@@ -170,7 +170,6 @@ public class CheckoutController {
                 t.setTicketType("senior");
                 remainingSenior--;
             } else {
-                // Fallback – should not happen if counts match seatIds length
                 t.setPrice(BigDecimal.ZERO);
                 t.setTicketType("unknown");
             }

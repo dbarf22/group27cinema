@@ -73,10 +73,10 @@ export default function ManageMoviesPage() {
     if (title.length > MAX_TITLE)
       newErrors.title = `Title must be at most ${MAX_TITLE} characters.`;
 
-      if (!director.trim()) newErrors.director = "Director is required.";
+    if (!director.trim()) newErrors.director = "Director is required.";
 
 
-      if (!castList.trim()) newErrors.castList = "Cast list is required.";
+    if (!castList.trim()) newErrors.castList = "Cast list is required.";
     if (castList.length > MAX_CAST)
       newErrors.castList = `Cast list must be at most ${MAX_CAST} characters.`;
 
@@ -92,7 +92,7 @@ export default function ManageMoviesPage() {
     } else if (!isValidPosterURL(poster.trim())) {
       newErrors.poster =
         "Poster must be an m.media-amazon.com/images/... URL.";
-  }
+    }
 
 
     if (!trailer.trim()) {
@@ -222,290 +222,289 @@ export default function ManageMoviesPage() {
             ← Back to Admin
           </a>
         </div>
-          <div className="min-h-0">
-              <div className="px-6 py-6">
-                <form onSubmit={handleSubmit} className="space-y-5">
-                  <div>
-                    <input
-                      className="input mt-1 w-full p-2"
-                      id="title"
-                      value={title}
-                      maxLength={MAX_TITLE}
-                      onChange={(e) => {
-                        setTitle(e.target.value);
-                        setErrors((prev) => ({ ...prev, title: "" }));
-                      }}
-                      placeholder="Title"
-                    />
-                    {errors.title && (
-                      <p className="text-error text-sm mt-1">
-                        {errors.title}
-                      </p>
-                    )}
-                  </div>
+        <div className="min-h-0">
+          <div className="px-6 py-6">
+            <form onSubmit={handleSubmit} className="space-y-5">
+              <div>
+                <input
+                  className="input mt-1 w-full p-2"
+                  id="title"
+                  value={title}
+                  maxLength={MAX_TITLE}
+                  onChange={(e) => {
+                    setTitle(e.target.value);
+                    setErrors((prev) => ({ ...prev, title: "" }));
+                  }}
+                  placeholder="Title"
+                />
+                {errors.title && (
+                  <p className="text-error text-sm mt-1">
+                    {errors.title}
+                  </p>
+                )}
+              </div>
 
-                  <div>
-                    <input
-                      id={"castList"}
-                      className="input mt-1 w-full p-2"
-                      value={castList}
-                      maxLength={MAX_CAST}
-                      onChange={(e) => {
-                        setCastList(e.target.value);
-                        setErrors((prev) => ({ ...prev, castList: "" }));
-                      }}
-                      placeholder="Cast List"
-                    />
-                    {errors.castList && (
-                      <p className="text-error text-sm mt-1">
-                        {errors.castList}
-                      </p>
-                    )}
-                  </div>
+              <div>
+                <input
+                  id={"castList"}
+                  className="input mt-1 w-full p-2"
+                  value={castList}
+                  maxLength={MAX_CAST}
+                  onChange={(e) => {
+                    setCastList(e.target.value);
+                    setErrors((prev) => ({ ...prev, castList: "" }));
+                  }}
+                  placeholder="Cast List"
+                />
+                {errors.castList && (
+                  <p className="text-error text-sm mt-1">
+                    {errors.castList}
+                  </p>
+                )}
+              </div>
 
-                  <div>
-                    <input
-                      id={"director"}
-                      className="input mt-1 w-full p-2"
-                      value={director}
-                      onChange={(e) => {
-                        setDirector(e.target.value);
-                      }}
-                      placeholder="Director"
-                    />
-                      {errors.director && (
-                          <p className="text-error text-sm mt-1">
-                              {errors.director}
-                          </p>
-                      )}
-                  </div>
+              <div>
+                <input
+                  id={"director"}
+                  className="input mt-1 w-full p-2"
+                  value={director}
+                  onChange={(e) => {
+                    setDirector(e.target.value);
+                  }}
+                  placeholder="Director"
+                />
+                {errors.director && (
+                  <p className="text-error text-sm mt-1">
+                    {errors.director}
+                  </p>
+                )}
+              </div>
 
-                  <div>
-                    <input
-                      id={"producer"}
-                      className="input mt-1 w-full p-2"
-                      value={producer}
-                      maxLength={MAX_PRODUCER}
-                      onChange={(e) => {
-                        setProducer(e.target.value);
-                        setErrors((prev) => ({ ...prev, producer: "" }));
-                      }}
-                      placeholder="Producer"
-                    />
-                    {errors.producer && (
-                      <p className="text-error text-sm mt-1">
-                        {errors.producer}
-                      </p>
-                    )}
-                  </div>
+              <div>
+                <input
+                  id={"producer"}
+                  className="input mt-1 w-full p-2"
+                  value={producer}
+                  maxLength={MAX_PRODUCER}
+                  onChange={(e) => {
+                    setProducer(e.target.value);
+                    setErrors((prev) => ({ ...prev, producer: "" }));
+                  }}
+                  placeholder="Producer"
+                />
+                {errors.producer && (
+                  <p className="text-error text-sm mt-1">
+                    {errors.producer}
+                  </p>
+                )}
+              </div>
 
-                  <div>
-                    <input
-                        id={"duration"}
-                      type="number"
-                      className="input mt-1 w-full p-2"
-                      value={duration ?? ""}
-                      onChange={(e) => {
-                        const v = e.target.value;
-                        setDuration(v === "" ? null : Number(v));
-                        setErrors((prev) => ({ ...prev, duration: "" }));
-                      }}
-                      placeholder="Duration (minutes)"
-                    />
-                    {errors.duration && (
-                      <p className="text-error text-sm mt-1">
-                        {errors.duration}
-                      </p>
-                    )}
-                  </div>
+              <div>
+                <input
+                  id={"duration"}
+                  type="number"
+                  className="input mt-1 w-full p-2"
+                  value={duration ?? ""}
+                  onChange={(e) => {
+                    const v = e.target.value;
+                    setDuration(v === "" ? null : Number(v));
+                    setErrors((prev) => ({ ...prev, duration: "" }));
+                  }}
+                  placeholder="Duration (minutes)"
+                />
+                {errors.duration && (
+                  <p className="text-error text-sm mt-1">
+                    {errors.duration}
+                  </p>
+                )}
+              </div>
 
-                  <div>
-                    <input
-                      id={"reviewScore"}
-                      type="number"
-                      min="1"
-                      max="5"
-                      step="0.1"
-                      className="input mt-1 w-full p-2"
-                      value={reviewScore}
-                      onChange={(e) => {
-                        setReviewScore(e.target.value);
-                        setErrors((prev) => ({
-                          ...prev,
-                          reviewScore: "",
-                        }));
-                      }}
-                      placeholder="Review Score"
-                    />
-                    {errors.reviewScore && (
-                      <p className="text-error text-sm mt-1">
-                        {errors.reviewScore}
-                      </p>
-                    )}
-                  </div>
+              <div>
+                <input
+                  id={"reviewScore"}
+                  type="number"
+                  min="1"
+                  max="5"
+                  step="0.1"
+                  className="input mt-1 w-full p-2"
+                  value={reviewScore}
+                  onChange={(e) => {
+                    setReviewScore(e.target.value);
+                    setErrors((prev) => ({
+                      ...prev,
+                      reviewScore: "",
+                    }));
+                  }}
+                  placeholder="Review Score"
+                />
+                {errors.reviewScore && (
+                  <p className="text-error text-sm mt-1">
+                    {errors.reviewScore}
+                  </p>
+                )}
+              </div>
 
-                  <div>
-                    <select
-                      className="btn btn-neutral mt-1 w-full p-2 text-left"
-                      id={"ratingCode"}
-                      value={ratingCode}
-                      onChange={(e) => {
-                        setRatingCode(e.target.value);
-                        setErrors((prev) => ({
-                          ...prev,
-                          ratingCode: "",
-                        }));
-                      }}
+              <div>
+                <select
+                  className="btn btn-neutral mt-1 w-full p-2 text-left"
+                  id={"ratingCode"}
+                  value={ratingCode}
+                  onChange={(e) => {
+                    setRatingCode(e.target.value);
+                    setErrors((prev) => ({
+                      ...prev,
+                      ratingCode: "",
+                    }));
+                  }}
+                >
+                  <option value="">Select rating</option>
+                  <option value="1">G – General Audiences</option>
+                  <option value="2">
+                    PG – Parental Guidance Suggested
+                  </option>
+                  <option value="3">
+                    PG-13 – Parents Strongly Cautioned
+                  </option>
+                  <option value="4">R – Restricted</option>
+                  <option value="5">NC-17 – Adults Only</option>
+                  <option value="6">Unrated</option>
+                  <option value="7">Not Rated</option>
+                </select>
+
+                {errors.ratingCode && (
+                  <p className="text-error text-sm mt-1">
+                    {errors.ratingCode}
+                  </p>
+                )}
+              </div>
+
+              <div>
+                <textarea
+                  id={"description"}
+                  className="mt-1 w-full input p-2 min-h-24"
+                  value={description}
+                  maxLength={MAX_DESCRIPTION}
+                  onChange={(e) => {
+                    setDescription(e.target.value);
+                    setErrors((prev) => ({
+                      ...prev,
+                      description: "",
+                    }));
+                  }}
+                  placeholder="Description"
+                />
+                {errors.description && (
+                  <p className="text-error text-sm mt-1">
+                    {errors.description}
+                  </p>
+                )}
+                <p className="text-xs mt-1">
+                  {description.length}/{MAX_DESCRIPTION} characters
+                </p>
+              </div>
+
+              <div>
+                <input
+                  id={"poster"}
+                  className="mt-1 w-full input p-2"
+                  value={poster}
+                  onChange={(e) => {
+                    setPoster(e.target.value);
+                    setErrors((prev) => ({ ...prev, poster: "" }));
+                  }}
+                  placeholder="Poster URL"
+                />
+                {errors.poster && (
+                  <p className="text-error text-sm mt-1">
+                    {errors.poster}
+                  </p>
+                )}
+              </div>
+
+              <div>
+
+                <input
+                  id={"trailer"}
+                  className="mt-1 w-full input p-2"
+                  value={trailer}
+                  onChange={(e) => {
+                    setTrailer(e.target.value);
+                    setErrors((prev) => ({ ...prev, trailer: "" }));
+                  }}
+                  placeholder="Trailer URL"
+                />
+                {errors.trailer && (
+                  <p className="text-error text-sm mt-1">
+                    {errors.trailer}
+                  </p>
+                )}
+              </div>
+
+              <div>
+                <div className="mt-1 flex gap-2">
+                  <input
+                    id={"genre"}
+                    className="flex-1 input p-2"
+                    value={genreInput}
+                    onChange={(e) => setGenreInput(e.target.value)}
+                    placeholder="Add a genre"
+                  />
+                  <button
+                    type="button"
+                    id={"addGenre"}
+                    onClick={addGenre}
+                    className="btn btn-neutral"
+                  >
+                    Add
+                  </button>
+                </div>
+
+                {errors.genres && (
+                  <p className="text-error text-sm mt-1">
+                    {errors.genres}
+                  </p>
+                )}
+
+                <div className="mt-3 flex flex-wrap gap-2">
+                  {genres.map((g) => (
+                    <span
+                      key={g}
+                      className="flex items-center gap-2 badge px-3 py-1"
                     >
-                      <option value="">Select rating</option>
-                      <option value="1">G – General Audiences</option>
-                      <option value="2">
-                        PG – Parental Guidance Suggested
-                      </option>
-                      <option value="3">
-                        PG-13 – Parents Strongly Cautioned
-                      </option>
-                      <option value="4">R – Restricted</option>
-                      <option value="5">NC-17 – Adults Only</option>
-                      <option value="6">Unrated</option>
-                      <option value="7">Not Rated</option>
-                    </select>
-
-                    {errors.ratingCode && (
-                      <p className="text-error text-sm mt-1">
-                        {errors.ratingCode}
-                      </p>
-                    )}
-                  </div>
-
-                  <div>
-                    <textarea
-                        id={"description"}
-                      className="mt-1 w-full input p-2 min-h-24"
-                      value={description}
-                      maxLength={MAX_DESCRIPTION}
-                      onChange={(e) => {
-                        setDescription(e.target.value);
-                        setErrors((prev) => ({
-                          ...prev,
-                          description: "",
-                        }));
-                      }}
-                      placeholder="Description"
-                    />
-                    {errors.description && (
-                      <p className="text-error text-sm mt-1">
-                        {errors.description}
-                      </p>
-                    )}
-                    <p className="text-xs mt-1">
-                      {description.length}/{MAX_DESCRIPTION} characters
-                    </p>
-                  </div>
-
-                  <div>
-                    <input
-                        id={"poster"}
-                      className="mt-1 w-full input p-2"
-                      value={poster}
-                      onChange={(e) => {
-                        setPoster(e.target.value);
-                        setErrors((prev) => ({ ...prev, poster: "" }));
-                      }}
-                      placeholder="Poster URL"
-                    />
-                    {errors.poster && (
-                      <p className="text-error text-sm mt-1">
-                        {errors.poster}
-                      </p>
-                    )}
-                  </div>
-
-                  <div>
-
-                    <input
-                        id={"trailer"}
-                      className="mt-1 w-full input p-2"
-                      value={trailer}
-                      onChange={(e) => {
-                        setTrailer(e.target.value);
-                        setErrors((prev) => ({ ...prev, trailer: "" }));
-                      }}
-                      placeholder="Trailer URL"
-                    />
-                    {errors.trailer && (
-                      <p className="text-error text-sm mt-1">
-                        {errors.trailer}
-                      </p>
-                    )}
-                  </div>
-
-                  <div>
-                    <div className="mt-1 flex gap-2">
-                      <input
-                          id={"genre"}
-                        className="flex-1 input p-2"
-                        value={genreInput}
-                        onChange={(e) => setGenreInput(e.target.value)}
-                        placeholder="Add a genre"
-                      />
+                      {g}
                       <button
                         type="button"
-                        id={"addGenre"}
-                        onClick={addGenre}
-                        className="btn btn-neutral"
+                        onClick={() => removeGenre(g)}
+                        className="text-sm font-bold text-error-content"
                       >
-                        Add
+                        ×
                       </button>
-                    </div>
-
-                    {errors.genres && (
-                      <p className="text-error text-sm mt-1">
-                        {errors.genres}
-                      </p>
-                    )}
-
-                    <div className="mt-3 flex flex-wrap gap-2">
-                      {genres.map((g) => (
-                        <span
-                          key={g}
-                          className="flex items-center gap-2 badge px-3 py-1"
-                        >
-                          {g}
-                          <button
-                            type="button"
-                            onClick={() => removeGenre(g)}
-                            className="text-sm font-bold text-error-content"
-                          >
-                            ×
-                          </button>
-                        </span>
-                      ))}
-                    </div>
-                  </div>
-
-                  {successMessage && (
-                    <div className="rounded bg-green-100 text-green-800 px-4 py-2 text-sm mb-2" id={"successMessage"}>
-                      {successMessage}
-                    </div>
-                  )}
-
-                  <button
-                    type="submit"
-                    id={"submitButton"}
-                    disabled={isSubmitting}
-                    className={`mt-2 w-full btn py-3 font-semibold btn-neutral  ${
-                      isSubmitting
-                        ? "bg-blue-300 cursor-not-allowed"
-                        : ""
-                    }`}
-                  >
-                    {isSubmitting ? "Saving..." : "Save Movie"}
-                  </button>
-                </form>
+                    </span>
+                  ))}
+                </div>
               </div>
-            </div>
+
+              {successMessage && (
+                <div className="rounded bg-green-100 text-green-800 px-4 py-2 text-sm mb-2" id={"successMessage"}>
+                  {successMessage}
+                </div>
+              )}
+
+              <button
+                type="submit"
+                id={"submitButton"}
+                disabled={isSubmitting}
+                className={`mt-2 w-full btn py-3 font-semibold btn-neutral  ${isSubmitting
+                  ? "bg-blue-300 cursor-not-allowed"
+                  : ""
+                  }`}
+              >
+                {isSubmitting ? "Saving..." : "Save Movie"}
+              </button>
+            </form>
           </div>
+        </div>
+      </div>
     </div>
   );
 }

@@ -1,5 +1,7 @@
 "use client";
 import {useEffect, useMemo, useState, FormEvent} from "react";
+import {useSession} from "@/app/session/SessionContext";
+import {useRouter} from "next/navigation";
 
 type CreateErrors = {
     code?: string;
@@ -21,6 +23,41 @@ type PromotionOption = {
 export default function ManagePromotionsPage() {
     const [createOpen, setCreateOpen] = useState(true);
     const [emailOpen, setEmailOpen] = useState(false);
+    const { currentUser } = useSession();
+    const router = useRouter();
+
+    const [isAuthorized, setIsAuthorized] = useState(false);
+    useEffect(() => {
+        if (currentUser === undefined) return;
+
+        if (currentUser === null) {
+            router.push('/login');
+            return;
+        }
+        async function verifyAdminAndLoad() {
+            try {
+                const res = await fetch(`/get-account-type?userKey=${currentUser!.userKey}`);
+
+                if (res.ok) {
+                    setIsAuthorized(true);
+                } else {
+                    router.push("/");
+                }
+            } catch (error) {
+                router.push("/login");
+            }
+        }
+
+        verifyAdminAndLoad();
+    }, [currentUser, router]);
+
+    if (!isAuthorized) {
+        return (
+            <div className="flex min-h-screen items-center justify-center">
+                <span className="loading loading-spinner loading-lg"></span>
+            </div>
+        );
+    }
 
     const [promo, setPromo] = useState({
         code: "",

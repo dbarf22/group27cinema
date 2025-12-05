@@ -150,7 +150,7 @@ export default function SignupForm() {
       <div className="collapse collapse-open bg-base-100 border-base-300 border mb-4 shadow-sm p-8">
         {!showVerify ? (
           <>
-            <h1 className="text-3xl text-center tracking-wide">CREATE ACCOUNT</h1>
+            <h1 className="text-3xl text-center text-semibold">CREATE ACCOUNT</h1>
             <p className="mt-1 text-center text-sm ">
               Provide your details to register
             </p>

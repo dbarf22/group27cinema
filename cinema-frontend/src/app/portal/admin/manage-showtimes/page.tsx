@@ -1,6 +1,8 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import {useSession} from "@/app/session/SessionContext";
+import {useRouter} from "next/navigation";
 
 type Movie = { id: number; title: string };
 
@@ -26,6 +28,45 @@ type ShowtimeRow = {
 };
 
 export default function ManageShowtimesPage() {
+
+    const { currentUser } = useSession();
+    const router = useRouter();
+
+    const [isAuthorized, setIsAuthorized] = useState(false);
+    useEffect(() => {
+        if (currentUser === undefined) return;
+
+        if (currentUser === null) {
+            router.push('/login');
+            return;
+        }
+        async function verifyAdminAndLoad() {
+            try {
+                const res = await fetch(`/get-account-type?userKey=${currentUser!.userKey}`);
+
+                if (res.ok) {
+                    setIsAuthorized(true);
+                    fetch("/api/movies").then((r) => r.json()).then(setMovies);
+                    refreshShowrooms();
+                } else {
+                    router.push("/");
+                }
+            } catch (error) {
+                router.push("/login");
+            }
+        }
+
+        verifyAdminAndLoad();
+    }, [currentUser, router]);
+
+    if (!isAuthorized) {
+        return (
+            <div className="flex min-h-screen items-center justify-center">
+                <span className="loading loading-spinner loading-lg"></span>
+            </div>
+        );
+    }
+
   const [movies, setMovies] = useState<Movie[]>([]);
   const [showrooms, setShowrooms] = useState<Showroom[]>([]);
   const [showtimes, setShowtimes] = useState<ShowtimeRow[]>([]);
@@ -42,6 +83,24 @@ export default function ManageShowtimesPage() {
   } | null>(null);
 
   useEffect(() => {
+      async function checkAdminStatus() {
+          try {
+              const res = await fetch(`/get-account-type?userKey=${currentUser!.userKey}`);
+
+              // Check for success status (200 OK)
+              if (res.ok) {
+                  // User is an admin, continue loading the page
+                  console.log("Admin verified!");
+              } else {
+                  // If the status is 403 Forbidden (Non-admin) or 400 Bad Request
+                  console.warn("User is not authorized, redirecting.");
+                  router.push('/');
+              }
+
+          } catch (error) {
+              router.push('/login');
+          }
+      }
     fetch("/api/movies")
       .then((res) => res.json())
       .then(setMovies)

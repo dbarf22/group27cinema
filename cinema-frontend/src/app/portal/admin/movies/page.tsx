@@ -1,5 +1,7 @@
 "use client";
 import { FormEvent, useState, useEffect } from "react";
+import {useSession} from "@/app/session/SessionContext";
+import {useRouter} from "next/navigation";
 
 const MAX_TITLE = 50;
 const MAX_CAST = 500;
@@ -65,6 +67,42 @@ export default function ManageMoviesPage() {
   const [promoSuccessMessage, setPromoSuccessMessage] = useState("");
   const [promoErrors, setPromoErrors] = useState<Record<string, string>>({});
   const [promoOpen, setPromoOpen] = useState(false);
+
+    const { currentUser } = useSession();
+    const router = useRouter();
+
+    const [isAuthorized, setIsAuthorized] = useState(false);
+    useEffect(() => {
+        if (currentUser === undefined) return;
+
+        if (currentUser === null) {
+            router.push('/login');
+            return;
+        }
+        async function verifyAdminAndLoad() {
+            try {
+                const res = await fetch(`/get-account-type?userKey=${currentUser!.userKey}`);
+
+                if (res.ok) {
+                    setIsAuthorized(true);
+                } else {
+                    router.push("/");
+                }
+            } catch (error) {
+                router.push("/login");
+            }
+        }
+
+        verifyAdminAndLoad();
+    }, [currentUser, router]);
+
+    if (!isAuthorized) {
+        return (
+            <div className="flex min-h-screen items-center justify-center">
+                <span className="loading loading-spinner loading-lg"></span>
+            </div>
+        );
+    }
 
   const validateFields = () => {
     const newErrors: Record<string, string> = {};

@@ -440,7 +440,7 @@ export default function EditProfilePage() {
                                         <input
                                             placeholder="Cardholder Name"
                                             id={"cardholder"}
-
+                                            value={c.cardholder}
                                             onChange={e => updateCard(i, 'cardholder', e.target.value)}
                                             required
                                             maxLength={19}
@@ -449,9 +449,8 @@ export default function EditProfilePage() {
                                         <input
                                             placeholder="Card number"
                                             id={"cardNumber"}
-
                                             onChange={e => updateCard(i, 'cardNumber', e.target.value)}
-                                            required
+
                                             maxLength={30}
                                             className="input"
                                         />

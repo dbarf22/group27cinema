@@ -122,7 +122,7 @@ public class CheckoutController {
                     .orElseThrow(() -> new RuntimeException("Promotion not found in DB"));
             BigDecimal discount = BigDecimal.valueOf(100 - promo.getDiscount())
                     .divide(BigDecimal.valueOf(100), 4, RoundingMode.HALF_UP);
-
+            booking.setPromotion(promo);
             ticketSubtotal = ticketSubtotal.multiply(discount);
         }
 

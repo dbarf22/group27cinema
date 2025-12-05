@@ -76,10 +76,10 @@ function TicketSelection({
 
   return (
     <div className="space-y-6">
-      <div className="bg-white rounded-lg border p-6">
+      <div className="card bg-base-100 shadow-lg rounded-lg card-border border-base shadow-sm p-6">
         <h2 className="text-2xl font-bold mb-4">Select Tickets</h2>
 
-        <div className="mb-6 bg-gray-50 rounded-lg p-4">
+        <div className="mb-6 card bg-base-200 card-border border-bg-base-300 p-4">
           <div className="font-semibold">{movie.title}</div>
           <div className="text-sm text-gray-600">
             Showtime: {new Date(showtime).toLocaleString()}
@@ -90,7 +90,7 @@ function TicketSelection({
           {tickets.map((ticket, index) => (
             <div
               key={ticket.id}
-              className="flex items-center gap-3 bg-gray-50 p-3 rounded"
+              className="flex flex-row card items-center gap-3 p-3"
             >
               <span className="font-semibold">Ticket {index + 1}</span>
               <select
@@ -98,7 +98,7 @@ function TicketSelection({
                 onChange={(e) =>
                   updateTicket(ticket.id, e.target.value as any)
                 }
-                className="flex-1 border rounded px-3 py-2"
+                className="btn text-left flex-1 px-3 py-2"
               >
                 {ageCategories.map((cat) => (
                   <option key={cat.id} value={cat.id}>
@@ -108,7 +108,7 @@ function TicketSelection({
               </select>
               <button
                 onClick={() => removeTicket(ticket.id)}
-                className="text-red-600 hover:text-red-800 font-semibold"
+                className="btn btn-error text-error-content  font-semibold"
               >
                 Remove
               </button>
@@ -118,7 +118,7 @@ function TicketSelection({
 
         <button
           onClick={addTicket}
-          className="w-full mb-4 bg-gray-200 text-gray-800 py-3 rounded-lg hover:bg-gray-300 transition font-semibold"
+          className="w-full mb-4 btn-neutral btn py-3 transition font-semibold"
         >
           + Add Ticket
         </button>
@@ -133,7 +133,7 @@ function TicketSelection({
         <button
           onClick={() => onContinue(tickets)}
           disabled={tickets.length === 0}
-          className="w-full bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700 transition font-semibold disabled:opacity-50 disabled:cursor-not-allowed"
+          className="w-full py-3 font-semibold btn btn-neutral"
         >
           Continue to Seat Selection ({tickets.length} ticket
           {tickets.length !== 1 ? 's' : ''})
@@ -216,27 +216,27 @@ function SeatSelection({
 
   const getSeatClass = (seatId: string) => {
     if (occupiedSeats.includes(seatId)) {
-      return 'bg-gray-400 cursor-not-allowed';
+      return 'bg-error cursor-not-allowed';
     }
     if (selectedSeats.includes(seatId)) {
-      return 'bg-blue-600 text-white';
+      return 'bg-success text-success-content';
     }
-    return 'bg-green-200 hover:bg-green-300 cursor-pointer';
+    return 'bg-neutral text-neutral-content hover:bg-success';
   };
 
   return (
     <div className="space-y-6">
       <button
         onClick={onBack}
-        className="text-blue-600 hover:underline flex items-center gap-2"
+        className="btn btn-neutral hover:underline flex items-center gap-2"
       >
         ← Back to Tickets
       </button>
 
-      <div className="bg-white rounded-lg border p-6">
+      <div className="card bg-base-100 shadow-lg card-border p-6">
         <h2 className="text-2xl font-bold mb-4">Select Seats</h2>
 
-        <div className="mb-6 bg-gray-50 rounded-lg p-4">
+        <div className="mb-6 card bg-base-200  p-4">
           <div className="font-semibold">{movie.title}</div>
           <div className="text-sm text-gray-600">
             Showtime: {new Date(showtime).toLocaleString()}
@@ -249,7 +249,7 @@ function SeatSelection({
 
         {/* Screen */}
         <div className="mb-8">
-          <div className="bg-gray-800 text-white text-center py-2 rounded-t-3xl mx-12">
+          <div className="bg-neutral text-neutral-content text-center py-2 rounded-t-3xl mx-12">
             SCREEN
           </div>
         </div>
@@ -258,7 +258,7 @@ function SeatSelection({
         <div className="mb-6 overflow-x-auto">
           <div className="inline-block min-w-full">
             {rows.map((row) => (
-              <div key={row} className="flex items-center gap-2 mb-2">
+              <div key={row} className="flex items-center justify-center gap-2 mb-2">
                 <span className="w-6 font-semibold">{row}</span>
                 {Array.from({ length: seatsPerRow }).map((_, i) => {
                   const seatNum = i + 1;
@@ -267,7 +267,7 @@ function SeatSelection({
                     <button
                       key={seatId}
                       onClick={() => toggleSeat(seatId)}
-                      className={`w-10 h-10 rounded-t-lg font-semibold text-sm transition ${getSeatClass(
+                      className={`w-10 h-10 rounded-b-lg btn font-semibold text-sm ${getSeatClass(
                         seatId
                       )}`}
                       disabled={occupiedSeats.includes(seatId)}
@@ -284,27 +284,27 @@ function SeatSelection({
         {/* Legend */}
         <div className="flex gap-6 mb-6 text-sm">
           <div className="flex items-center gap-2">
-            <div className="w-6 h-6 bg-green-200 rounded-t-lg"></div>
+            <div className="w-6 h-6 bg-neutral rounded-t-lg"></div>
             <span>Available</span>
           </div>
           <div className="flex items-center gap-2">
-            <div className="w-6 h-6 bg-blue-600 rounded-t-lg"></div>
+            <div className="w-6 h-6 bg-success rounded-t-lg"></div>
             <span>Selected</span>
           </div>
           <div className="flex items-center gap-2">
-            <div className="w-6 h-6 bg-gray-400 rounded-t-lg"></div>
+            <div className="w-6 h-6 bg-error rounded-t-lg"></div>
             <span>Occupied</span>
           </div>
         </div>
 
         {selectedSeats.length > 0 && (
-          <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-4">
+          <div className="card bg-base-200 p-4 mb-4">
             <div className="font-semibold mb-2">Selected Seats:</div>
             <div className="flex flex-wrap gap-2">
               {selectedSeats.map((seat) => (
                 <span
                   key={seat}
-                  className="bg-blue-600 text-white px-3 py-1 rounded-full text-sm"
+                  className="badge badge-lg bg-info text-info-content px-3 py-2 text-sm"
                 >
                   {seat}
                 </span>
@@ -316,7 +316,7 @@ function SeatSelection({
         <button
           onClick={() => onConfirm(selectedSeats)}
           disabled={selectedSeats.length !== tickets.length}
-          className="w-full bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700 transition font-semibold disabled:opacity-50 disabled:cursor-not-allowed"
+          className="w-full  py-3 font-semibold btn btn-neutral"
         >
           {selectedSeats.length === tickets.length
             ? 'Confirm Booking'
@@ -543,11 +543,11 @@ function BookingConfirmation({
 
   return (
     <div className="max-w-3xl mx-auto space-y-6">
-      <div className="bg-white rounded-lg border p-8">
+      <div className="card bg-base-100 card-border border-base-300 shadow-lg p-8">
         <h2 className="text-3xl font-bold mb-4 text-center">Review & Pay</h2>
 
         {/* Booking summary */}
-        <div className="bg-gray-50 rounded-lg p-6 mb-6 space-y-3">
+        <div className="card bg-base-200 shadow-md rounded-lg p-6 mb-6 space-y-3">
           <div>
             <span className="font-semibold">Movie:</span> {movie.title}
           </div>
@@ -572,13 +572,13 @@ function BookingConfirmation({
   {/* Promo discount (if any) */}
   {appliedPromo && (
     <>
-      <div className="flex justify-between text-sm text-green-700">
+      <div className="flex justify-between text-sm text-success">
         <span>
           Promo ({appliedPromo.promoCode} - {appliedPromo.discount}% off):
         </span>
         <span>- ${discountAmount.toFixed(2)}</span>
       </div>
-      <div className="flex justify-between text-xs text-gray-500">
+      <div className="flex justify-between text-xs">
         <span>{appliedPromo.description}</span>
       </div>
     </>
@@ -612,13 +612,13 @@ function BookingConfirmation({
         </div>
 
         {/* Promo code section */}
-        <div className="mb-6 border rounded-lg p-4 bg-gray-50 space-y-3">
+        <div className="card bg-base-200 mb-6 p-4 shadow-md space-y-3">
           <div className="flex justify-between items-center">
-            <h3 className="text-sm font-semibold">Have a promo code?</h3>
+            <h3 className="card-title font-semibold">Have a promo code?</h3>
             {appliedPromo && (
               <button
                 type="button"
-                className="text-xs text-red-600 hover:underline"
+                className="text-xs btn btn-error text-error-content"
                 onClick={handleClearPromo}
               >
                 Remove promo
@@ -630,23 +630,23 @@ function BookingConfirmation({
               type="text"
               value={promoCode}
               onChange={(e) => setPromoCode(e.target.value)}
-              className="flex-1 border rounded px-3 py-2 text-sm"
+              className="flex-1 input px-3 py-2 text-sm"
               placeholder="Enter promo code"
             />
             <button
               type="button"
               onClick={handleApplyPromo}
               disabled={promoChecking}
-              className="px-4 py-2 rounded bg-gray-800 text-white text-sm font-semibold disabled:opacity-50"
+              className="px-4 py-2 btn btn-neutral text-sm"
             >
               {promoChecking ? 'Checking...' : 'Apply'}
             </button>
           </div>
           {promoError && (
-            <div className="text-xs text-red-600 mt-1">{promoError}</div>
+            <div className="text-xs text-error mt-1">{promoError}</div>
           )}
           {appliedPromo && !promoError && (
-            <div className="text-xs text-green-700 mt-1">
+            <div className="text-xs text-success mt-1">
               Promo <span className="font-semibold">{appliedPromo.promoCode}</span> applied: {appliedPromo.discount}
               % off.
             </div>
@@ -665,7 +665,7 @@ function BookingConfirmation({
               <button
                 type="button"
                 onClick={handleGoToEditProfile}
-                className="w-full bg-gray-200 text-gray-800 py-3 rounded-lg hover:bg-gray-300 transition font-semibold"
+                className="w-full btn py-3 btn-neutral"
               >
                 Add Payment Method in Profile
               </button>
@@ -676,10 +676,12 @@ function BookingConfirmation({
                 {savedCards.map((card) => (
                   <label
                     key={card.id}
-                    className="flex items-center gap-3 border rounded-lg px-4 py-3 cursor-pointer hover:bg-gray-50"
+                    className="btn btn-xl btn-bg-300 shadow-lg flex
+                    text-left items-center justify-start gap-3 px-4 py-12"
                   >
                     <input
                       type="radio"
+                      className={"radio"}
                       name="savedCard"
                       value={card.id}
                       checked={selectedCardId === card.id}
@@ -694,11 +696,11 @@ function BookingConfirmation({
                           ? `ending in ${card.cardNumber.slice(-4)}`
                           : ''}
                       </div>
-                      <div className="text-gray-600">
+                      <div className="">
                         Expires {card.expMonth}/{card.expYear}
                       </div>
                       {card.billingStreet && (
-                        <div className="text-xs text-gray-500">
+                        <div className="text-xs ">
                           Billing: {card.billingStreet}
                           {card.billingCity && `, ${card.billingCity}`}
                           {card.billingState && `, ${card.billingState}`}{' '}
@@ -713,7 +715,7 @@ function BookingConfirmation({
               <button
                 type="button"
                 onClick={handleGoToEditProfile}
-                className="w-full mt-2 border border-gray-300 text-gray-800 py-2 rounded-lg hover:bg-gray-50 text-sm"
+                className="w-full mt-2  py-2 btn btn-bg-base-300"
               >
                 Manage Payment Methods in Profile
               </button>
@@ -721,7 +723,7 @@ function BookingConfirmation({
               <button
                 type="submit"
                 disabled={isPaying || !selectedCardId}
-                className="mt-4 w-full bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700 transition font-semibold disabled:opacity-50 disabled:cursor-not-allowed"
+                className="mt-4 w-full py-3 btn btn-success  font-semibold"
               >
                 {isPaying ? 'Processing...' : 'Complete Payment'}
               </button>

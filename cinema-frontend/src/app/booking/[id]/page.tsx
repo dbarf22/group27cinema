@@ -332,78 +332,68 @@ function BookingConfirmation({
   showtime,
   tickets,
   seats,
-  savedCard,
+  savedCards,
   onNewBooking,
   screeningId,
   auditoriumId,
   rows,
   seatsPerRow,
   userId,
-  seatIdOffset,
+  seatIdOffset = 0,   // if you added offsets earlier; default 0 so it's safe
 }: {
   movie: Movie;
   showtime: string;
   tickets: Ticket[];
   seats: string[];
-  savedCard: Card | null;
+  savedCards: Card[];     // ⬅️ now we take ALL cards, not just one
   onNewBooking: () => void;
   screeningId: number;
   auditoriumId: number;
   rows: string[];
   seatsPerRow: number;
   userId: number;
-  seatIdOffset: number;
+  seatIdOffset?: number;
 }) {
+  const router = useRouter();
   const total = tickets.reduce((sum, t) => sum + t.price, 0);
 
-  const [cardholderName, setCardholderName] = useState<string>('');
-  const [cardNumber, setCardNumber] = useState<string>(
-    savedCard ? `**** **** **** ${savedCard.lastFour}` : ''
+  // pick first card by default if any exist
+  const [selectedCardId, setSelectedCardId] = useState<number | null>(
+    savedCards[0]?.id ?? null
   );
-  const [expMonth, setExpMonth] = useState<string>(savedCard?.expMonth ?? '');
-  const [expYear, setExpYear] = useState<string>(
-    savedCard?.expYear ? savedCard.expYear.slice(-2) : ''
-  );
-  const [cvc, setCvc] = useState<string>('');
   const [isPaying, setIsPaying] = useState(false);
 
-  // Convert labels like "A3" -> seat_id using your auditorium layout rule
+  // Convert labels like "A3" -> seat_id using your layout rule
   function labelToSeatId(label: string): number | null {
-  if (!label || label.length < 2) return null;
+    if (!label || label.length < 2) return null;
 
-  const rowChar = label[0];                 // e.g. 'A'
-  const seatNum = parseInt(label.slice(1), 10); // e.g. "6" -> 6
-  if (Number.isNaN(seatNum)) return null;
+    const rowChar = label[0]; // 'A'
+    const seatNum = parseInt(label.slice(1), 10);
+    if (Number.isNaN(seatNum)) return null;
 
-  const rowIndex = rowChar.charCodeAt(0) - 'A'.charCodeAt(0); // 0-based
+    const rowIndex = rowChar.charCodeAt(0) - 'A'.charCodeAt(0); // 0-based
+    const indexWithinAud = rowIndex * seatsPerRow + (seatNum - 1);
 
-  // Index within THIS auditorium's seating layout
-  const indexWithinAud = rowIndex * seatsPerRow + (seatNum - 1);
-
-  // Global seat_id = offset for earlier auditoriums + indexWithinAud + 1
-  // auditorium1: offset 0  -> 1..150
-  // auditorium2: offset 150 -> 151..250
-  // auditorium3: offset 250 -> 251..300
-  return seatIdOffset + indexWithinAud + 1;
-}
-
-
+    // If you’re using global seat IDs with offsets:
+    // auditorium1 offset 0 -> 1..N
+    // auditorium2 offset K -> K+1.. etc
+    return seatIdOffset + indexWithinAud + 1;
+  }
 
   const handlePayment = async (e: React.FormEvent) => {
     e.preventDefault();
-
-    if (!cardNumber || !expMonth || !expYear || !cvc) {
-      alert('Please fill in your card details to complete payment.');
-      return;
-    }
 
     if (!screeningId || !userId) {
       alert('Missing screening or user info.');
       return;
     }
 
+    if (!selectedCardId) {
+      alert('Please select a payment method.');
+      return;
+    }
+
     setIsPaying(true);
-    console.log('handlePayment called');
 
     try {
       // Convert seat labels to numeric seat IDs:
@@ -417,20 +407,14 @@ function BookingConfirmation({
         return;
       }
 
-      const adultCount = tickets.filter(
-        (t) => t.category === 'adult'
-      ).length;
-      const childCount = tickets.filter(
-        (t) => t.category === 'child'
-      ).length;
-      const seniorCount = tickets.filter(
-        (t) => t.category === 'senior'
-      ).length;
+      const adultCount = tickets.filter((t) => t.category === 'adult').length;
+      const childCount = tickets.filter((t) => t.category === 'child').length;
+      const seniorCount = tickets.filter((t) => t.category === 'senior').length;
 
       const body = {
         screeningId,
         seatIds,
-        cardID: savedCard && savedCard.id ? savedCard.id : 1, // fallback test card
+        cardID: selectedCardId,   // ⬅️ use selected saved card
         userID: userId,
         promoID: 0,
         adultTickets: adultCount,
@@ -467,7 +451,6 @@ function BookingConfirmation({
         return;
       }
 
-      // Success – go home
       onNewBooking();
     } catch (err) {
       console.error(err);
@@ -475,6 +458,10 @@ function BookingConfirmation({
     } finally {
       setIsPaying(false);
     }
+  };
+
+  const handleGoToEditProfile = () => {
+    router.push('/profile/edit');
   };
 
   return (
@@ -495,12 +482,10 @@ function BookingConfirmation({
             <span className="font-semibold">Tickets:</span> {tickets.length}
           </div>
           <div>
-            <span className="font-semibold">Seats:</span>{' '}
-            {seats.join(', ')}
+            <span className="font-semibold">Seats:</span> {seats.join(', ')}
           </div>
           <div className="border-t pt-3 text-xl">
-            <span className="font-semibold">Total:</span>{' '}
-            ${total.toFixed(2)}
+            <span className="font-semibold">Total:</span> ${total.toFixed(2)}
           </div>
         </div>
 
@@ -508,100 +493,76 @@ function BookingConfirmation({
         <form onSubmit={handlePayment} className="space-y-4">
           <h3 className="text-xl font-semibold mb-2">Payment Method</h3>
 
-          {/* Saved card display if exists */}
-          {savedCard && (
-            <div className="mb-4 rounded-lg border border-blue-200 bg-blue-50 p-4 text-sm">
-              <div className="font-semibold mb-1">Saved Card</div>
-              <div>
-                {savedCard.cardType} ending in {savedCard.lastFour}
-              </div>
-              <div>
-                Expires {savedCard.expMonth}/
-                {savedCard.expYear.slice(-2)}
-              </div>
-              <div className="mt-2 text-xs text-gray-600">
-                You can use this saved card or update the fields below.
-              </div>
+          {savedCards.length === 0 ? (
+            <div className="space-y-3">
+              <p className="text-sm text-gray-700">
+                You don&apos;t have any saved payment methods.
+              </p>
+              <button
+                type="button"
+                onClick={handleGoToEditProfile}
+                className="w-full bg-gray-200 text-gray-800 py-3 rounded-lg hover:bg-gray-300 transition font-semibold"
+              >
+                Add Payment Method in Profile
+              </button>
             </div>
+          ) : (
+            <>
+              <div className="space-y-3">
+                {savedCards.map((card) => (
+                  <label
+                    key={card.id}
+                    className="flex items-center gap-3 border rounded-lg px-4 py-3 cursor-pointer hover:bg-gray-50"
+                  >
+                    <input
+                      type="radio"
+                      name="savedCard"
+                      value={card.id}
+                      checked={selectedCardId === card.id}
+                      onChange={() => setSelectedCardId(card.id ?? null)}
+                    />
+                    <div className="text-sm">
+                      <div className="font-semibold">
+                        {card.cardType}{' '}
+                        {card.lastFour
+                          ? `ending in ${card.lastFour}`
+                          : card.cardNumber
+                          ? `ending in ${card.cardNumber.slice(-4)}`
+                          : ''}
+                      </div>
+                      <div className="text-gray-600">
+                        Expires {card.expMonth}/{card.expYear}
+                      </div>
+                      {card.billingStreet && (
+                        <div className="text-xs text-gray-500">
+                          Billing: {card.billingStreet}
+                          {card.billingCity && `, ${card.billingCity}`}
+                          {card.billingState && `, ${card.billingState}`}{' '}
+                          {card.billingZip}
+                        </div>
+                      )}
+                    </div>
+                  </label>
+                ))}
+              </div>
+
+              <button
+                type="button"
+                onClick={handleGoToEditProfile}
+                className="w-full mt-2 border border-gray-300 text-gray-800 py-2 rounded-lg hover:bg-gray-50 text-sm"
+              >
+                Manage Payment Methods in Profile
+              </button>
+
+              <button
+                type="submit"
+                disabled={isPaying || !selectedCardId}
+                className="mt-4 w-full bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700 transition font-semibold disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {isPaying ? 'Processing...' : 'Complete Payment'}
+              </button>
+            </>
           )}
-
-          {/* Cardholder Name */}
-          <div>
-            <label className="block text-sm font-medium mb-1">
-              Cardholder Name
-            </label>
-            <input
-              type="text"
-              value={cardholderName}
-              onChange={(e) => setCardholderName(e.target.value)}
-              className="w-full border rounded px-3 py-2"
-              placeholder="Name on card"
-            />
-          </div>
-
-          {/* Card Number */}
-          <div>
-            <label className="block text-sm font-medium mb-1">
-              Card Number
-            </label>
-            <input
-              type="text"
-              value={cardNumber}
-              onChange={(e) => setCardNumber(e.target.value)}
-              className="w-full border rounded px-3 py-2"
-              placeholder={
-                savedCard
-                  ? `**** **** **** ${savedCard.lastFour}`
-                  : '1234 5678 9012 3456'
-              }
-            />
-          </div>
-
-          {/* Expiration + CVC */}
-          <div className="flex gap-3">
-            <div className="flex-1">
-              <label className="block text-sm font-medium mb-1">
-                Expiration (MM/YY)
-              </label>
-              <div className="flex gap-2">
-                <input
-                  type="text"
-                  value={expMonth}
-                  onChange={(e) => setExpMonth(e.target.value)}
-                  className="w-1/2 border rounded px-3 py-2"
-                  placeholder="MM"
-                />
-                <input
-                  type="text"
-                  value={expYear}
-                  onChange={(e) => setExpYear(e.target.value)}
-                  className="w-1/2 border rounded px-3 py-2"
-                  placeholder="YY"
-                />
-              </div>
-            </div>
-
-            <div className="w-24">
-              <label className="block text-sm font-medium mb-1">
-                CVC
-              </label>
-              <input
-                type="password"
-                value={cvc}
-                onChange={(e) => setCvc(e.target.value)}
-                className="w-full border rounded px-3 py-2"
-                placeholder="CVC"
-              />
-            </div>
-          </div>
-
-          <button
-            type="submit"
-            disabled={isPaying}
-            className="mt-4 w-full bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700 transition font-semibold disabled:opacity-50 disabled:cursor-not-allowed"
-          >
-            {isPaying ? 'Processing...' : 'Complete Payment'}
-          </button>
         </form>
       </div>
     </div>
@@ -802,14 +763,13 @@ setSeatIdOffset(offset);
           showtime={currentShowtime}
           tickets={tickets}
           seats={seats}
-          savedCard={(currentUser as any)?.cards?.[0] ?? null}
+          savedCards={(currentUser as any)?.cards ?? []}
           onNewBooking={handleNewBooking}
           screeningId={screeningId}
-          auditoriumId={auditoriumId ?? 1} // fallback to 1 if somehow null
+          auditoriumId={auditoriumId ?? 1}
           rows={rows}
           seatsPerRow={seatsPerRow}
           userId={(currentUser as any)?.id}
-          seatIdOffset={seatIdOffset}
         />
       )}
     </main>

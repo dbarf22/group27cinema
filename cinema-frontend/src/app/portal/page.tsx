@@ -81,7 +81,7 @@ const PortalPage = () => {
             <div className="rounded-box border border-base-300 bg-base-100">
                 <h1 className={"card-title text-3xl py-7 justify-center"}>Your Order History</h1>
                 <div className={"card-body text-xl"}>
-                    <table className="table">
+                    <table className="table flex">
                         <thead>
                         <tr className="">
                             <th>Movie Title</th>

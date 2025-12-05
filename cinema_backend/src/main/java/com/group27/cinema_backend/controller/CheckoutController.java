@@ -5,6 +5,7 @@ import com.group27.cinema_backend.dto.CheckoutResponse;
 import com.group27.cinema_backend.model.*;
 import com.group27.cinema_backend.repository.*;
 
+import com.group27.cinema_backend.service.EmailService;
 import org.springframework.data.crossstore.ChangeSetPersister;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -13,6 +14,9 @@ import javax.management.RuntimeMBeanException;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.Instant;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -180,6 +184,20 @@ public class CheckoutController {
         resp.setBookingId(booking.getId());
         resp.setTotalPrice(booking.getTotalPrice().doubleValue());
         resp.setBookedSeatIds(request.getSeatIds());
+
+        Instant time = screening.getShowtime();
+
+        ZonedDateTime est = time.atZone(ZoneId.of("America/New_York"));
+
+        String formattedTime = est.format(DateTimeFormatter.ofPattern("hh:mm a"));
+
+        String subject = "Your Order";
+        String body = "Your order successfully went through! You bought: \n" +
+                booking.getNumberOfTickets() + " ticket(s) for " + screening.getMovie().getTitle() + " at " +
+                formattedTime + " in auditorium "
+                + screening.getAuditorium().getAuditoriumName() + "." + "\n\nFor more details, visit your Order History in the User Portal.\n\n" +
+                "Thank you!";
+        EmailService.INSTANCE.sendEmail(booking.getUser().getEmail(), subject, body);
 
         return ResponseEntity.ok(resp);
     }

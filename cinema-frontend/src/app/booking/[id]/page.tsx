@@ -896,7 +896,7 @@ setSeatIdOffset(offset);
   };
 
   const handleNewBooking = () => {
-    router.push('/');
+    router.push('/booking/success');
   };
 
   return (

@@ -451,7 +451,6 @@ export default function EditProfilePage() {
                                             id={"cardNumber"}
 
                                             onChange={e => updateCard(i, 'cardNumber', e.target.value)}
-                                            required
                                             maxLength={30}
                                             className="input"
                                         />

@@ -109,15 +109,15 @@ public class CheckoutController {
         float childPrice = request.getChildTickets() * 8;
         float seniorPrice = request.getSeniorTickets() * 9;
 
-        int discount;
+        int discount = 1;
 
-        if (request.getPromoCode().isEmpty()) {
-            discount = 1;
-        } else {
-            Promotion promo = promotionRepository.findByPromoCode(request.getPromoCode())
-                    .orElseThrow(() -> new RuntimeException("Promotion not found in DB"));
-            discount = promo.getDiscount();
-        }
+//        if (request.getPromoCode()) {
+//            discount = 1;
+//        } else {
+//            Promotion promo = promotionRepository.findByPromoCode(request.getPromoCode())
+//                    .orElseThrow(() -> new RuntimeException("Promotion not found in DB"));
+//            discount = promo.getDiscount();
+//        }
 
         float finalPrice = (adultPrice + childPrice + seniorPrice) * discount;
 

@@ -86,21 +86,43 @@ export default async function MovieDetails(
                 <section>
                     <h2 className="text-xl font-semibold mb-3">Showtimes</h2>
                     <div className="flex flex-wrap gap-2">
-                        {showtimes.map((time: string, i: number) => (
-                            <Link
-                                key={i}
-                                href={`/booking/${movie.id}?showtime=${encodeURIComponent(time)}`}
-                                className="px-4 py-2 rounded-full text-xs font-bold btn bg-base-100"
-                            >
-                                {new Date(time).toLocaleTimeString([], {
-                                    hour: "2-digit",
-                                    minute: "2-digit",
-                                    day: "2-digit",
-                                    month: "2-digit",
-                                    year: "2-digit",
-                                })}
-                            </Link>
-                        ))}
+                        {showtimes.map((time: string, i: number) => {
+                            const showtimeDate = new Date(time);
+                            const now = new Date();
+                            const cutoffTime = new Date(showtimeDate.getTime() + 15 * 60 * 1000);
+                            const isPast = now > cutoffTime;
+
+                            return isPast ? (
+                                <button
+                                    key={i}
+                                    className="px-4 py-2 rounded-full text-xs font-bold btn bg-neutral text-neutral-content opacity-50 cursor-not-allowed"
+                                    disabled
+                                >
+                                    {showtimeDate.toLocaleTimeString([], {
+                                        hour: "2-digit",
+                                        minute: "2-digit",
+                                        day: "2-digit",
+                                        month: "2-digit",
+                                        year: "2-digit",
+                                    })}
+                                </button>
+                            ) : (
+                                <Link
+                                    key={i}
+                                    href={`/booking/${movie.id}?showtime=${encodeURIComponent(time)}`}
+                                    className="px-4 py-2 rounded-full text-xs font-bold btn bg-neutral text-neutral-content"
+                                >
+                                    {showtimeDate.toLocaleTimeString([], {
+                                        hour: "2-digit",
+                                        minute: "2-digit",
+                                        day: "2-digit",
+                                        month: "2-digit",
+                                        year: "2-digit",
+                                    })}
+                                </Link>
+                            );
+                        })}
+
                     </div>
                 </section>
             )}

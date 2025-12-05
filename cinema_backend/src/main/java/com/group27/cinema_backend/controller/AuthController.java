@@ -120,6 +120,7 @@ public class AuthController {
             LoginResponse response = new LoginResponse("Profile successfully edited.", user);
             return ResponseEntity.ok(response);
         } catch (Exception e) {
+            System.out.println(e.toString());
             return new ResponseEntity<>("There was an error trying to edit your profile.", HttpStatus.BAD_REQUEST);
         }
     }

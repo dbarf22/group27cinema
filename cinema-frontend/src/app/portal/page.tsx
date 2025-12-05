@@ -112,7 +112,7 @@ const PortalPage = () => {
                                     <td>{order.auditoriumName}</td>
                                     <td>{order.theaterName}</td>
                                     <td>
-                                        <button className="btn"
+                                        <button className="btn btn-neutral"
                                                 onClick={() =>
                                                     (document.getElementById(modalID) as HTMLDialogElement).showModal()}>Details
                                         </button>

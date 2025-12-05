@@ -26,6 +26,8 @@ type Card = {
   id?: number;
 };
 
+const TAX_RATE = 0.07; // 7% tax
+
 type Promo = {
   id: number;
   promoCode: string;
@@ -72,7 +74,10 @@ function TicketSelection({
     }
   };
 
-  const total = tickets.reduce((sum, t) => sum + t.price, 0);
+  const subtotal = tickets.reduce((sum, t) => sum + t.price, 0);
+  const taxAmount = subtotal * TAX_RATE;
+  const totalWithTax = subtotal + taxAmount;
+
 
   return (
     <div className="space-y-6">
@@ -123,12 +128,21 @@ function TicketSelection({
           + Add Ticket
         </button>
 
-        <div className="border-t pt-4 mb-4">
-          <div className="flex justify-between items-center text-xl font-bold">
-            <span>Total:</span>
-            <span>${total.toFixed(2)}</span>
-          </div>
-        </div>
+        <div className="border-t pt-4 mb-4 space-y-1">
+  <div className="flex justify-between items-center text-sm">
+    <span>Subtotal:</span>
+    <span>${subtotal.toFixed(2)}</span>
+  </div>
+  <div className="flex justify-between items-center text-sm">
+    <span>Sales Tax ({(TAX_RATE * 100).toFixed(1)}%):</span>
+    <span>${taxAmount.toFixed(2)}</span>
+  </div>
+  <div className="flex justify-between items-center text-xl font-bold pt-1">
+    <span>Total:</span>
+    <span>${totalWithTax.toFixed(2)}</span>
+  </div>
+</div>
+
 
         <button
           onClick={() => onContinue(tickets)}
@@ -443,13 +457,16 @@ function BookingConfirmation({
     setPromoError('');
   };
 
-  // compute discount & final total
-  const discountAmount =
-    appliedPromo && appliedPromo.discount
-      ? (subtotal * appliedPromo.discount) / 100
-      : 0;
+  // compute discount, tax & final total
+const discountAmount =
+  appliedPromo && appliedPromo.discount
+    ? (subtotal * appliedPromo.discount) / 100
+    : 0;
 
-  const finalTotal = Math.max(0, subtotal - discountAmount);
+const taxableSubtotal = Math.max(0, subtotal - discountAmount);
+const taxAmount = taxableSubtotal * TAX_RATE;
+const finalTotal = taxableSubtotal + taxAmount;
+
 
   const handlePayment = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -555,32 +572,41 @@ function BookingConfirmation({
           <div>
             <span className="font-semibold">Seats:</span> {seats.join(', ')}
           </div>
-
+        </div>
           {/* totals with promo */}
           <div className="border-t pt-3 space-y-1">
-            <div className="flex justify-between text-sm">
-              <span>Subtotal:</span>
-              <span>${subtotal.toFixed(2)}</span>
-            </div>
-            {appliedPromo && (
-              <>
-                <div className="flex justify-between text-sm text-green-700">
-                  <span>
-                    Promo ({appliedPromo.promoCode} - {appliedPromo.discount}% off):
-                  </span>
-                  <span>- ${discountAmount.toFixed(2)}</span>
-                </div>
-                <div className="flex justify-between text-xs text-gray-500">
-                  <span>{appliedPromo.description}</span>
-                </div>
-              </>
-            )}
-            <div className="flex justify-between text-xl font-semibold pt-2">
-              <span>Total:</span>
-              <span>${finalTotal.toFixed(2)}</span>
-            </div>
-          </div>
+  <div className="flex justify-between text-sm">
+    <span>Subtotal:</span>
+    <span>${subtotal.toFixed(2)}</span>
+  </div>
+
+  {appliedPromo && (
+    <>
+      <div className="flex justify-between text-sm text-green-700">
+        <span>
+          Promo ({appliedPromo.promoCode} - {appliedPromo.discount}% off):
+        </span>
+        <span>- ${discountAmount.toFixed(2)}</span>
+      </div>
+      {appliedPromo.description && (
+        <div className="flex justify-between text-xs text-gray-500">
+          <span>{appliedPromo.description}</span>
         </div>
+      )}
+    </>
+  )}
+
+  <div className="flex justify-between text-sm">
+    <span>Sales Tax ({(TAX_RATE * 100).toFixed(1)}%):</span>
+    <span>${taxAmount.toFixed(2)}</span>
+  </div>
+
+  <div className="flex justify-between text-xl font-semibold pt-2">
+    <span>Total:</span>
+    <span>${finalTotal.toFixed(2)}</span>
+  </div>
+</div>
+
 
         {/* Promo code section */}
         <div className="mb-6 border rounded-lg p-4 bg-gray-50 space-y-3">

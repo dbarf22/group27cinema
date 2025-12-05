@@ -26,6 +26,8 @@ type Card = {
     billingCity: string;
     billingState: string;
     billingZip: string;
+    cardholder: string;
+    cvv: string;
 };
 
 type SessionContextInfo = {

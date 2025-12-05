@@ -19,6 +19,8 @@ type Card = {
     billingCity: string;
     billingState: string;
     billingZip: string;
+    cardholder: string;
+    cvv: string;
 };
 
 const emptyCard: Card = {
@@ -30,6 +32,8 @@ const emptyCard: Card = {
     billingCity: '',
     billingState: '',
     billingZip: '',
+    cardholder: '',
+    cvv:''
 };
 
 export default function EditProfilePage() {
@@ -434,12 +438,21 @@ export default function EditProfilePage() {
                                             <option value="American Express">American Express</option>
                                         </select>
                                         <input
+                                            placeholder="Cardholder Name"
+                                            id={"cardholder"}
+
+                                            onChange={e => updateCard(i, 'cardholder', e.target.value)}
+                                            required
+                                            maxLength={19}
+                                            className="input"
+                                        />
+                                        <input
                                             placeholder="Card number"
                                             id={"cardNumber"}
 
                                             onChange={e => updateCard(i, 'cardNumber', e.target.value)}
                                             required
-                                            maxLength={19}
+                                            maxLength={30}
                                             className="input"
                                         />
                                         <input
@@ -488,6 +501,13 @@ export default function EditProfilePage() {
                                             id={"cardBillingZip"}
                                             onChange={e => updateCard(i, 'billingZip', e.target.value)}
                                             className="input"
+                                        />
+                                        <input
+                                            placeholder={"CVV"}
+                                            value={c.cvv}
+                                            id={"cvv"}
+                                            onChange={e => updateCard(i, 'cvv', e.target.value)}
+                                            className={"input"}
                                         />
                                     </div>
                                 </div>

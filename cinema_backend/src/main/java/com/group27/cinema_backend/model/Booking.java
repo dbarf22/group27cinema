@@ -31,7 +31,7 @@ public class Booking {
     @Column(name = "booking_id", nullable = false)
     private Integer id;
 
-    @JsonBackReference
+    @JsonBackReference("user-booking")
     @ManyToOne(fetch = FetchType.LAZY)
     @OnDelete(action = OnDeleteAction.CASCADE)
     @JoinColumn(name = "user_id")
@@ -46,7 +46,7 @@ public class Booking {
     @ManyToOne(fetch = FetchType.LAZY)
     @OnDelete(action = OnDeleteAction.SET_NULL)
     @JoinColumn(name = "card_id")
-    @JsonBackReference
+    @JsonBackReference("booking-card")
     private Card card;
 
     @Column(name = "number_of_tickets")

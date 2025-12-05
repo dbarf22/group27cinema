@@ -28,7 +28,7 @@ public class User {
     private Instant tokenCreatedAt;
 
     @OneToMany(mappedBy = "user")
-    @JsonManagedReference
+    @JsonManagedReference("user-booking")
     private Set<Booking> bookings = new LinkedHashSet<>();
 
     public String getUserKey() {
@@ -233,7 +233,7 @@ public class User {
     private String accountType;
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
-    @JsonManagedReference
+    @JsonManagedReference("user-cards")
     private List<Card> cards = new ArrayList<>();
 
     public Set<Booking> getBookings() {

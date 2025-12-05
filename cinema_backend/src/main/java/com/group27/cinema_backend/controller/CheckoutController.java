@@ -2,15 +2,14 @@ package com.group27.cinema_backend.controller;
 
 import com.group27.cinema_backend.dto.CheckoutRequest;
 import com.group27.cinema_backend.dto.CheckoutResponse;
-import com.group27.cinema_backend.model.Booking;
-import com.group27.cinema_backend.model.Seat;
-import com.group27.cinema_backend.model.Showtime;
-import com.group27.cinema_backend.model.Ticket;
+import com.group27.cinema_backend.model.*;
 import com.group27.cinema_backend.repository.*;
 
+import org.springframework.data.crossstore.ChangeSetPersister;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import javax.management.RuntimeMBeanException;
 import java.math.BigDecimal;
 import java.time.Instant;      
 import java.util.ArrayList;
@@ -28,6 +27,7 @@ public class CheckoutController {
     private final ShowtimeRepository showtimeRepo;
     private final CardRepository cardRepo;
     private final UserRepository userRepo;
+    private final PromotionRepository promotionRepository;
 
     public CheckoutController(
             BookingRepository bookingRepo,
@@ -35,7 +35,8 @@ public class CheckoutController {
             TicketRepository ticketRepo,
             ShowtimeRepository showtimeRepo,
             CardRepository cardRepo,
-            UserRepository userRepo
+            UserRepository userRepo,
+            PromotionRepository promotionRepository
     ) {
         this.bookingRepo = bookingRepo;
         this.seatRepo = seatRepo;
@@ -43,6 +44,7 @@ public class CheckoutController {
         this.showtimeRepo = showtimeRepo;
         this.cardRepo = cardRepo;
         this.userRepo = userRepo;
+        this.promotionRepository = promotionRepository;
     }
 
     // POST /api/checkout  → create a booking + tickets
@@ -107,7 +109,17 @@ public class CheckoutController {
         float childPrice = request.getChildTickets() * 8;
         float seniorPrice = request.getSeniorTickets() * 9;
 
-        float finalPrice = adultPrice + childPrice + seniorPrice;
+        int discount;
+
+        if (request.getPromoCode().isEmpty()) {
+            discount = 1;
+        } else {
+            Promotion promo = promotionRepository.findByPromoCode(request.getPromoCode())
+                    .orElseThrow(() -> new RuntimeException("Promotion not found in DB"));
+            discount = promo.getDiscount();
+        }
+
+        float finalPrice = (adultPrice + childPrice + seniorPrice) * discount;
 
         booking.setTotalPrice(BigDecimal.valueOf(finalPrice));
         booking.setPurchasedAt(Instant.now());
@@ -159,6 +171,13 @@ public class CheckoutController {
         resp.setBookedSeatIds(request.getSeatIds());
 
         return ResponseEntity.ok(resp);
+    }
+
+
+    @GetMapping("/discount/{code}")
+    public Promotion getDiscountInfo(@PathVariable String code) {
+        Promotion p = promotionRepository.findByPromoCode(code).orElseThrow(() -> new RuntimeException("Promotion not found."));
+        return p;
     }
 
     // GET /api/checkout/screening/{screeningId}/seats

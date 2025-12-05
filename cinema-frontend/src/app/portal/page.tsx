@@ -105,8 +105,8 @@ const PortalPage = () => {
                                     <td>{order.cardLastFour}</td>
                                     <td>{order.numberOfTickets}</td>
                                     <td>{formatLocal(order.screeningTime)}</td>
-                                    <td>{order.promotionCode}</td>
-                                    <td>{order.promotionDiscount}%</td>
+                                    <td>{order.promotionCode || "N/A"}</td>
+                                    <td>{order.promotionDiscount ? `${order.promotionDiscount}%` : "N/A"}</td>
                                     <td>${order.totalPrice}</td>
                                     <td>{formatLocal(order.purchasedAt)}</td>
                                     <td>{order.auditoriumName}</td>
@@ -129,7 +129,7 @@ const PortalPage = () => {
                                                     </thead>
                                                     <tbody>
                                                         {order.tickets?.map(ticket => (
-                                                            <tr>
+                                                            <tr key={ticket.id}>
                                                                 <td>{ticket.rowLabel}{ticket.seatNumber}</td>
                                                                 <td>{ticket.ticketType}</td>
                                                                 <td>{ticket.price}</td>

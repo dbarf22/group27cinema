@@ -14,7 +14,7 @@ public class CheckoutRequest {
 
     private int userID;
 
-    private int promoID;
+    private String promoCode;
 
     private int seniorTickets;
 
@@ -22,8 +22,8 @@ public class CheckoutRequest {
 
     private int adultTickets;
 
-    public void setPromoID(int promoID) {
-        this.promoID = promoID;
+    public void setPromoCode(String promoCode) {
+        this.promoCode = promoCode;
     }
 
     public int getSeniorTickets() {
@@ -50,12 +50,12 @@ public class CheckoutRequest {
         this.adultTickets = adultTickets;
     }
 
-    public int getPromoID() {
-        return promoID;
+    public String getPromoCode() {
+        return promoCode;
     }
 
     public void setPromoID() {
-        this.promoID = promoID;
+        this.promoCode = promoCode;
     }
 
     public int getCardID() {

@@ -11,7 +11,8 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.management.RuntimeMBeanException;
 import java.math.BigDecimal;
-import java.time.Instant;      
+import java.math.RoundingMode;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -105,23 +106,33 @@ public class CheckoutController {
         int childCount = request.getChildTickets();
         int seniorCount = request.getSeniorTickets();
 
-        float adultPrice = request.getAdultTickets() * 12;
-        float childPrice = request.getChildTickets() * 8;
-        float seniorPrice = request.getSeniorTickets() * 9;
+        BigDecimal adultPrice = BigDecimal.valueOf(adultCount).multiply(BigDecimal.valueOf(12));
+        BigDecimal childPrice = BigDecimal.valueOf(childCount).multiply(BigDecimal.valueOf(8));
+        BigDecimal seniorPrice = BigDecimal.valueOf(seniorCount).multiply(BigDecimal.valueOf(9));
 
-        int discount = 1;
+        BigDecimal ticketSubtotal = adultPrice.add(childPrice).add(seniorPrice);
 
-//        if (request.getPromoCode()) {
-//            discount = 1;
-//        } else {
-//            Promotion promo = promotionRepository.findByPromoCode(request.getPromoCode())
-//                    .orElseThrow(() -> new RuntimeException("Promotion not found in DB"));
-//            discount = promo.getDiscount();
-//        }
+        String promoCode = request.getPromoCode();
+        if (promoCode != null && !promoCode.isBlank()) {
+            Promotion promo = promotionRepository.findByPromoCode(promoCode)
+                    .orElseThrow(() -> new RuntimeException("Promotion not found in DB"));
+            BigDecimal discount = BigDecimal.valueOf(100 - promo.getDiscount())
+                    .divide(BigDecimal.valueOf(100), 4, RoundingMode.HALF_UP);
 
-        float finalPrice = (adultPrice + childPrice + seniorPrice) * discount;
+            ticketSubtotal = ticketSubtotal.multiply(discount);
+        }
 
-        booking.setTotalPrice(BigDecimal.valueOf(finalPrice));
+        BigDecimal taxRate = new BigDecimal("0.08");
+        BigDecimal taxAmount = ticketSubtotal.multiply(taxRate);
+
+        BigDecimal onlineFee = new BigDecimal("2.00");
+
+        BigDecimal finalPrice = ticketSubtotal
+            .add(taxAmount)
+            .add(onlineFee)
+            .setScale(2, RoundingMode.HALF_UP);
+
+        booking.setTotalPrice(finalPrice);
         booking.setPurchasedAt(Instant.now());
         booking = bookingRepo.save(booking);
 
@@ -167,7 +178,7 @@ public class CheckoutController {
         resp.setSuccess(true);
         resp.setMessage("Booking completed successfully");
         resp.setBookingId(booking.getId());
-        resp.setTotalPrice(booking.getTotalPrice().doubleValue());
+        resp.setTotalPrice(booking.getTotalPrice());
         resp.setBookedSeatIds(request.getSeatIds());
 
         return ResponseEntity.ok(resp);

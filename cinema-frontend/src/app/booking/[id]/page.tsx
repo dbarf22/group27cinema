@@ -363,8 +363,6 @@ function BookingConfirmation({
 }) {
   const router = useRouter();
 
-  const subtotal = tickets.reduce((sum, t) => sum + t.price, 0);
-
   // cards
   const [selectedCardId, setSelectedCardId] = useState<number | null>(
     savedCards[0]?.id ?? null
@@ -376,6 +374,22 @@ function BookingConfirmation({
   const [appliedPromo, setAppliedPromo] = useState<Promo | null>(null);
   const [promoChecking, setPromoChecking] = useState(false);
   const [promoError, setPromoError] = useState('');
+
+  const TAX_RATE = 0.08;
+  const ONLINE_FEE = 2; // $2 flat online fee
+
+  const subtotal = tickets.reduce((sum, t) => sum + t.price, 0);
+
+  const discountAmount =
+    appliedPromo && appliedPromo.discount
+      ? (subtotal * appliedPromo.discount) / 100
+      : 0;
+
+  const subtotalAfterPromo = Math.max(0, subtotal - discountAmount);
+
+  const taxAmount = subtotalAfterPromo * TAX_RATE;
+
+  const finalTotal = subtotalAfterPromo + taxAmount + ONLINE_FEE;
 
   // Convert labels like "A3" -> seat_id using your layout rule
   function labelToSeatId(label: string): number | null {
@@ -405,7 +419,7 @@ function BookingConfirmation({
     try {
       // adjust URL/path to your actual promo validation endpoint
       const resp = await fetch(
-        `http://localhost:8080/api/promotions/validate?code=${encodeURIComponent(
+        `http://localhost:8080/api/checkout/discount/${encodeURIComponent(
           trimmed
         )}`
       );
@@ -443,14 +457,6 @@ function BookingConfirmation({
     setPromoError('');
   };
 
-  // compute discount & final total
-  const discountAmount =
-    appliedPromo && appliedPromo.discount
-      ? (subtotal * appliedPromo.discount) / 100
-      : 0;
-
-  const finalTotal = Math.max(0, subtotal - discountAmount);
-
   const handlePayment = async (e: React.FormEvent) => {
     e.preventDefault();
 
@@ -487,7 +493,7 @@ function BookingConfirmation({
         seatIds,
         cardID: selectedCardId,
         userID: userId,
-        promoID: appliedPromo ? appliedPromo.id : 0, // ⬅️ send promo id if any
+        promoCode: appliedPromo ? appliedPromo.promoCode : '',
         adultTickets: adultCount,
         childTickets: childCount,
         seniorTickets: seniorCount,
@@ -556,30 +562,53 @@ function BookingConfirmation({
             <span className="font-semibold">Seats:</span> {seats.join(', ')}
           </div>
 
-          {/* totals with promo */}
           <div className="border-t pt-3 space-y-1">
-            <div className="flex justify-between text-sm">
-              <span>Subtotal:</span>
-              <span>${subtotal.toFixed(2)}</span>
-            </div>
-            {appliedPromo && (
-              <>
-                <div className="flex justify-between text-sm text-green-700">
-                  <span>
-                    Promo ({appliedPromo.promoCode} - {appliedPromo.discount}% off):
-                  </span>
-                  <span>- ${discountAmount.toFixed(2)}</span>
-                </div>
-                <div className="flex justify-between text-xs text-gray-500">
-                  <span>{appliedPromo.description}</span>
-                </div>
-              </>
-            )}
-            <div className="flex justify-between text-xl font-semibold pt-2">
-              <span>Total:</span>
-              <span>${finalTotal.toFixed(2)}</span>
-            </div>
-          </div>
+  {/* Ticket subtotal before promo */}
+  <div className="flex justify-between text-sm">
+    <span>Ticket Subtotal:</span>
+    <span>${subtotal.toFixed(2)}</span>
+  </div>
+
+  {/* Promo discount (if any) */}
+  {appliedPromo && (
+    <>
+      <div className="flex justify-between text-sm text-green-700">
+        <span>
+          Promo ({appliedPromo.promoCode} - {appliedPromo.discount}% off):
+        </span>
+        <span>- ${discountAmount.toFixed(2)}</span>
+      </div>
+      <div className="flex justify-between text-xs text-gray-500">
+        <span>{appliedPromo.description}</span>
+      </div>
+    </>
+  )}
+
+  {/* Subtotal after promo */}
+  <div className="flex justify-between text-sm">
+    <span>Subtotal after promo:</span>
+    <span>${subtotalAfterPromo.toFixed(2)}</span>
+  </div>
+
+  {/* 8% tax */}
+  <div className="flex justify-between text-sm">
+    <span>Sales tax (8%):</span>
+    <span>${taxAmount.toFixed(2)}</span>
+  </div>
+
+  {/* $2 fee */}
+  <div className="flex justify-between text-sm">
+    <span>Online booking fee:</span>
+    <span>${ONLINE_FEE.toFixed(2)}</span>
+  </div>
+
+  {/* Final total */}
+  <div className="flex justify-between text-xl font-semibold pt-2">
+    <span>Total:</span>
+    <span>${finalTotal.toFixed(2)}</span>
+  </div>
+</div>
+
         </div>
 
         {/* Promo code section */}

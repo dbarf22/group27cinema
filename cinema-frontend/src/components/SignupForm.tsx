@@ -15,6 +15,9 @@ type Card = {
   billingCity: string;
   billingState: string;
   billingZip: string;
+  cardholder: string;
+  cvv: string;
+  lastFour: string;
 };
 
 
@@ -27,6 +30,9 @@ const emptyCard: Card = {
   billingCity: "",
   billingState: "",
   billingZip: "",
+  cardholder: "",
+  cvv: "",
+  lastFour: "",
 };
 
 
@@ -41,13 +47,11 @@ export default function SignupForm() {
   const [addedInitialCard, setAddedInitialCard] = useState(false);
   const maxCards = 3;
 
-  // helper function updateCard for adding or updating information fields in a card
-  // ensures that only the selected field and card is updated and properly re-rerendered to React
   function updateCard(cardIndex: number, field: keyof Card, value: string) {
     setCards((prev) => {
-      const copy = [...prev]; // copy of previous card array state
-      copy[cardIndex] = { ...copy[cardIndex], [field]: value }; // makes new version of card with only updated field information
-      return copy; // replaces previous card state with updated info
+      const copy = [...prev]; 
+      copy[cardIndex] = { ...copy[cardIndex], [field]: value }; 
+      return copy; 
     });
   }
 
@@ -65,7 +69,7 @@ export default function SignupForm() {
       const next = !prev;
       if (next && !addedInitialCard) {
         setCards([{ ...emptyCard }]);
-        setAddedInitialCard(true); //Ensures that only the first card info form pops up when toggling show payment method
+        setAddedInitialCard(true); 
       }
       return next;
     });
@@ -316,8 +320,18 @@ export default function SignupForm() {
                                           <option value="Visa">Visa</option>
                                           <option value="MasterCard">MasterCard</option>
                                           <option value="Discover">Discover</option>
+                                          <option value="AmEx">American Express</option>
                                       </select>
                                   </div>
+                                  <div>
+                                      <input
+                                          type="text"
+                                          placeholder={"Cardholder Name"}
+                                          value={card.cardholder}
+                                          onChange={(e) => updateCard(cardIndex, "cardholder", e.target.value)}
+                                          className="w-full px-3 py-2 input"
+                                      />
+                                  </div>    
                                   <div>
                                       <input
                                           type="text"
@@ -381,6 +395,15 @@ export default function SignupForm() {
                                           className="w-full px-3 py-2 input"
                                       />
                                   </div>
+                                  <div>
+                                      <input
+                                          type="text"
+                                          placeholder={"CVV"}
+                                          value={card.cvv}
+                                          onChange={(e) => updateCard(cardIndex, "cvv", e.target.value)}
+                                          className="w-full px-3 py-2 input"
+                                      />
+                                  </div>
                               </div>
                               <div className="mt-3 flex justify-end gap-2">
                                   {cards.length > 0 && (
@@ -433,7 +456,7 @@ export default function SignupForm() {
               />
               <button
                 type="button"
-                onClick={() => router.push("/login")} //Redirect to login page after confirming
+                onClick={() => router.push("/login")} 
                 className="mt-4 w-full rounded-xl bg-black px-4 py-2.5 font-semibold text-white hover:bg-neutral-900 transition"
               >
                 Confirm

@@ -178,7 +178,7 @@ public class CheckoutController {
         resp.setSuccess(true);
         resp.setMessage("Booking completed successfully");
         resp.setBookingId(booking.getId());
-        resp.setTotalPrice(booking.getTotalPrice());
+        resp.setTotalPrice(booking.getTotalPrice().doubleValue());
         resp.setBookedSeatIds(request.getSeatIds());
 
         return ResponseEntity.ok(resp);

@@ -152,7 +152,9 @@ public class UserService {
             for (Card card : updatedUser.getCards()) {
                 int length = card.getCardNumber().length();
                 card.setLastFour(card.getCardNumber().substring(length-4));
-                card.setCardNumber(encoder.encode(card.getCardNumber()));
+                if (card.getCardNumber() != null || card.getCardNumber().isBlank()) {
+                    card.setCardNumber(encoder.encode(card.getCardNumber()));
+                }
                 card.setUser(user);
                 user.getCards().add(card);
             }

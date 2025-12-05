@@ -99,7 +99,7 @@ export default function ManageShowtimesPage() {
       const data = await res.json();
       const roomsToUse = roomsOverride ?? showrooms;
       const rows: ShowtimeRow[] = data.map((s: any) => {
-        const auditoriumId = findAuditoriumIdForShowtime(s.id, roomsToUse);
+          const auditoriumId = s.auditorium?.id ?? null;
         return {
           id: s.id,
           showtime: s.showtime ?? s.when,

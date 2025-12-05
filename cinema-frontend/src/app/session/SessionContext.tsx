@@ -28,6 +28,7 @@ type Card = {
     billingZip: string;
     cardholder: string;
     cvv: string;
+    lastFour: string;
 };
 
 type SessionContextInfo = {

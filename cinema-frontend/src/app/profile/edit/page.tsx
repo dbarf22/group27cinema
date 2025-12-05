@@ -21,6 +21,7 @@ type Card = {
     billingZip: string;
     cardholder: string;
     cvv: string;
+    lastFour: string;
 };
 
 const emptyCard: Card = {
@@ -33,7 +34,8 @@ const emptyCard: Card = {
     billingState: '',
     billingZip: '',
     cardholder: '',
-    cvv:''
+    cvv:'',
+    lastFour:''
 };
 
 export default function EditProfilePage() {
@@ -449,8 +451,9 @@ export default function EditProfilePage() {
                                         <input
                                             placeholder="Card number"
                                             id={"cardNumber"}
+                                            required
                                             onChange={e => updateCard(i, 'cardNumber', e.target.value)}
-
+                                            defaultValue={`**** **** **** ${c.lastFour}`}
                                             maxLength={30}
                                             className="input"
                                         />

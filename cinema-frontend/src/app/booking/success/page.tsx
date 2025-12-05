@@ -2,30 +2,21 @@
 import 'react-phone-number-input/style.css'
 import SignupForm from "@/components/SignupForm";
 import Link from "next/link";
-import {useSession} from '@/app/session/SessionContext';
-import {useRouter} from 'next/navigation';
-import {useEffect, useState} from "react";
+import { useSession } from '@/app/session/SessionContext';
+import { useRouter } from 'next/navigation';
+import {useEffect} from "react";
+
 
 
 export default function SignupPage() {
-    const {currentUser} = useSession();
+    const { currentUser } = useSession();
     const router = useRouter();
 
-    const [isAuthorized, setIsAuthorized] = useState(false);
-
     useEffect(() => {
-        if (currentUser) {
-            setIsAuthorized(true);
+        if (!currentUser) {
+            router.push('/login');
         }
     }, [currentUser, router])
-
-    if (!isAuthorized) {
-        return (
-            <div className="flex min-h-screen items-center justify-center">
-                <span className="loading loading-spinner loading-lg"></span>
-            </div>
-        );
-    }
 
     return (
         <div className="mx-auto mt-14 px-4 max-w-md">

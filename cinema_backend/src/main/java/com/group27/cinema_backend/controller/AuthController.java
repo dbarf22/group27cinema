@@ -73,7 +73,7 @@ public class AuthController {
             LoginResponse response = new LoginResponse("Login successful.", user);
             return ResponseEntity.ok(response);
         } catch (Exception e) {
-            return new ResponseEntity<>("There was an error logging in. Incorrect username/password.", HttpStatus.UNAUTHORIZED);
+            return new ResponseEntity<>("There was an error logging in.", HttpStatus.UNAUTHORIZED);
         }
     }
 

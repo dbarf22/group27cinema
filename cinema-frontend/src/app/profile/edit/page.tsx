@@ -72,15 +72,10 @@ export default function EditProfilePage() {
     const [showPayments, setShowPayments] = useState(false);
     const [showPassword, setShowPassword] = useState(false);
 
-    const [isAuthorized, setIsAuthorized] = useState(false);
-
-
     useEffect(() => {
         if (!currentUser) {
             router.push('/login');
             return;
-        } else {
-            setIsAuthorized(true);
         }
         setUsername(currentUser.username || '');
         setEmail(currentUser.email || '');
@@ -95,14 +90,6 @@ export default function EditProfilePage() {
         setZip(currentUser.zipCode || '')
 
     }, [currentUser, router]);
-
-    if (!isAuthorized) {
-        return (
-            <div className="flex min-h-screen items-center justify-center">
-                <span className="loading loading-spinner loading-lg"></span>
-            </div>
-        );
-    }
 
     const setError = (s: string) => setMsg({error: s, ok: ''});
     const setOk = (s: string) => setMsg({error: '', ok: s});

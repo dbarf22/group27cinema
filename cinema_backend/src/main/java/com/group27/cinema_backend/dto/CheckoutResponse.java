@@ -1,6 +1,5 @@
 package com.group27.cinema_backend.dto;
 
-import java.math.BigDecimal;
 import java.util.List;
 
 public class CheckoutResponse {
@@ -8,7 +7,7 @@ public class CheckoutResponse {
     private boolean success;
     private String message;
     private Integer bookingId;
-    private BigDecimal totalPrice;
+    private double totalPrice;
     private List<Integer> bookedSeatIds;
 
     public boolean isSuccess() {
@@ -35,11 +34,11 @@ public class CheckoutResponse {
         this.bookingId = bookingId;
     }
 
-    public BigDecimal getTotalPrice() {
+    public double getTotalPrice() {
         return totalPrice;
     }
 
-    public void setTotalPrice(BigDecimal totalPrice) {
+    public void setTotalPrice(double totalPrice) {
         this.totalPrice = totalPrice;
     }
 
